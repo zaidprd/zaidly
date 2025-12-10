@@ -1,0 +1,63 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+interface Props {
+	post: CollectionEntry<'blog' | 'guides' | 'picks'>;
+}
+
+const { post } = Astro.props;
+
+// Fungsi helper untuk menentukan label koleksi dan warna
+const getCollectionLabel = (collection: string) => {
+    switch (collection) {
+        case 'blog':
+            return { label: 'Blog Post', color: 'bg-coffee-brown' };
+        case 'guides':
+            return { label: 'Brewing Guide', color: 'bg-link-blue' };
+        case 'picks':
+            return { label: 'Best Pick', color: 'bg-accent-primary' };
+        default:
+            return { label: 'Article', color: 'bg-gray-500' };
+    }
+};
+
+const { label, color } = getCollectionLabel(post.collection);
+
+// Format tanggal
+const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+});
+---
+
+<article class="bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full">
+    <a href={`/${post.slug}`} class="block">
+        <div class="h-48 w-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
+            
+        </div>
+    </a>
+    <div class="p-6 flex flex-col flex-grow">
+        
+        {/* Label Kategori */}
+        <div class="mb-3">
+            <span class={`text-white text-xs font-semibold px-3 py-1 rounded-full ${color}`}>
+                {label}
+            </span>
+        </div>
+
+        <a href={`/${post.slug}`} class="block flex-grow">
+            <h3 class="text-xl font-bold text-coffee-dark hover:text-accent-primary transition duration-150 leading-tight mb-2">
+                {post.data.title}
+            </h3>
+        </a>
+        
+        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+            {post.data.description}
+        </p>
+        
+        <div class="mt-auto pt-3 border-t text-sm text-gray-500">
+            Published on {formattedDate}
+        </div>
+    </div>
+</article>

@@ -1,11 +1,62 @@
 ---
-import Welcome from '../components/Welcome.astro';
-import Layout from '../layouts/Layout.astro';
+// src/pages/index.astro
 
-// Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
-// Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
+// 1. Ambil Layout Utama 
+import MainLayout from '../layouts/BaseLayout.astro';
+
+// 2. Component (ROOT components/ - PATH SUDAH BENAR)
+import Hero from '../components/Hero.astro'; 
+
+// 3. Section Component (components/section/)
+import WhoIsZaidly from '../components/section/WhoIsZaidly.astro'; 
+import FeaturedCategories from '../components/section/FeaturedCategories.astro';
+import CoffeeGearHub from '../components/section/CoffeeGearHub.astro'; 
+import LatestPosts from '../components/section/LatestArticles.astro'; 
+import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
+
+// 4. Ambil data Postingan
+import { getCollection } from 'astro:content';
+
+// Ambil semua postingan dan tambahkan pengamanan || []
+const allPosts = await getCollection('blog') || []; 
+
+// Filter 8 postingan terbaru
+const latestPosts = allPosts
+    .sort((a, b) => new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime())
+    .slice(0, 8);
+
+// Filter 4 postingan dengan category: 'gear'
+const gearPosts = allPosts.filter(post => post.data.category === 'gear').slice(0, 4);
+
+// Data statis untuk Featured Categories
+const featuredCategories = [
+    { title: "Gear Guides", description: "Reviews & guides for all brewing equipment.", url: "#", icon: "ri:tools-line" },
+    { title: "Bean Types", description: "Explore origins, roasts, and flavor profiles.", url: "#", icon: "ri:seedling-line" },
+    { title: "Brew Methods", description: "Master various techniques from pour-over to espresso.", url: "#", icon: "ri:cup-line" },
+    { title: "Café Culture", description: "Stories, tips, and trends from the coffee world.", url: "#", icon: "ri:store-line" },
+];
 ---
 
-<Layout>
-	<Welcome />
-</Layout>
+<MainLayout title="Zaidly - Your Ultimate Coffee Resource">
+    
+    <Hero 
+        title="Master Your Coffee Journey" 
+        subtitle="From bean selection to brewing perfection, Zaidly is your trusted resource for everything coffee."
+        linkText="Start Exploring Guides"
+        linkUrl="/guides" 
+    />
+
+    <FeaturedCategories categories={featuredCategories} />
+
+    <WhoIsZaidly 
+        title="Who is Zaidly?" 
+        subtitle="Zaidly was founded by a team of specialty coffee lovers who believe brewing the perfect cup at home shouldn't be complicated. We cut through the noise to provide unbiased reviews, high-quality, and expert advice."
+        linkText="Read Our Story →"
+        linkUrl="/about" 
+    />
+    
+    <CoffeeGearHub posts={gearPosts || []} />
+    <CoffeeBeanGuides posts={gearPosts || []}  />
+    <LatestPosts posts={latestPosts || []} />
+
+</MainLayout>

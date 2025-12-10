@@ -1,0 +1,108 @@
+---
+interface Post {
+  slug: string;
+  data: {
+    title: string;
+    image?: string;
+  };
+}
+
+interface Props {
+  posts: Post[];
+}
+
+const { posts } = Astro.props;
+
+// Daftar link statis untuk Bean Guides
+const staticFeaturedLinks = [
+  { title: "Best Coffee Beans", url: "#", image: "/images/who-we-are.jpg" },
+  { title: "Single Origin vs Blends", url: "#", image: "/images/who-we-are.jpg" },
+  { title: "Light vs Dark Roast", url: "#", image: "/images/who-we-are.jpg" },
+  { title: "How to Store Beans", url: "#", image: "/images/who-we-are.jpg" },
+];
+---
+
+<section class="py-20 bg-white">
+  <div class="container mx-auto max-w-7xl p-0">
+
+    <!-- Card utama tanpa shadow -->
+    <div class="max-w-7xl mx-auto mb-12">
+      <div class="bg-white p-8 rounded-xl border border-transparent shadow-none drop-shadow-none">
+
+        <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
+          Coffee Bean Guides
+        </h2>
+
+        <p class="text-lg text-gray-700 mb-8">
+          The journey to the perfect cup starts with the bean. We break down the world of coffee beans, from different origins and roasts to buying tips and storage hacks.
+        </p>
+
+        <p class="font-bold text-coffee-dark mb-3 text-lg">In our coffee bean hub, you’ll learn about:</p>
+
+        <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4 mb-10">
+          <li><strong>Origins:</strong> Unique flavor profiles from Africa, the Americas, and Asia.</li>
+          <li><strong>Roasting Levels:</strong> Differences between light, medium, and dark roasts.</li>
+          <li><strong>Buying Tips:</strong> Certifications, freshness, and spotting quality beans.</li>
+          <li><strong>Storage:</strong> How to store beans to keep them fresh.</li>
+          <li><strong>Preparation:</strong> Grinding methods for optimal extraction.</li>
+        </ul>
+
+        <h3 class="text-2xl font-bold text-coffee-dark mt-8 mb-6">
+          Explore these essential bean guides:
+        </h3>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          {staticFeaturedLinks.map((link) => (
+            <a href={link.url} class="block bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
+              aria-label={link.title}
+            >
+              <img
+                src={link.image}
+                alt={link.title}
+                class="w-full h-32 object-cover"
+                style={{ aspectRatio: '4/3' }}
+              />
+              <div class="p-3 text-center">
+                <p class="text-sm font-bold text-coffee-dark hover:text-accent-primary transition duration-300">
+                  {link.title}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </div>
+    </div>
+
+    <!-- Daftar post -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      {posts.map((post) => (
+        <a href={`/${post.slug}`} class="block group relative bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1">
+
+          <img
+            src={post.data.image || '/images/default-post.jpg'}
+            alt={post.data.title}
+            class="w-full h-56 object-cover"
+            style={{ aspectRatio: '4/3' }}
+          />
+
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent p-4 flex flex-col justify-end">
+            <h3 class="text-lg font-bold text-white group-hover:text-accent-primary transition duration-300">
+              {post.data.title}
+            </h3>
+          </div>
+        </a>
+      ))}
+    </div>
+
+    <!-- Button bawah -->
+    <div class="text-center mt-12">
+      <a
+        href="/beans"
+        class="inline-block bg-accent-primary text-white font-semibold px-10 py-3 rounded-lg hover:bg-coffee-dark transition duration-300"
+      >
+        View All Bean Guides
+      </a>
+    </div>
+
+  </div>
+</section>

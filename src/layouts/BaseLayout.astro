@@ -1,0 +1,73 @@
+---
+// IMPORT CSS: Mengimpor file CSS utama Anda secara langsung. 
+// Pastikan path ini benar (misalnya, src/styles/global.css)
+import '../styles/global.css'; 
+
+// Import komponen Header dan Footer
+import Header from '../components/Header.astro';
+import Footer from '../components/Footer.astro';
+
+export interface Props {
+    title: string;
+    description?: string;
+    image?: string;
+    canonical?: string;
+}
+
+const { 
+    // GANTI DEFAULT: Mengubah nama situs dari Home Grounds ke Zaidly
+    title = "Zaidly - Your Trusted Resource For All Things Coffee", 
+    description = "Zaidly is your leading coffee website online. Our team of specialty coffee experts cover everything from gear reviews to brewing guides.",
+    
+    // GANTI PATH GAMBAR DEFAULT: Asumsikan Anda memiliki aset ini di public/images
+    image = "/images/zaidly-logo-social.png",
+    
+    canonical = Astro.url.pathname
+} = Astro.props;
+
+// VARIABEL UNTUK META TAG
+const siteName = "Zaidly";
+---
+
+<!DOCTYPE html>
+<html lang="en-US" class="min-h-screen">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="profile" href="https://gmpg.org/xfn/11">
+    
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    
+    <meta property="og:type" content="website" />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:image" content={image} />
+    <meta property="og:site_name" content={siteName} />
+    
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:site" content="@Zaidly_Coffee" /> 
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={image} />
+    
+    <link rel="icon" type="image/png" href="/images/zaidly-favicon.png" />
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    
+</head>
+<body class="flex flex-col min-h-screen antialiased">
+    
+    <Header />
+    
+    <main class="flex-grow">
+        <slot />
+    </main>
+    
+    <Footer />
+    
+</body>
+</html>

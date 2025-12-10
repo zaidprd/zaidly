@@ -1,0 +1,46 @@
+---
+import BaseLayout from './BaseLayout.astro';
+// Asumsikan frontmatter berisi data (title, pubDate, description)
+const { frontmatter } = Astro.props;
+
+// Format tanggal
+const formattedDate = frontmatter.pubDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+});
+---
+
+<BaseLayout title={frontmatter.title}>
+    <article class="max-w-4xl mx-auto py-12 px-4">
+        
+        {/* Header Artikel */}
+        <header class="mb-10 border-b pb-6">
+            <h1 class="text-5xl font-extrabold text-coffee-dark mb-4 leading-tight">
+                {frontmatter.title}
+            </h1>
+            <p class="text-xl text-gray-600 mb-4">
+                {frontmatter.description}
+            </p>
+            <time datetime={frontmatter.pubDate.toISOString()} class="text-sm text-gray-500">
+                Published: {formattedDate}
+            </time>
+        </header>
+
+        {/* Konten Markdown */}
+        <div class="prose prose-lg max-w-none prose-coffee">
+            <slot />
+        </div>
+        
+    </article>
+</BaseLayout>
+
+{/* Tambahkan gaya kustom untuk konten Markdown jika diperlukan */}
+<style is:global>
+    /* Menyesuaikan gaya 'prose' Tailwind untuk tema kopi Anda */
+    .prose-coffee {
+        --tw-prose-body: #3C2F2F; /* coffee-dark */
+        --tw-prose-headings: #6F4E37; /* coffee-brown */
+        --tw-prose-links: #B5651D; /* accent-primary */
+    }
+</style>

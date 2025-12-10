@@ -1,0 +1,46 @@
+---
+// src/components/Hero.astro
+// Ini menerima props dari index.astro
+
+interface Props {
+    title: string;
+    subtitle: string;
+    linkText: string;
+    linkUrl: string;
+}
+
+const { title, subtitle, linkText, linkUrl } = Astro.props;
+---
+
+<section class="bg-gray-100 py-20 md:py-32"> 
+    
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
+            
+            <div>
+                <img 
+                    src="/images/coffee-hero-bg.jpg" 
+                    alt="Espresso machine pulling a shot" 
+                    class="rounded-xl w-full h-auto" 
+                    loading="eager"
+                />
+            </div>
+
+            <div>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-coffee-dark mb-4 leading-tight">
+                    {title}
+                </h1>
+                <p class="text-xl text-gray-700 mb-8">
+                    {subtitle}
+                </p>
+                <a 
+                    href={linkUrl} 
+                    class="inline-block bg-accent-primary text-white font-semibold px-8 py-4 rounded-lg hover:bg-coffee-dark transition duration-300 transform hover:scale-105">
+                    {linkText}
+                </a>
+            </div>
+            
+        </div>
+    </div>
+</section>
