@@ -1,15 +1,27 @@
-<header class="bg-white border-b border-gray-200 shadow-sm">
-    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 flex justify-between items-center h-16">
-        <a href="/" class="text-2xl font-bold text-coffee-dark tracking-wide">
+<header 
+    id="main-header" 
+    class="fixed w-full top-0 z-50 
+           bg-white border-b border-gray-200 shadow-sm h-16 
+           transition-all duration-300"
+>
+    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 
+                flex justify-between items-center h-full">
+        
+        <a 
+            href="/" 
+            id="header-logo" 
+            class="text-2xl font-bold text-coffee-dark tracking-wide 
+                   transition-all duration-300"
+        >
             Zaidly
         </a>
 
         <nav class="hidden md:block">
             <ul class="flex space-x-6 text-gray-700 font-semibold">
                 <li><a href="/guides" class="hover:text-accent-primary transition">Brewing Guides</a></li>
-                <li><a href="/reviews" class="hover:text-accent-primary transition">Reviews</a></li>
                 <li><a href="/gear" class="hover:text-accent-primary transition">Gear</a></li>
                 <li><a href="/beans" class="hover:text-accent-primary transition">Beans</a></li>
+                <li><a href="/blog" class="hover:text-accent-primary transition">Blog</a></li>
             </ul>
         </nav>
 
@@ -18,3 +30,48 @@
         </button>
     </div>
 </header>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const header = document.getElementById('main-header');
+        const logo = document.getElementById('header-logo');
+        
+        // Jarak scroll (dalam piksel) untuk memicu perubahan
+        const scrollThreshold = 50; 
+
+        // Kelas untuk kondisi Awal (Initial State)
+        const initialHeaderClasses = ['bg-white', 'border-b', 'border-gray-200', 'shadow-sm', 'h-16'];
+        const initialLogoClasses = ['text-2xl'];
+
+        // Kelas untuk kondisi Scroll (Scrolled State)
+        // bg-white/95: Semi-transparan
+        // backdrop-blur-sm: Efek blur ringan
+        const scrolledHeaderClasses = ['bg-white/95', 'backdrop-blur-sm', 'shadow-lg', 'h-20'];
+        const scrolledLogoClasses = ['text-3xl']; // Logo membesar
+
+        const updateHeader = () => {
+            if (window.scrollY > scrollThreshold) {
+                // SCROLLED STATE: Tambahkan kelas scrolled, hapus kelas awal
+                header.classList.remove(...initialHeaderClasses);
+                header.classList.add(...scrolledHeaderClasses);
+                
+                logo.classList.remove(...initialLogoClasses);
+                logo.classList.add(...scrolledLogoClasses);
+
+            } else {
+                // INITIAL STATE: Tambahkan kelas awal, hapus kelas scrolled
+                header.classList.remove(...scrolledHeaderClasses);
+                header.classList.add(...initialHeaderClasses);
+                
+                logo.classList.remove(...scrolledLogoClasses);
+                logo.classList.add(...initialLogoClasses);
+            }
+        };
+
+        // Jalankan sekali saat halaman dimuat (jika pengguna me-refresh saat sudah di-scroll)
+        updateHeader();
+
+        // Jalankan saat pengguna scroll
+        window.addEventListener('scroll', updateHeader);
+    });
+</script>
