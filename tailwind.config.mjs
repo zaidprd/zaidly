@@ -1,4 +1,5 @@
 // tailwind.config.mjs
+
 /** @type {import('tailwindcss').Config} */
 export default {
     content: [
@@ -19,5 +20,8 @@ export default {
             }
         },
     },
-    plugins: [],
+    plugins: [
+        // *** SOLUSI: TAMBAHKAN PLUGIN INI ***
+        require('@tailwindcss/typography'),
+    ],
 };

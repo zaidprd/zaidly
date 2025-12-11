@@ -1,10 +1,17 @@
+---
+// Import komponen untuk Logo (jika Anda menggunakan Image atau SVG)
+// import { Image } from 'astro:assets'; 
+
+// Tidak ada frontmatter lain yang diperlukan di sini.
+---
+
 <header 
     id="main-header" 
     class="fixed w-full top-0 z-50 
-           bg-white border-b border-gray-200 shadow-sm h-16 
+           bg-white border-b border-gray-200 shadow-sm h-14 
            transition-all duration-300"
 >
-    <div class="container mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 
                 flex justify-between items-center h-full">
         
         <a 
@@ -17,7 +24,7 @@
         </a>
 
         <nav class="hidden md:block">
-            <ul class="flex space-x-6 text-gray-700 font-semibold">
+            <ul class="flex space-x-6 text-gray-700 font-semibold" id="main-nav-links">
                 <li><a href="/guides" class="hover:text-accent-primary transition">Brewing Guides</a></li>
                 <li><a href="/gear" class="hover:text-accent-primary transition">Gear</a></li>
                 <li><a href="/beans" class="hover:text-accent-primary transition">Beans</a></li>
@@ -33,42 +40,72 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
+        // Ambil elemen header dan logo
         const header = document.getElementById('main-header');
         const logo = document.getElementById('header-logo');
-        
+        const navLinksContainer = document.getElementById('main-nav-links');
+
         // Jarak scroll (dalam piksel) untuk memicu perubahan
         const scrollThreshold = 50; 
 
         // Kelas untuk kondisi Awal (Initial State)
-        const initialHeaderClasses = ['bg-white', 'border-b', 'border-gray-200', 'shadow-sm', 'h-16'];
-        const initialLogoClasses = ['text-2xl'];
+        const initialHeaderClasses = ['bg-white', 'border-b', 'border-gray-200', 'shadow-sm', 'h-14']; 
+        const initialLogoClasses = ['text-2xl', 'text-coffee-dark'];
+        const initialNavLinkClasses = ['text-gray-700'];
+        const initialNavLinkHoverClasses = ['hover:text-accent-primary'];
 
-        // Kelas untuk kondisi Scroll (Scrolled State)
-        // bg-white/95: Semi-transparan
-        // backdrop-blur-sm: Efek blur ringan
-        const scrolledHeaderClasses = ['bg-white/95', 'backdrop-blur-sm', 'shadow-lg', 'h-20'];
-        const scrolledLogoClasses = ['text-3xl']; // Logo membesar
+        // Kelas untuk kondisi Scroll (Scrolled State - Coffee Dark Semi-Transparant)
+        const scrolledHeaderClasses = ['bg-amber-950/90', 'backdrop-blur-sm', 'shadow-lg', 'h-16', 'border-b-amber-900'];
+        const scrolledLogoClasses = ['text-3xl', 'text-white']; 
+        const scrolledNavLinkClasses = ['text-white'];
+        const scrolledNavLinkHoverClasses = ['hover:text-amber-300'];
+
+        // --- Perbaikan TypeScript: Pastikan elemen ada sebelum diakses ---
+        if (!header || !logo || !navLinksContainer) {
+            console.error('Header, Logo, or Nav element not found!');
+            return; 
+        }
+
+        const navLinks = navLinksContainer.querySelectorAll('a');
 
         const updateHeader = () => {
             if (window.scrollY > scrollThreshold) {
-                // SCROLLED STATE: Tambahkan kelas scrolled, hapus kelas awal
+                // SCROLLED STATE: COFFEE GELAP + PUTIH
+                
+                // HEADER
                 header.classList.remove(...initialHeaderClasses);
                 header.classList.add(...scrolledHeaderClasses);
                 
+                // LOGO
                 logo.classList.remove(...initialLogoClasses);
                 logo.classList.add(...scrolledLogoClasses);
+                
+                // MENU NAVIGASI
+                navLinks.forEach(link => {
+                    link.classList.remove(...initialNavLinkClasses, ...initialNavLinkHoverClasses);
+                    link.classList.add(...scrolledNavLinkClasses, ...scrolledNavLinkHoverClasses);
+                });
 
             } else {
-                // INITIAL STATE: Tambahkan kelas awal, hapus kelas scrolled
+                // INITIAL STATE: PUTIH + TEKS GELAP
+                
+                // HEADER
                 header.classList.remove(...scrolledHeaderClasses);
                 header.classList.add(...initialHeaderClasses);
                 
+                // LOGO
                 logo.classList.remove(...scrolledLogoClasses);
                 logo.classList.add(...initialLogoClasses);
+
+                // MENU NAVIGASI
+                navLinks.forEach(link => {
+                    link.classList.remove(...scrolledNavLinkClasses, ...scrolledNavLinkHoverClasses);
+                    link.classList.add(...initialNavLinkClasses, ...initialNavLinkHoverClasses);
+                });
             }
         };
 
-        // Jalankan sekali saat halaman dimuat (jika pengguna me-refresh saat sudah di-scroll)
+        // Jalankan sekali saat halaman dimuat
         updateHeader();
 
         // Jalankan saat pengguna scroll

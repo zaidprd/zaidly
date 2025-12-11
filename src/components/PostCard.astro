@@ -1,63 +1,57 @@
 ---
+// Import tipe data (asumsi Anda menggunakan tipe yang sama)
 import type { CollectionEntry } from 'astro:content';
+type CombinedPost = CollectionEntry<'blog'> | CollectionEntry<'guides'> | CollectionEntry<'picks'>;
 
 interface Props {
-	post: CollectionEntry<'blog' | 'guides' | 'picks'>;
+  post: CombinedPost;
+  postType: string; // Misal: 'blog', 'guides', 'picks'
 }
 
-const { post } = Astro.props;
+const { post, postType } = Astro.props;
 
-// Fungsi helper untuk menentukan label koleksi dan warna
-const getCollectionLabel = (collection: string) => {
-    switch (collection) {
-        case 'blog':
-            return { label: 'Blog Post', color: 'bg-coffee-brown' };
-        case 'guides':
-            return { label: 'Brewing Guide', color: 'bg-link-blue' };
-        case 'picks':
-            return { label: 'Best Pick', color: 'bg-accent-primary' };
-        default:
-            return { label: 'Article', color: 'bg-gray-500' };
-    }
-};
+// Ambil data gambar (path ke /public/images/...)
+const imagePath = post.data.image; 
 
-const { label, color } = getCollectionLabel(post.collection);
-
-// Format tanggal
-const formattedDate = post.data.pubDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-});
+// Format Tanggal
+const formattedDate = post.data.pubDate 
+    ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'Date not available';
 ---
 
-<article class="bg-white border border-gray-100 rounded-lg shadow-md hover:shadow-xl transition duration-300 overflow-hidden flex flex-col h-full">
-    <a href={`/${post.slug}`} class="block">
-        <div class="h-48 w-full bg-gray-200 flex items-center justify-center text-gray-500 text-sm">
-            
-        </div>
-    </a>
-    <div class="p-6 flex flex-col flex-grow">
-        
-        {/* Label Kategori */}
-        <div class="mb-3">
-            <span class={`text-white text-xs font-semibold px-3 py-1 rounded-full ${color}`}>
-                {label}
-            </span>
-        </div>
+<a href={`/${post.slug}`} class="block overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition duration-300 bg-white">
+    
+    <div class="h-48 w-full bg-gray-100 overflow-hidden">
+        {imagePath ? (
+            <img 
+                src={imagePath} 
+                alt={post.data.title}
+                class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+            />
+        ) : (
+            // Fallback jika tidak ada gambar
+            <div class="w-full h-full flex items-center justify-center text-gray-400">
+                No Image
+            </div>
+        )}
+    </div>
 
-        <a href={`/${post.slug}`} class="block flex-grow">
-            <h3 class="text-xl font-bold text-coffee-dark hover:text-accent-primary transition duration-150 leading-tight mb-2">
-                {post.data.title}
-            </h3>
-        </a>
+    <div class="p-5">
         
-        <p class="text-gray-600 text-sm mb-4 line-clamp-3">
+        <span class="inline-block bg-coffee-dark text-white text-xs font-semibold px-3 py-1 rounded-full mb-3">
+            {postType.toUpperCase()}
+        </span>
+
+        <h3 class="text-xl font-bold text-coffee-dark mb-2 leading-tight">
+            {post.data.title}
+        </h3>
+        
+        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
             {post.data.description}
         </p>
-        
-        <div class="mt-auto pt-3 border-t text-sm text-gray-500">
+
+        <p class="text-xs text-gray-400">
             Published on {formattedDate}
-        </div>
+        </p>
     </div>
-</article>
+</a>

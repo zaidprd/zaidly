@@ -1,46 +1,123 @@
 ---
 import BaseLayout from './BaseLayout.astro';
-// Asumsikan frontmatter berisi data (title, pubDate, description)
-const { frontmatter } = Astro.props;
+import type { CollectionEntry } from 'astro:content'; 
 
-// Format tanggal
-const formattedDate = frontmatter.pubDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-});
+interface Heading {
+    depth: number; 
+    slug: string; 
+    text: string; 
+}
+
+interface CustomFrontmatter {
+    title: string; 
+    description: string;
+    pubDate: Date; 
+    author: string; 
+    image?: string; 
+    tags?: string[];
+}
+
+interface Props {
+    frontmatter: CustomFrontmatter; 
+    headings: Heading[]; 
+}
+
+const { frontmatter, headings } = Astro.props; 
+
+// Logika Tampilan
+const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
+const showSidebar = filteredHeadings.length > 0;
+
+// Format Tanggal
+const formattedDate = frontmatter.pubDate 
+    ? frontmatter.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
+    : 'Date not available';
+    
+const headerImage = frontmatter.image || '/default-header.jpg';
+
 ---
-
 <BaseLayout title={frontmatter.title}>
-    <article class="max-w-4xl mx-auto py-12 px-4">
+    <div class="flex max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         
-        {/* Header Artikel */}
-        <header class="mb-10 border-b pb-6">
-            <h1 class="text-5xl font-extrabold text-coffee-dark mb-4 leading-tight">
-                {frontmatter.title}
-            </h1>
-            <p class="text-xl text-gray-600 mb-4">
-                {frontmatter.description}
-            </p>
-            <time datetime={frontmatter.pubDate.toISOString()} class="text-sm text-gray-500">
-                Published: {formattedDate}
-            </time>
-        </header>
+        {/* Kolom Kiri: Konten Utama */}
+        <article class:list={[showSidebar ? 'lg:w-3/4 lg:pr-10' : 'w-full', 'max-w-none']}>
+            
+            {/* 1. METADATA DI ATAS JUDUL (Author | Date) */}
+            <div class="text-gray-500 text-sm flex items-center justify-between flex-wrap border-b border-gray-100 pb-3 mb-4">
+                
+                {/* Bagian Kiri: Author & Tanggal */}
+                <div class="flex items-center space-x-2">
+                    <span class="text-gray-700 font-semibold">
+                        Author: <span class="text-accent-primary hover:text-accent-primary-dark transition duration-150">{frontmatter.author}</span>
+                    </span>
+                    <span class="text-gray-400">|</span>
+                    <span class="text-gray-700 font-semibold">
+                        Last Updated: <time datetime={frontmatter.pubDate.toISOString()}>{formattedDate}</time>
+                    </span>
+                </div>
+            </div>
 
-        {/* Konten Markdown */}
-        <div class="prose prose-lg max-w-none prose-coffee">
-            <slot />
-        </div>
+            {/* 2. GAMBAR HEADER (DIATAS JUDUL/KONTEN MARKDOWN) */}
+            {headerImage && (
+                <div class="max-w-3xl mx-auto my-8"> {/* MEMBATASI LEBAR */}
+                    <img 
+                        src={headerImage} 
+                        alt={frontmatter.title} 
+                        class="w-full h-auto object-cover rounded-lg shadow-xl"
+                    />
+                </div>
+            )}
+
+            {/* 3. KONTEN MARKDOWN (MEMBAWA JUDUL H1 DARI FILE MARKDOWN) */}
+            <div class="prose max-w-none">
+                <slot /> 
+            </div>
+            
+        </article>
+
         
-    </article>
+        {/* Kolom Kanan: Sidebar (TOC & Iklan) - TETAP DI KANAN */}
+        {showSidebar && (
+            <aside class="hidden lg:block w-1/4 sticky top-20 h-full">
+                
+                {/* 1. TABLE OF CONTENTS (TOC) */}
+                <div class="p-4 border border-gray-200 rounded-lg shadow-sm bg-white mb-6">
+                    <h2 class="font-extrabold text-lg text-coffee-dark mb-3 border-b pb-2 flex items-center justify-between">
+                        Table of Contents
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
+                        </svg>
+                    </h2>
+                    <nav>
+                        <ul class="space-y-2 text-gray-700">
+                            {filteredHeadings.map(h => (
+                                <li class:list={[h.depth === 2 ? 'pl-0 font-medium' : 'pl-4 text-sm', 'hover:text-accent-primary transition duration-150']}>
+                                    <a href={`#${h.slug}`}>
+                                        {h.text}
+                                    </a>
+                                </li>
+                            ))}
+                        </ul>
+                    </nav>
+                </div>
+                
+                {/* 2. AREA IKLAN GAMBAR */}
+                <div class="p-4 border border-gray-200 rounded-lg shadow-sm bg-white text-center">
+                    <h3 class="font-bold text-sm text-gray-500 mb-3 uppercase">Sponsored Content</h3>
+                    <a href="/" class="block hover:opacity-90 transition duration-300">
+                        <img 
+                            src="/images/article-3.jpg" 
+                            alt="Iklan Sidebar Khusus" 
+                            width="250"
+                            height="300"
+                            class="mx-auto rounded-md shadow-md"
+                        />
+                    </a>
+                    <p class="text-xs text-gray-400 mt-2">Klik untuk kembali ke Home</p>
+                </div>
+
+            </aside>
+        )}
+
+    </div>
 </BaseLayout>
-
-{/* Tambahkan gaya kustom untuk konten Markdown jika diperlukan */}
-<style is:global>
-    /* Menyesuaikan gaya 'prose' Tailwind untuk tema kopi Anda */
-    .prose-coffee {
-        --tw-prose-body: #3C2F2F; /* coffee-dark */
-        --tw-prose-headings: #6F4E37; /* coffee-brown */
-        --tw-prose-links: #B5651D; /* accent-primary */
-    }
-</style>

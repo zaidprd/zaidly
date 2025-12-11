@@ -3,40 +3,46 @@ import { getCollection } from "astro:content";
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleLayout from '../layouts/ArticleLayout.astro'; 
 import Error404 from '../components/Error404.astro'; 
+import type { CollectionEntry } from 'astro:content';
+
+// Tipe gabungan untuk semua postingan
+type CombinedPost = CollectionEntry<'blog'> | CollectionEntry<'guides'> | CollectionEntry<'picks'>;
 
 // --- Bagian 1: getStaticPaths (Menangani Routing) ---
 
 export async function getStaticPaths() {
-  // Fix 2769: Memanggil getCollection tanpa argumen lain yang memicu error
-  // Kita harus meyakinkan TypeScript bahwa kita memanggil fungsi ini dengan benar
-  const blog = await getCollection('blog');
-  // Gunakan 'as any' pada pemanggilan untuk koleksi kedua dan ketiga
-  // untuk memaksa TypeScript menerima pemanggilan yang valid ini.
-  const guides = await (getCollection as any)('guides'); 
-  const picks = await (getCollection as any)('picks'); 
-  
-  // Gabungkan semua postingan
-  const allPosts = [...blog, ...guides, ...picks];
+    // Ambil koleksi
+    const blog = await getCollection('blog');
+    const guides = await getCollection('guides'); 
+    const picks = await getCollection('picks'); 
+    
+    const allPosts: CombinedPost[] = [...blog, ...guides, ...picks];
 
-  // Map ke format params/props
-  // Fix 2339: Karena kita tahu 'post' adalah ContentEntry, properti 'slug' ada.
-  return allPosts.map((post: any) => ({
-    params: { slug: post.slug },
-    props: { post },
-  }));
+    return allPosts.map((post) => ({
+        params: { slug: post.slug },
+        props: { post },
+    }));
 }
 
-// --- Bagian 2: Tampilan Halaman Dinamis (Tetap Sama) ---
+// --- Bagian 2: Tampilan Halaman Dinamis ---
 
-const { post } = Astro.props;
+// Pastikan tipe props-nya sudah benar
+const { post } = Astro.props as { post: CombinedPost }; 
 
-const { Content } = await (post as any).render();
+// Render post dan ambil Content, dan yang terpenting: headings
+const { Content, headings } = await post.render();
 
-const postData = (post as any).data;
+// Ambil postData dengan type assertion yang aman jika diperlukan, 
+// tetapi seharusnya post.data sudah cukup untuk TypeScript jika layout diperbaiki.
+const postData = post.data;
+
+// Fix: Kita harus memastikan post.data memiliki tipe yang kompatibel 
+// dengan CustomFrontmatter di ArticleLayout.
+
 ---
 
 {post ? (
-    <ArticleLayout frontmatter={postData}>
+    <ArticleLayout frontmatter={postData as any} headings={headings}> 
         <Content />
     </ArticleLayout>
 ) : (
