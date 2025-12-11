@@ -22,11 +22,11 @@ const staticFeaturedLinks = [
 ];
 ---
 
-<section class="py-20 bg-white">
+<section class="pt-0 pb-6 bg-white">
   <div class="container mx-auto max-w-7xl p-0">
 
     <!-- Card utama tanpa shadow -->
-    <div class="max-w-7xl mx-auto mb-12">
+    <div class="max-w-7xl mx-auto mb-2">
       <div class="bg-white p-8 rounded-xl border border-transparent shadow-none drop-shadow-none">
 
         <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
@@ -53,7 +53,9 @@ const staticFeaturedLinks = [
 
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           {staticFeaturedLinks.map((link) => (
-            <a href={link.url} class="block bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
+            <a
+              href={link.url}
+              class="block bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
               aria-label={link.title}
             >
               <img
@@ -76,15 +78,16 @@ const staticFeaturedLinks = [
     <!-- Daftar post -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {posts.map((post) => (
-        <a href={`/${post.slug}`} class="block group relative bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1">
-
+        <a
+          href={`/${post.slug}`}
+          class="block group relative bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
+        >
           <img
             src={post.data.image || '/images/default-post.jpg'}
             alt={post.data.title}
             class="w-full h-56 object-cover"
             style={{ aspectRatio: '4/3' }}
           />
-
           <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent p-4 flex flex-col justify-end">
             <h3 class="text-lg font-bold text-white group-hover:text-accent-primary transition duration-300">
               {post.data.title}
@@ -93,16 +96,5 @@ const staticFeaturedLinks = [
         </a>
       ))}
     </div>
-
-    <!-- Button bawah -->
-    <div class="text-center mt-12">
-      <a
-        href="/beans"
-        class="inline-block bg-accent-primary text-white font-semibold px-10 py-3 rounded-lg hover:bg-coffee-dark transition duration-300"
-      >
-        View All Bean Guides
-      </a>
-    </div>
-
   </div>
 </section>

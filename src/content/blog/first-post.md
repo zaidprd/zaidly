@@ -2,7 +2,8 @@
 title: "Tips Memulai Hari dengan Kopi Terbaik"
 pubDate: 2025-12-08
 description: "Panduan sederhana untuk mengoptimalkan rutinitas kopi pagi Anda."
---- 
+category: "culture"
+---
 
 # Selamat Datang di Postingan Blog Pertama Anda
 
