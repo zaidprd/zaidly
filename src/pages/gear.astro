@@ -1,0 +1,42 @@
+---
+// src/pages/gear.astro
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro'; 
+// --- Komponen Gear yang Sudah Dipisah ---
+import AccessoriesSection from '../components/gear/AccessoriesSection.astro'; 
+import GrindersSection from '../components/gear/GrindersSection.astro'; 
+import MakersSection from '../components/gear/MakersSection.astro'; 
+import EspressoSection from '../components/gear/EspressoSection.astro'; 
+import BonusGearTable from '../components/gear/BonusGearTable.astro'; 
+
+// --- TIDAK ADA LOGIKA getCollection ATAU FILTER POSTS DI SINI ---
+
+
+// --- Data Hero & SEO Saja ---
+const heroData = {
+    title: "Perlengkapan Kopi Terbaik untuk Setiap Brewer",
+    subtitle: "Temukan ulasan, panduan pembelian, dan perbandingan mendalam untuk setiap peralatan kopi, dari grinder hingga mesin espresso.", 
+    linkText: "Lihat Semua Kategori", 
+    linkUrl: "#accessories-and-tools", 
+    image: "/images/hero-gear.jpg"
+};
+const pageTitle = "Perlengkapan Kopi Terbaik - Zaidly Gear Hub";
+---
+
+<BaseLayout title={pageTitle}>
+    
+    <Hero {...heroData} />
+
+    {/* Setiap Section kini dipanggil TANPA prop 'posts' */}
+    <AccessoriesSection />
+
+    <GrindersSection />
+
+    <MakersSection />
+
+    <EspressoSection />
+
+    <BonusGearTable />
+
+</BaseLayout>

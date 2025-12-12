@@ -8,23 +8,25 @@
 <header 
     id="main-header" 
     class="fixed w-full top-0 z-50 
-           bg-white border-b border-gray-200 shadow-sm h-14 
+           /* WARNA AWAL: coffee-light sebagai putih */
+           bg-coffee-light border-b border-coffee-light/50 shadow-sm h-14 
            transition-all duration-300"
 >
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 
-                flex justify-between items-center h-full">
+                 flex justify-between items-center h-full">
         
         <a 
             href="/" 
             id="header-logo" 
             class="text-2xl font-bold text-coffee-dark tracking-wide 
-                   transition-all duration-300"
+                    transition-all duration-300"
         >
             Zaidly
         </a>
 
         <nav class="hidden md:block">
-            <ul class="flex space-x-6 text-gray-700 font-semibold" id="main-nav-links">
+            {/* WARNA TEKS NAV: coffee-brown (untuk teks sekunder) */}
+            <ul class="flex space-x-6 text-coffee-brown font-semibold" id="main-nav-links">
                 <li><a href="/guides" class="hover:text-accent-primary transition">Brewing Guides</a></li>
                 <li><a href="/gear" class="hover:text-accent-primary transition">Gear</a></li>
                 <li><a href="/beans" class="hover:text-accent-primary transition">Beans</a></li>
@@ -40,25 +42,34 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', () => {
-        // Ambil elemen header dan logo
         const header = document.getElementById('main-header');
         const logo = document.getElementById('header-logo');
         const navLinksContainer = document.getElementById('main-nav-links');
 
-        // Jarak scroll (dalam piksel) untuk memicu perubahan
         const scrollThreshold = 50; 
 
+        // =========================================================================
+        // --- WARNA KUSTOM TAILWIND ---
+        // initialHeaderClasses: bg-coffee-light
+        // initialLogoClasses: text-coffee-dark
+        // initialNavLinkClasses: text-coffee-brown
+        // scrolledHeaderClasses: bg-coffee-dark/90
+        // scrolledLogoClasses: text-white
+        // scrolledNavLinkClasses: text-white
+        // scrolledNavLinkHoverClasses: hover:text-accent-primary (Menggunakan aksen utama Anda)
+        // =========================================================================
+
         // Kelas untuk kondisi Awal (Initial State)
-        const initialHeaderClasses = ['bg-white', 'border-b', 'border-gray-200', 'shadow-sm', 'h-14']; 
+        const initialHeaderClasses = ['bg-coffee-light', 'border-b', 'border-coffee-light/50', 'shadow-sm', 'h-14']; 
         const initialLogoClasses = ['text-2xl', 'text-coffee-dark'];
-        const initialNavLinkClasses = ['text-gray-700'];
-        const initialNavLinkHoverClasses = ['hover:text-accent-primary'];
+        const initialNavLinkClasses = ['text-coffee-brown']; // Menggunakan coffee-brown
+        const initialNavLinkHoverClasses = ['hover:text-accent-primary']; // Menggunakan accent-primary
 
         // Kelas untuk kondisi Scroll (Scrolled State - Coffee Dark Semi-Transparant)
-        const scrolledHeaderClasses = ['bg-amber-950/90', 'backdrop-blur-sm', 'shadow-lg', 'h-16', 'border-b-amber-900'];
-        const scrolledLogoClasses = ['text-3xl', 'text-white']; 
+        const scrolledHeaderClasses = ['bg-coffee-dark/90', 'backdrop-blur-sm', 'shadow-lg', 'h-16', 'border-b-coffee-dark'];
+        const scrolledLogoClasses = ['text-3xl', 'text-white']; // text-white karena background gelap
         const scrolledNavLinkClasses = ['text-white'];
-        const scrolledNavLinkHoverClasses = ['hover:text-amber-300'];
+        const scrolledNavLinkHoverClasses = ['hover:text-accent-primary']; // Aksen konsisten
 
         // --- Perbaikan TypeScript: Pastikan elemen ada sebelum diakses ---
         if (!header || !logo || !navLinksContainer) {

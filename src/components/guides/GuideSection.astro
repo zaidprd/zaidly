@@ -1,14 +1,20 @@
 ---
-interface Post {
+// src/components/guides/GuideSection.astro
+
+// Definisikan interface yang kompatibel dengan data minimal yang dikirim dari pages/guides.astro
+interface GuidePost {
   slug: string;
+  collection: string; 
   data: {
-    title: string;
-    image?: string;
+      title: string;
+      image?: string;
+      // Menambahkan description opsional untuk fleksibilitas di masa depan
+      description?: string; 
   };
 }
 
 interface Props {
-  posts: Post[];
+  posts: GuidePost[];
 }
 
 const { posts } = Astro.props;
@@ -22,23 +28,24 @@ const staticFeaturedLinks = [
 ];
 ---
 
-<section class="pt-0 pb-0 bg-cream-latte"> {/* Ganti bg-white menjadi bg-cream-latte */}
-  <div class="container mx-auto max-w-6xl p-0">
+<section id="guides-grid" class="pt-2 pb-16 bg-white">
+  <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
 
-    <div class="max-w-7xl mx-auto mb-0">
-      <div class="bg-coffee-light p-8 rounded-xl border border-transparent shadow-none drop-shadow-none"> {/* Ganti bg-white menjadi bg-coffee-light */}
+    {/* BLOK DESKRIPSI & LINK STATIS */}
+    <div class="max-w-7xl mx-auto mb-6">
+      <div class="bg-white p-8 rounded-xl border border-transparent shadow-none drop-shadow-none">
 
         <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
           Coffee Bean Guides
         </h2>
 
-        <p class="text-lg text-coffee-brown mb-8"> {/* Ganti text-gray-700 menjadi text-coffee-brown */}
+        <p class="text-lg text-gray-700 mb-8">
           The journey to the perfect cup starts with the bean. We break down the world of coffee beans, from different origins and roasts to buying tips and storage hacks.
         </p>
 
         <p class="font-bold text-coffee-dark mb-3 text-lg">In our coffee bean hub, you’ll learn about:</p>
 
-        <ul class="list-disc list-inside text-coffee-brown space-y-2 ml-4 mb-10"> {/* Ganti text-gray-700 menjadi text-coffee-brown */}
+        <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4 mb-10">
           <li><strong>Origins:</strong> Unique flavor profiles from Africa, the Americas, and Asia.</li>
           <li><strong>Roasting Levels:</strong> Differences between light, medium, and dark roasts.</li>
           <li><strong>Buying Tips:</strong> Certifications, freshness, and spotting quality beans.</li>
@@ -50,12 +57,14 @@ const staticFeaturedLinks = [
           Explore these essential bean guides:
         </h3>
 
+        {/* --- GRID LINK STATIS (4 KOLOM) --- */}
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
           {staticFeaturedLinks.map((link) => (
-            <a href={link.url} 
-               class="block bg-coffee-light rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg hover:shadow-accent-primary/20"
-               aria-label={link.title}
-            > {/* Ganti bg-white menjadi bg-coffee-light */}
+            <a
+              href={link.url}
+              class="block bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
+              aria-label={link.title}
+            >
               <img
                 src={link.image}
                 alt={link.title}
@@ -73,11 +82,14 @@ const staticFeaturedLinks = [
       </div>
     </div>
 
+    {/* --- DAFTAR POST DINAMIS (POSTS GRID) --- */}
+    {/* Catatan: Blok ini hanya akan me-render jika array 'posts' tidak kosong */}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
       {posts.map((post) => (
-        <a href={`/${post.slug}`} 
-           class="block group relative bg-coffee-light rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl hover:shadow-accent-primary/30"
-        > {/* Ganti bg-white menjadi bg-coffee-light, tambahkan shadow aksen */}
+        <a 
+          href={`/${post.collection}/${post.slug}/`} 
+          class="block group relative bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
+        >
 
           <img
             src={post.data.image || '/images/default-post.jpg'}
@@ -86,7 +98,7 @@ const staticFeaturedLinks = [
             style={{ aspectRatio: '4/3' }}
           />
 
-          <div class="absolute inset-0 bg-gradient-to-t from-coffee-dark/80 via-coffee-dark/40 to-transparent p-4 flex flex-col justify-end"> {/* Ganti black/60 dan black/30 menjadi coffee-dark/80 dan coffee-dark/40 */}
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent p-4 flex flex-col justify-end">
             <h3 class="text-lg font-bold text-white group-hover:text-accent-primary transition duration-300">
               {post.data.title}
             </h3>

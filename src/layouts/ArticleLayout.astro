@@ -26,7 +26,7 @@ interface Props {
 const { frontmatter, headings } = Astro.props; 
 
 // Logika Tampilan
-const showSidebar = headings.filter(h => h.depth > 1 && h.depth < 4).length > 0;
+const showSidebar = headings.filter((h: Heading) => h.depth > 1 && h.depth < 4).length > 0;
 
 // Format Tanggal (FIX ERROR SYNTAX)
 const formattedDate = frontmatter.pubDate 

@@ -1,0 +1,31 @@
+---
+// src/pages/beans.astro
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Hero from '../components/Hero.astro'; 
+// --- Komponen Utama Biji Kopi ---
+import BeanHubSection from '../components/beans/BeanHub.astro'; 
+
+// --- Data Hero & SEO Saja ---
+const heroData = {
+    title: "Mengenal Biji Kopi: Asal, Proses, dan Rasa",
+    subtitle: "Pelajari perbedaan antara Arabika dan Robusta, profil rasa dari berbagai asal, hingga cara terbaik menyimpan biji kopi Anda.", 
+    linkText: "Jelajahi Panduan Biji Kopi", 
+    linkUrl: "#bean-hub", 
+    image: "/images/hero-beans.jpg"
+};
+const pageTitle = "Panduan Biji Kopi - Zaidly Coffee";
+
+// TIDAK ADA: import { getCollection } dari 'astro:content';
+// TIDAK ADA: const allPosts = ...
+// TIDAK ADA: const beanPosts = ...
+---
+
+<BaseLayout title={pageTitle}>
+    
+    <Hero {...heroData} />
+
+    {/* Memanggil komponen TANPA mengirim prop posts */}
+    <BeanHubSection /> 
+
+</BaseLayout>

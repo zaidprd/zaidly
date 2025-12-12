@@ -1,0 +1,48 @@
+---
+import type { CollectionEntry } from 'astro:content';
+
+// Interface disesuaikan dengan skema konten Anda
+interface PostData {
+  title: string;
+  description: string; // Asumsi ada deskripsi untuk kartu
+  image?: string;
+}
+
+interface Props {
+  // Asumsi koleksi Anda adalah 'blog'
+  guide: CollectionEntry<'blog'>; 
+}
+
+const { guide } = Astro.props;
+---
+
+<a 
+  href={`/${guide.collection}/${guide.slug}/`} 
+  class="block group bg-white rounded-xl overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-2xl"
+>
+    
+    {/* Gambar Kartu */}
+    <div class="aspect-video overflow-hidden">
+        <img 
+            src={guide.data.image || '/images/default-guide.jpg'} 
+            alt={guide.data.title} 
+            class="w-full h-full object-cover group-hover:scale-105 transition duration-500"
+        />
+    </div>
+
+    {/* Konten Kartu */}
+    <div class="p-4">
+        <h3 class="text-lg font-bold text-gray-900 group-hover:text-accent-primary transition duration-150 mb-1 line-clamp-2">
+            {guide.data.title}
+        </h3>
+        {/* Menggunakan deskripsi jika tersedia di frontmatter */}
+        {guide.data.description && (
+          <p class="text-gray-600 text-sm line-clamp-3">
+              {guide.data.description}
+          </p>
+        )}
+        <span class="inline-block text-sm font-semibold text-accent-primary mt-3">
+            Baca Panduan →
+        </span>
+    </div>
+</a>

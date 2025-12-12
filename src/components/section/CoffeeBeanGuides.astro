@@ -1,4 +1,6 @@
 ---
+// src/components/section/CoffeeBeanGuides.astro
+
 interface Post {
   slug: string;
   data: {
@@ -7,6 +9,7 @@ interface Post {
   };
 }
 
+// Karena komponen ini dipanggil di index.astro dengan posts, kita asumsikan wajib
 interface Props {
   posts: Post[];
 }
@@ -22,24 +25,23 @@ const staticFeaturedLinks = [
 ];
 ---
 
-<section class="pt-0 pb-6 bg-white">
+<section class="pt-0 pb-0 bg-cream-latte">
   <div class="container mx-auto max-w-6xl p-0">
 
-    <!-- Card utama tanpa shadow -->
     <div class="max-w-7xl mx-auto mb-2">
-      <div class="bg-white p-8 rounded-xl border border-transparent shadow-none drop-shadow-none">
+      <div class="bg-coffee-light p-8 rounded-xl border border-transparent shadow-none drop-shadow-none">
 
         <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
           Coffee Bean Guides
         </h2>
 
-        <p class="text-lg text-gray-700 mb-8">
+        <p class="text-lg text-coffee-brown mb-8">
           The journey to the perfect cup starts with the bean. We break down the world of coffee beans, from different origins and roasts to buying tips and storage hacks.
         </p>
 
         <p class="font-bold text-coffee-dark mb-3 text-lg">In our coffee bean hub, you’ll learn about:</p>
 
-        <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4 mb-10">
+        <ul class="list-disc list-inside text-coffee-brown space-y-2 ml-4 mb-10">
           <li><strong>Origins:</strong> Unique flavor profiles from Africa, the Americas, and Asia.</li>
           <li><strong>Roasting Levels:</strong> Differences between light, medium, and dark roasts.</li>
           <li><strong>Buying Tips:</strong> Certifications, freshness, and spotting quality beans.</li>
@@ -55,7 +57,7 @@ const staticFeaturedLinks = [
           {staticFeaturedLinks.map((link) => (
             <a
               href={link.url}
-              class="block bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
+              class="block bg-coffee-light rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg hover:shadow-accent-primary/20"
               aria-label={link.title}
             >
               <img
@@ -75,12 +77,12 @@ const staticFeaturedLinks = [
       </div>
     </div>
 
-    <!-- Daftar post -->
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    {/* Daftar post */}
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mt-8">
       {posts.map((post) => (
         <a
           href={`/${post.slug}`}
-          class="block group relative bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
+          class="block group relative bg-coffee-light rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl hover:shadow-accent-primary/30"
         >
           <img
             src={post.data.image || '/images/default-post.jpg'}
@@ -88,7 +90,7 @@ const staticFeaturedLinks = [
             class="w-full h-56 object-cover"
             style={{ aspectRatio: '4/3' }}
           />
-          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent p-4 flex flex-col justify-end">
+          <div class="absolute inset-0 bg-gradient-to-t from-coffee-dark/80 via-coffee-dark/40 to-transparent p-4 flex flex-col justify-end">
             <h3 class="text-lg font-bold text-white group-hover:text-accent-primary transition duration-300">
               {post.data.title}
             </h3>
@@ -97,4 +99,4 @@ const staticFeaturedLinks = [
       ))}
     </div>
   </div>
-</section>
+</section> {/* <-- TAG PENUTUP SECTION SUDAH DITAMBAHKAN KEMBALI */}

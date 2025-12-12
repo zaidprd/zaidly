@@ -1,0 +1,119 @@
+---
+// src/components/gear/BonusGearTable.astro
+
+// Definisikan tipe data untuk setiap baris tabel
+interface GearItem {
+    type: string;
+    image: string;
+    product: string;
+    details: string[];
+    brandImage?: string;
+    amazonUrl: string;
+}
+
+// Data statis untuk tabel (hanya 3 baris sebagai contoh)
+const gearPicks: GearItem[] = [
+    {
+        type: "BEST AUTOMATIC DRIP",
+        image: "/images/technivorm.jpg", // Ganti dengan path gambar yang benar
+        product: "TECHNIVORM MOCCAMASTER KBGV SELECT",
+        details: [
+            "10 cups capacity",
+            "Cone filter",
+            "Glass carafe"
+        ],
+        brandImage: "/images/coffee-roastery.png", // Ganti dengan logo roastery Anda
+        amazonUrl: "#" 
+    },
+    {
+        type: "BEST ESPRESSO MACHINE",
+        image: "/images/breville.jpg",
+        product: "BREVILLE BES840XL INFUSER",
+        details: [
+            "Semi-automatic machine",
+            "Manual steam wand",
+            "61 ounces water tank"
+        ],
+        brandImage: "/images/amazon-logo.png", // Atau logo Amazon
+        amazonUrl: "#"
+    },
+    {
+        type: "BEST POUR-OVER BREWER",
+        image: "/images/kalita.jpg",
+        product: "KALITA WAVE",
+        details: [
+            "Stainless steel, ceramic, glass, copper",
+            "2 or 4 cups capacity",
+            "Kalita filters"
+        ],
+        brandImage: "/images/amazon-logo.png",
+        amazonUrl: "#"
+    },
+];
+---
+
+<section class="py-16 bg-gray-50">
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-extrabold text-coffee-dark mb-10 text-center">
+            A Bonus List Of 15 Best Coffee Gear Picks
+        </h2>
+
+        <div class="shadow-xl rounded-xl overflow-hidden border border-gray-200">
+            {gearPicks.map((item) => (
+                <div class="flex flex-col md:flex-row items-center border-b border-gray-200 last:border-b-0 bg-white p-4 sm:p-6">
+                    
+                    {/* Kolom 1: Image & Type */}
+                    <div class="flex-shrink-0 w-full md:w-1/4 text-center mb-4 md:mb-0">
+                        <span class="inline-block bg-accent-primary text-white text-xs font-semibold px-2 py-1 rounded mb-2">
+                            {item.type}
+                        </span>
+                        <img 
+                            src={item.image} 
+                            alt={item.product} 
+                            class="h-32 w-auto object-contain mx-auto" 
+                        />
+                    </div>
+
+                    {/* Kolom 2: Product Name & Details */}
+                    <div class="flex-grow w-full md:w-1/2 px-0 md:px-6 mb-4 md:mb-0">
+                        <p class="text-xl font-bold text-coffee-dark mb-3">{item.product}</p>
+                        <ul class="text-sm text-gray-700 space-y-1">
+                            {item.details.map(detail => (
+                                <li class="flex items-center">
+                                    <svg class="w-4 h-4 text-green-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                                    {detail}
+                                </li>
+                            ))}
+                        </ul>
+                    </div>
+
+                    {/* Kolom 3: Brand & Check Price */}
+                    <div class="flex-shrink-0 w-full md:w-1/4 text-center">
+                        {item.brandImage && (
+                            <img 
+                                src={item.brandImage} 
+                                alt="Brand Logo" 
+                                class="h-12 w-auto object-contain mx-auto mb-3" 
+                            />
+                        )}
+                        <a 
+                            href={item.amazonUrl} 
+                            target="_blank" 
+                            rel="noopener noreferrer"
+                            class="inline-block bg-orange-600 hover:bg-orange-700 text-white font-bold py-2 px-4 rounded-lg shadow transition duration-300"
+                        >
+                            CHECK PRICE
+                        </a>
+                    </div>
+                </div>
+            ))}
+        </div>
+        
+        {/* Tombol Lihat Semua (Opsional) */}
+        <div class="text-center mt-8">
+            <a href="#" class="text-coffee-dark hover:text-accent-primary font-semibold text-lg border-b border-coffee-dark">
+                Lihat Semua 15 Pilihan Terbaik →
+            </a>
+        </div>
+    </div>
+</section>

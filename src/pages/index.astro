@@ -23,7 +23,7 @@ const allPosts = await getCollection('blog') || [];
 // Filter 8 postingan terbaru
 const latestPosts = allPosts
     .sort((a, b) => (b.data.pubDate as Date).getTime() - (a.data.pubDate as Date).getTime())
-    .slice(0, 8);
+    .slice(0, 3);
 
 // Filter 4 postingan dengan category: 'gear'
 const gearPosts = allPosts.filter(post => post.data.category === 'gear').slice(0, 4);
