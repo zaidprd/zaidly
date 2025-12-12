@@ -3,8 +3,8 @@ import { defineCollection, z } from 'astro:content';
 const articleSchema = z.object({
   title: z.string(),
   description: z.string(),
-  // *** TAMBAH BARIS INI UNTUK AUTHOR ***
-  author: z.string(), 
+  // *** author: z.string() TETAP WAJIB ***
+  author: z.string(), // Mempertahankan 'author' sebagai wajib
   // **********************************
   pubDate: z.date().optional(),
   category: z.enum(['beans', 'gear', 'culture', 'methods']).optional(),
@@ -17,18 +17,9 @@ const blogCollection = defineCollection({
   schema: articleSchema,
 });
 
-const guidesCollection = defineCollection({
-  type: 'content',
-  schema: articleSchema,
-});
-
-const picksCollection = defineCollection({
-  type: 'content',
-  schema: articleSchema,
-});
+// KOLEKSI 'guidesCollection' dan 'picksCollection' DIHAPUS DARI SINI
 
 export const collections = {
   blog: blogCollection,
-  guides: guidesCollection,
-  picks: picksCollection,
+  // KOLEKSI 'guides' dan 'picks' DIHAPUS DARI SINI
 };
