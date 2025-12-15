@@ -1,0 +1,79 @@
+---
+// src/components/ContentSection.astro (FINAL TEMPLATE FLEKSIBEL)
+
+// Menerima data dari Parent (BeanHub.astro)
+interface Props {
+    data: any; 
+    isFirst: boolean;
+}
+
+const { data, isFirst } = Astro.props;
+
+// Mengatur padding atas: pt-0 untuk blok pertama, pt-12 untuk blok berikutnya
+const paddingTopClass = isFirst ? 'pt-0' : 'pt-12';
+---
+
+<div id={data.sectionId} class:list={[paddingTopClass, 'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8']}>
+    {/* JUDUL UTAMA SECTION */}
+    <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
+        {data.sectionTitle}
+    </h2>
+
+    {/* SUBTITLE SECTION */}
+    <p class="text-lg text-coffee-brown mb-8">
+        {data.sectionSubtitle}
+    </p>
+    
+    {/* LOOP BODY CONTENT (INI ADALAH KUNCI FLEKSIBILITAS) */}
+    {data.bodyContent.map((element: any) => (
+        <div class="mb-8">
+            {/* 1. RENDER JUDUL ELEMEN (Jika ada) */}
+            {element.title && (
+                <p class:list={[
+                    "font-bold text-coffee-dark mb-3 text-lg",
+                    { "text-2xl mt-8 mb-6 border-b pb-2 border-coffee-light": element.type === 'grid' } // Judul Grid Lebih Besar
+                ]}>
+                    {element.title}
+                </p>
+            )}
+
+            {/* 2. RENDER BERDASARKAN TYPE */}
+            {element.type === 'paragraph' && (
+                <p class="text-coffee-brown mb-4">
+                    {element.text}
+                </p>
+            )}
+
+            {element.type === 'list' && (
+                <ul class="list-disc list-inside text-coffee-brown space-y-2 ml-4 mb-10 marker:text-accent-primary">
+                    {element.listItems.map((point: string) => ( 
+                        <li class="pl-2" set:html={point} />
+                    ))}
+                </ul>
+            )}
+
+            {element.type === 'grid' && element.guides && (
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    {element.guides.map((link: any) => ( 
+                        <a
+                            href={link.url}
+                            class="group block bg-coffee-light rounded-xl overflow-hidden shadow-md transition duration-300 transform hover:shadow-xl hover:-translate-y-1 border border-transparent hover:border-accent-primary"
+                            aria-label={link.title}
+                        >
+                            <img
+                                src={link.image}
+                                alt={link.title}
+                                class="w-full h-32 object-cover transition duration-500 group-hover:scale-105"
+                            />
+                            <div class="p-3 text-center">
+                                <p class="text-sm font-bold text-coffee-dark group-hover:text-accent-primary transition duration-300">
+                                    {link.title}
+                                </p>
+                            </div>
+                        </a>
+                    ))}
+                </div>
+            )}
+        </div>
+    ))}
+</div>

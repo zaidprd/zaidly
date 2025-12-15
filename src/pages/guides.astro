@@ -1,46 +1,25 @@
 ---
-// src/pages/guides.astro
+// src/pages/guides.astro (KODE CLEAN DAN FINAL)
 
-// 1. Ambil Layout Utama 
 import BaseLayout from '../layouts/BaseLayout.astro';
-
-// 2. Component Root (components/)
 import Hero from '../components/Hero.astro'; 
+import GuidesHub from '../components/guides/GuideHub.astro'; 
 
-// 3. Komponen Utama Anda dari guides/
-import GuideSection from '../components/guides/GuideSection.astro';
-import SecondGuideSection from '../components/guides/SecondGuideSection.astro';
-
-// 4. Ambil data Postingan (DIKEMBALIKAN)
-import { getCollection } from 'astro:content';
-
-// Ambil semua postingan
-const allPosts = await getCollection('blog') || []; 
-
-// Filter 4 postingan dengan category: 'gear' (Gunakan filter yang sama dengan index.astro untuk contoh)
-const guidePosts = allPosts.filter(post => post.data.category === 'gear').slice(0, 4);
-
-// Data Hero
 const heroData = {
-    title: "Panduan Kopi Lengkap", 
-    subtitle: "Kuasai seni menyeduh kopi, dari pemula hingga ahli.",
-    linkText: "Lihat Semua",
-    linkUrl: "#guides-grid",
-    image: "/images/hero-guides.jpg" 
+    title: "Master Semua Teknik Seduh Kopi",
+    subtitle: "Koleksi panduan paling lengkap untuk pemula hingga barista tingkat lanjut. Mulai dari V60, Chemex, hingga rahasia Cold Brew.", 
+    linkText: "Lihat Panduan Dasar", 
+    linkUrl: "#brewing-methods", 
+    image: "/images/hero-guides.jpg"
 };
 
-const pageTitle = "Panduan Kopi - Zaidly Resource Hub";
+const pageTitle = "Panduan Kopi Lengkap - Zaidly Guides";
 ---
 
 <BaseLayout title={pageTitle}>
-    
-    {/* 1. HERO SECTION */}
-    <Hero {...heroData} />
+    
+    <Hero {...heroData} />
 
-    {/* 2. GUIDE SECTION PERTAMA (Menerima posts prop) */}
-    <GuideSection posts={guidePosts || []} /> 
-    
-    {/* 3. GUIDE SECTION KEDUA (Menerima posts prop) */}
-    <SecondGuideSection posts={guidePosts || []} />
-    
+    <GuidesHub /> 
+
 </BaseLayout>

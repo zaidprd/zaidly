@@ -3,41 +3,42 @@
 // Pastikan tipe data 'posts' yang dilewatkan konsisten
 const { posts } = Astro.props;
 ---
-<section class="py-20 bg-gray-50 border-t border-gray-200">
-    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-center text-coffee-dark mb-10">
-            Latest Articles
-        </h2>
+<section class="pt-0 pb-20 bg-cream-latte"> 
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+        <h2 class="text-3xl font-bold text-center text-coffee-dark mb-10">
+            Latest Articles
+        </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {posts.map((post: any) => (
-                 <article class="bg-white rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition duration-300">
-                    <img 
-                        src={post.data.image || '/images/default-post-small.jpg'} 
-                        alt={post.data.title} 
-                        class="w-full h-56 object-cover"
-                    />
-                    <div class="p-6">
-                        <span class="text-xs font-semibold text-accent-primary uppercase mb-2 block">{post.data.category || 'Guide'}</span>
-                        <h3 class="text-xl font-semibold text-coffee-dark mb-2 line-clamp-2">
-                            <a href={`/${post.slug}`} class="hover:text-accent-primary transition">
-                                {post.data.title}
-                            </a>
-                        </h3>
-                        <p class="text-sm text-gray-600 line-clamp-3">
-                            {post.data.description?.substring(0, 120) || 'Read the full article for detailed information and expert tips.'}...
-                        </p>
-                    </div>
-                </article>
-            ))}
-        </div>
-         <div class="text-center mt-12">
-            <a 
-                href="/blog" 
-                class="inline-block border border-coffee-dark text-coffee-dark font-semibold px-10 py-3 rounded-lg hover:bg-coffee-dark hover:text-white transition duration-300"
-            >
-                View All Articles
-            </a>
-        </div>
-    </div>
-</section>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {posts.map((post: any) => (
+                 <article class="bg-coffee-light rounded-lg overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-accent-primary/20 transition duration-300">
+                    <img 
+                        src={post.data.image || '/images/default-post-small.jpg'} 
+                        alt={post.data.title} 
+                        class="w-full h-56 object-cover"
+                    />
+                    <div class="p-6">
+                        <span class="text-xs font-semibold text-accent-primary uppercase mb-2 block">{post.data.category || 'Guide'}</span>
+                        <h3 class="text-xl font-semibold text-coffee-dark mb-2 line-clamp-2">
+                            <a href={`/${post.slug}`} class="hover:text-accent-primary transition">
+                                {post.data.title}
+                            </a>
+                        </h3>
+                        {/* PERIKSA SINTAKS JAVASCRIPT DI BARIS INI */}
+                        <p class="text-sm text-coffee-brown line-clamp-3"> 
+                            {post.data.description?.substring(0, 120) || 'Read the full article for detailed information and expert tips.'}
+                        </p>
+                    </div>
+                </article>
+            ))}
+        </div>
+         <div class="text-center mt-12">
+            <a 
+                href="/blog" 
+                class="inline-block border border-coffee-dark text-coffee-dark font-semibold px-10 py-3 rounded-lg hover:bg-coffee-dark hover:text-white transition duration-300"
+            >
+                View All Articles
+            </a>
+        </div>
+    </div>
+</section> {/* <--- TAG PENUTUP SECTION SUDAH DIKEMBALIKAN */}

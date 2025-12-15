@@ -1,0 +1,157 @@
+---
+// src/components/gear/GearHub.astro (5 BLOK DATA POLIMORFIK, MENGGUNAKAN ContentSection.astro)
+
+import ContentSection from '../ContentSection.astro'; // <<< MEMANGGIL HELPER YANG SAMA
+
+// --- INTERFACE POLIMORFIK (Sama persis dengan BeanHub) ---
+interface GuideLink {
+	title: string;
+	url: string;
+	image: string;
+}
+
+interface BodyElement {
+    type: 'paragraph' | 'list' | 'grid';
+    title?: string;
+    text?: string;
+    listItems?: string[];
+    guides?: GuideLink[];
+}
+
+interface ContentBlockData {
+	sectionId: string;
+	sectionTitle: string;
+	sectionSubtitle: string;
+	bodyContent: BodyElement[]; 
+}
+
+// --- DATA UTAMA: 5 BLOK GEAR (Setiap Grid memiliki TEPAT 4 elemen) ---
+const ALL_GEAR_BLOCKS: ContentBlockData[] = [
+	// BLOK 1: ACCESSORIES (SUDAH 4 GRID)
+	{
+		sectionId: "accessories-and-tools",
+		sectionTitle: "1. Accessories and Tools",
+		sectionSubtitle: "Detail kecil yang membuat perbedaan besar. Panduan lengkap untuk timbangan, teko leher angsa, dan filter.",
+		bodyContent: [
+            {
+                type: 'list',
+                title: 'In this section, we cover:',
+                listItems: [
+                    "<strong>Scales:</strong> Mengapa akurasi penting dalam rasio kopi.",
+                    "<strong>Kettles:</strong> Kontrol suhu dan aliran air.",
+                    "<strong>Filters:</strong> Perbedaan antara kertas, kain, dan filter metal.",
+                ]
+            },
+            {
+                type: 'grid',
+                title: 'Featured Accessory Guides:',
+                guides: [
+                    { title: "Best Scales Review", url: "#", image: "/images/gear/scale-featured.jpg" },
+                    { title: "Gooseneck Kettles", url: "#", image: "/images/gear/kettle-featured.jpg" },
+                    { title: "Filter Paper Comparison", url: "#", image: "/images/gear/filter-featured.jpg" },
+                    // ELEMEN KE-4 DITAMBAHKAN UNTUK MEMENUHI 4 KOLOM
+                    { title: "Cleaning Tools Essentials", url: "#", image: "/images/gear/cleaning-placeholder.jpg" }, 
+                ]
+            }
+		],
+	},
+	// BLOK 2: GRINDERS (SUDAH 4 GRID)
+	{
+		sectionId: "grinders-section",
+		sectionTitle: "2. Coffee Grinders: The Heart of Brewing",
+		sectionSubtitle: "Menggiling biji kopi tepat sebelum menyeduh adalah perubahan terbesar yang dapat Anda lakukan. Pelajari mengapa burr grinder mengalahkan blade grinder.",
+		bodyContent: [
+            {
+                type: 'list',
+                title: 'What to learn about Grinders:',
+                listItems: [
+                    "Burr vs Blade: Konsistensi gilingan sangat krusial.",
+                    "Manual vs Electric: Sesuai anggaran dan gaya hidup.",
+                ]
+            },
+            {
+                type: 'grid',
+                title: 'Featured Grinder Reviews:',
+                guides: [
+                    { title: "Baratza Encore Review", url: "#", image: "/images/gear/grinder-encore.jpg" },
+                    { title: "Manual Grinder Terbaik", url: "#", image: "/images/gear/grinder-manual.jpg" },
+                    // ELEMEN KE-3 & KE-4 DITAMBAHKAN UNTUK MEMENUHI 4 KOLOM
+                    { title: "Grinder Maintenance Tips", url: "#", image: "/images/gear/maintenance-placeholder.jpg" },
+                    { title: "Budget Electric Grinders", url: "#", image: "/images/gear/budget-placeholder.jpg" },
+                ]
+            }
+		],
+	},
+    // BLOK 3: MAKERS (SUDAH 4 GRID)
+	{
+		sectionId: "makers-section",
+		sectionTitle: "3. Brewing Makers (Pour Over & Immersion)",
+		sectionSubtitle: "Jelajahi berbagai dripper dan pembuat kopi yang digunakan untuk metode pour over dan immersion.",
+		bodyContent: [
+            // Blok ini sudah 4 elemen, jadi aman.
+            {
+                type: 'grid',
+                title: 'Popular Brewing Makers Guides:',
+                guides: [
+                    { title: "Hario V60", url: "#", image: "/images/gear/dripper-v60.jpg" },
+                    { title: "Chemex", url: "#", image: "/images/gear/dripper-chemex.jpg" },
+                    { title: "Aeropress", url: "#", image: "/images/gear/dripper-aeropress.jpg" },
+                    { title: "French Press", url: "#", image: "/images/gear/dripper-frenchpress.jpg" },
+                ]
+            }
+		],
+	},
+    // BLOK 4: ESPRESSO (DITAMBAH 4 GRID)
+    {
+		sectionId: "espresso-section",
+		sectionTitle: "4. Espresso at Home",
+		sectionSubtitle: "Panduan dan tips untuk barista rumahan yang ingin memasuki dunia espresso yang kompleks.",
+		bodyContent: [
+            {
+                type: 'paragraph',
+                text: "Membuat espresso yang enak membutuhkan investasi yang signifikan. Kami memecah komponen penting yang perlu Anda ketahui sebelum membeli."
+            },
+            {
+                type: 'grid', // GRID BARU DITAMBAH DI SINI
+                title: 'Featured Espresso Gear:',
+                guides: [
+                    { title: "Best Budget Machines", url: "#", image: "/images/gear/espresso-budget.jpg" },
+                    { title: "Mid-Range Machine Guide", url: "#", image: "/images/gear/espresso-mid.jpg" },
+                    { title: "Essential Tampers & Distrib.", url: "#", image: "/images/gear/tamper-placeholder.jpg" },
+                    { title: "Milk Steaming Guide", url: "#", image: "/images/gear/steamer-placeholder.jpg" },
+                ]
+            },
+		],
+	},
+    // BLOK 5: BONUS GEAR (SUDAH 4 GRID)
+    {
+		sectionId: "bonus-gear-section",
+		sectionTitle: "5. Bonus Gear and Maintenance",
+		sectionSubtitle: "Alat-alat kecil yang sering diabaikan, namun penting untuk menjaga kualitas kopi dan peralatan Anda.",
+		bodyContent: [
+            {
+                type: 'paragraph',
+                text: "Bagian ini membahas pembersihan rutin, penyimpanan biji yang benar, dan barang-barang yang diremehkan lainnya."
+            },
+            {
+                type: 'grid',
+                title: 'Maintenance Guides:',
+                guides: [
+                    { title: "Cleaning Your Grinder", url: "#", image: "/images/gear/cleaning.jpg" },
+                    { title: "Coffee Storage Best Practices", url: "#", image: "/images/gear/storage.jpg" },
+                    // ELEMEN KE-3 & KE-4 DITAMBAHKAN UNTUK MEMENUHI 4 KOLOM
+                    { title: "Water Quality & Filtration", url: "#", image: "/images/gear/water-placeholder.jpg" },
+                    { title: "The Perfect Travel Kit", url: "#", image: "/images/gear/travel-placeholder.jpg" },
+                ]
+            }
+		],
+	},
+];
+---
+
+{ALL_GEAR_BLOCKS.map((data, index) => (
+    <ContentSection 
+        data={data} 
+        isFirst={index === 0} 
+    />
+))}

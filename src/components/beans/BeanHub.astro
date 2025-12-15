@@ -1,119 +1,154 @@
 ---
-// src/components/gear/AccessoriesSection.astro
+// src/components/beans/BeanHub.astro (FINAL DATA STRUCTURE: POLIMORFIK)
 
-// Definisikan interface yang kompatibel dengan data minimal yang dikirim dari pages/guides.astro
-interface MinimalPost {
-    slug: string;
-    collection: string; 
-    data: {
-        title: string;
-        image?: string;
-        description?: string; 
-    };
+import ContentSection from '../ContentSection.astro'; // Import Helper Component
+
+// --- INTERFACE UTAMA (Wajib) ---
+interface GuideLink {
+	title: string;
+	url: string;
+	image: string;
 }
 
-// Interface Props: posts DIBUAT OPSIONAL (posts?)
-interface Props {
-    posts?: MinimalPost[]; 
+// Interface untuk setiap elemen di bodyContent (PARAGRAF, LIST, GRID)
+interface BodyElement {
+    type: 'paragraph' | 'list' | 'grid'; // Tipe konten
+    title?: string; // Opsional: Judul di atas paragraf/list/grid
+    text?: string; // Opsional: Isi Paragraf
+    listItems?: string[]; // Opsional: Isi Daftar Poin
+    guides?: GuideLink[]; // Opsional: Isi Grid Tautan
 }
 
-// Tambahkan nilai default array kosong untuk posts
-const { posts = [] } = Astro.props as Props;
+// Interface untuk seluruh blok konten
+interface ContentBlockData {
+	sectionId: string;
+	sectionTitle: string;
+	sectionSubtitle: string;
+	bodyContent: BodyElement[]; // ARRAY BARU: Tempat semua elemen konten masuk
+}
 
-// Daftar link statis untuk Accessories
-const staticFeaturedLinks = [
-    { title: "Best Scales", url: "#", image: "/images/article-3.jpg" }, // Ganti path gambar
-    { title: "Gooseneck Kettles", url: "#", image: "images/article-3.jpg" },
-    { title: "Filter Paper Comparison", url: "#", image: "/images/article-3.jpg" },
-    { title: "Coffee Storage", url: "#", image: "/images/article-3.jpg" },
-];
+// --- DATA UTAMA: SEMUA BLOK DALAM SATU ARRAY ---
+const ALL_CONTENT_BLOCKS: ContentBlockData[] = [
+	// BLOK 1: BIJI KOPI (MENGGUNAKAN STRUKTUR BARU)
+	{
+		sectionId: "coffee-beans-block",
+		sectionTitle: "All About Coffee Beans",
+		sectionSubtitle:
+			"Pelajari perbedaan spesies, proses, dan asal biji kopi untuk memahami profil rasa unik di setiap cangkir.",
+		bodyContent: [
+            {
+                type: 'paragraph',
+                title: 'In this hub, you’ll learn about:',
+                text: 'Materi ini membahas dasar-dasar biji kopi, dari spesies hingga tingkat sangrai.',
+            },
+            {
+                type: 'list',
+                listItems: [
+                    "<strong>Arabika & Robusta:</strong> Memahami perbedaan fundamental spesies kopi.",
+                    "<strong>Proses Pasca Panen:</strong> Bagaimana proses <em>washed</em>, <em>natural</em>, atau <em>honey</em> memengaruhi kompleksitas rasa.",
+                    "<strong>Roast Level:</strong> Dampak dari <em>Light</em>, <em>Medium</em>, dan <em>Dark Roast</em>.",
+                    "<strong>Origin:</strong> Ethiopia, Kolombia, dan Indonesia.",
+                ]
+            },
+            {
+                type: 'grid',
+                title: 'Explore these essential guides:', // Judul guides ada di sini sekarang
+                guides: [
+                    { title: "Arabika vs Robusta", url: "#", image: "/images/beans/arabica-featured.jpg" },
+                    { title: "Proses Pasca Panen", url: "#", image: "/images/beans/process-featured.jpg" },
+                    { title: "Tingkat Sangrai", url: "#", image: "/images/beans/roast-featured.jpg" },
+                    { title: "Origin Flavor Guide", url: "#", image: "/images/beans/origin-featured.jpg" },
+                ]
+            }
+		],
+	},
+	// BLOK 2: AKSESORI (MENGGUNAKAN STRUKTUR BARU)
+	{
+		sectionId: "accessories-and-tools-block",
+		sectionTitle: "Accessories and Tools",
+		sectionSubtitle:
+			"Detail kecil yang membuat perbedaan besar. Temukan timbangan, teko leher angsa, filter, dan alat bantu lainnya.",
+		bodyContent: [
+            {
+                type: 'list',
+                title: 'In this hub, you’ll learn about:',
+                listItems: [
+                    "<strong>Scales:</strong> Mengapa akurasi penting dalam rasio kopi.",
+                    "<strong>Kettles:</strong> Kontrol suhu dan aliran air untuk pouring yang sempurna.",
+                    "<strong>Filters:</strong> Perbedaan antara kertas, kain, dan filter metal.",
+                    "<strong>Storage:</strong> Cara menjaga biji dan peralatan Anda tetap prima.",
+                    "<strong>Maintenance:</strong> Tips membersihkan peralatan Anda.",
+                ]
+            },
+            {
+                type: 'grid',
+                title: 'Explore these essential guides:',
+                guides: [
+                    { title: "Best Scales", url: "#", image: "/images/gear/scale-featured.jpg" },
+                    { title: "Gooseneck Kettles", url: "#", image: "/images/gear/kettle-featured.jpg" },
+                    { title: "Filter Paper Comparison", url: "#", image: "/images/gear/filter-featured.jpg" },
+                    { title: "Coffee Storage", url: "#", image: "/images/gear/storage-featured.jpg" },
+                ]
+            }
+		],
+	},
 
-// --- DATA STATIS KATEGORI INI DITANAM DI SINI ---
-const sectionId = "accessories-and-tools";
-const sectionTitle = "Accessories and Tools";
-const sectionSubtitle = "Detail kecil yang membuat perbedaan besar. Temukan timbangan, teko leher angsa, filter, dan alat bantu lainnya.";
-const learningPoints = [
-    "<strong>Scales:</strong> Mengapa akurasi penting dalam rasio kopi.",
-    "<strong>Kettles:</strong> Kontrol suhu dan aliran air untuk pouring yang sempurna.",
-    "<strong>Filters:</strong> Perbedaan antara kertas, kain, dan filter metal.",
-    "<strong>Storage:</strong> Cara menjaga biji dan peralatan Anda tetap prima.",
-    "<strong>Maintenance:</strong> Tips membersihkan peralatan Anda.",
-];
+    // BLOK 3: MANUAL COFFEE BREWING GUIDES (BARU)
+	{
+		sectionId: "manual-brewing-guides",
+		sectionTitle: "Manual Coffee Brewing Guides",
+		sectionSubtitle:
+			"What kind of home barista are you if you haven’t experienced making pour over coffee? Pour over brewing allows you to take charge of every aspect of the process, including brew temperature, time, and flow rate. We think it’s the best method for highlighting specialty coffee beans’ complex and subtle flavors.",
+		bodyContent: [
+			{
+				type: 'paragraph',
+				text: "Pour over coffee is simple in theory but complicated in execution with so many variables under your control. It takes patience and time to master. But don’t worry, we’re here to guide you through it with these detailed recipes for the most popular drippers."
+			},
+			{
+				type: 'grid',
+				title: 'Explore Pour Over Recipes:', // Judul khusus untuk grid ini
+				guides: [
+					// Contoh Data Tautan Panduan Pour Over
+					{ title: "Hario V60 Recipe", url: "#", image: "/images/brewing/v60-recipe.jpg" },
+					{ title: "Chemex Masterclass", url: "#", image: "/images/brewing/chemex-masterclass.jpg" },
+					{ title: "Kalita Wave Guide", url: "#", image: "/images/brewing/kalita-wave.jpg" },
+					{ title: "Gino Dripper Basics", url: "#", image: "/images/brewing/gino-basics.jpg" },
+				]
+			}
+		],
+	},
+]; // Penutup array ALL_CONTENT_BLOCKS
+
+    // <<< CARA MENAMBAH BLOK BARU DENGAN ISI BERBEDA:
+    // Blok baru yang HANYA berisi Paragraf dan Grid.
+    // {
+    //     sectionId: "brewing-guides-block",
+    //     sectionTitle: "Aeropress & Cold Brew Guides",
+    //     sectionSubtitle: "Detail panduan seduh yang spesifik.",
+    //     bodyContent: [
+    //         {
+    //             type: 'paragraph',
+    //             text: 'Aeropress telah menjadi alat seduh paling populer karena fleksibilitasnya.',
+    //         },
+    //         {
+    //             type: 'grid',
+    //             title: 'Aeropress Guides:',
+    //             guides: [/* ... 3 link Aeropress ... */]
+    //         },
+    //         {
+    //             type: 'grid',
+    //             title: 'Cold Brew Guides:',
+    //             guides: [/* ... 4 link Cold Brew ... */]
+    //         }
+    //     ]
+    // }
+
 ---
 
-<section id={sectionId} class="pt-2 pb-16 bg-white">
-    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-
-        {/* BLOK DESKRIPSI & LINK STATIS */}
-        <div class="max-w-7xl mx-auto mb-6">
-            <div class="bg-white p-8 rounded-xl border border-transparent shadow-none drop-shadow-none">
-
-                <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
-                    {sectionTitle}
-                </h2>
-
-                <p class="text-lg text-gray-700 mb-8">
-                    {sectionSubtitle}
-                </p>
-
-                <p class="font-bold text-coffee-dark mb-3 text-lg">In this hub, you’ll learn about:</p>
-
-                <ul class="list-disc list-inside text-gray-700 space-y-2 ml-4 mb-10">
-                    {learningPoints.map((point) => (
-                        <li set:html={point} />
-                    ))}
-                </ul>
-
-                <h3 class="text-2xl font-bold text-coffee-dark mt-8 mb-6">
-                    Explore these essential guides:
-                </h3>
-
-                {/* --- GRID LINK STATIS (4 KOLOM) --- */}
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {staticFeaturedLinks.map((link) => (
-                        <a
-                            href={link.url}
-                            class="block bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1"
-                            aria-label={link.title}
-                        >
-                            <img
-                                src={link.image}
-                                alt={link.title}
-                                class="w-full h-32 object-cover"
-                                style={{ aspectRatio: '4/3' }}
-                            />
-                            <div class="p-3 text-center">
-                                <p class="text-sm font-bold text-coffee-dark hover:text-accent-primary transition duration-300">
-                                    {link.title}
-                                </p>
-                            </div>
-                        </a>
-                    ))}
-                </div>
-            </div>
-        </div>
-
-        {/* --- DAFTAR POST DINAMIS (POSTS GRID) --- */}
-        {/* Blok ini menggunakan posts yang sekarang dijamin menjadi array, meskipun kosong */}
-        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            {posts.map((post) => (
-                <a 
-                    href={`/${post.collection}/${post.slug}/`} 
-                    class="block group relative bg-white rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl"
-                >
-                    <img
-                        src={post.data.image || '/images/default-post.jpg'}
-                        alt={post.data.title}
-                        class="w-full h-56 object-cover"
-                        style={{ aspectRatio: '4/3' }}
-                    />
-                    <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent p-4 flex flex-col justify-end">
-                        <h3 class="text-lg font-bold text-white group-hover:text-accent-primary transition duration-300">
-                            {post.data.title}
-                        </h3>
-                    </div>
-                </a>
-            ))}
-        </div>
-    </div>
-</section>
+{/* Menggunakan MAP untuk merender semua blok data dengan ContentSection.astro */}
+{ALL_CONTENT_BLOCKS.map((data, index) => (
+    <ContentSection 
+        data={data} 
+        isFirst={index === 0} 
+    />
+))}

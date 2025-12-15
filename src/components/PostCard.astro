@@ -1,57 +1,62 @@
 ---
-// Import tipe data (asumsi Anda menggunakan tipe yang sama)
+// src/components/PostCard.astro
+
 import type { CollectionEntry } from 'astro:content';
-type CombinedPost = CollectionEntry<'blog'> | CollectionEntry<'guides'> | CollectionEntry<'picks'>;
+type CombinedPost = CollectionEntry<'blog'>; 
 
 interface Props {
-  post: CombinedPost;
-  postType: string; // Misal: 'blog', 'guides', 'picks'
+  post: CombinedPost;
+  postType: string; 
 }
 
 const { post, postType } = Astro.props;
 
-// Ambil data gambar (path ke /public/images/...)
 const imagePath = post.data.image; 
 
 // Format Tanggal
 const formattedDate = post.data.pubDate 
-    ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    : 'Date not available';
+    ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'Date not available';
+
+// Tentukan URL Dinamis: /collection/slug
+const postUrl = `/${post.collection}/${post.slug}`;
 ---
 
-<a href={`/${post.slug}`} class="block overflow-hidden rounded-lg shadow-lg hover:shadow-xl transition duration-300 bg-white">
-    
-    <div class="h-48 w-full bg-gray-100 overflow-hidden">
-        {imagePath ? (
-            <img 
-                src={imagePath} 
-                alt={post.data.title}
-                class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
-            />
-        ) : (
-            // Fallback jika tidak ada gambar
-            <div class="w-full h-full flex items-center justify-center text-gray-400">
-                No Image
-            </div>
-        )}
-    </div>
+<a href={postUrl} 
+   class="block overflow-hidden rounded-xl shadow-md hover:shadow-xl transition duration-300 bg-white 
+          border border-transparent hover:border-accent-primary transform hover:-translate-y-1">
+    
+    <div class="h-48 w-full bg-coffee-light overflow-hidden">
+        {imagePath ? (
+            <img 
+                src={imagePath} 
+                alt={post.data.title}
+                class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+                loading="lazy"
+            />
+        ) : (
+            <div class="w-full h-full flex items-center justify-center text-coffee-brown/50 font-medium">
+                No Image Available
+            </div>
+        )}
+    </div>
 
-    <div class="p-5">
-        
-        <span class="inline-block bg-coffee-dark text-white text-xs font-semibold px-3 py-1 rounded-full mb-3">
-            {postType.toUpperCase()}
-        </span>
+    <div class="p-5">
+        
+        <span class="inline-block bg-accent-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase">
+            {postType} 
+        </span>
 
-        <h3 class="text-xl font-bold text-coffee-dark mb-2 leading-tight">
-            {post.data.title}
-        </h3>
-        
-        <p class="text-gray-600 text-sm mb-4 line-clamp-2">
-            {post.data.description}
-        </p>
+        <h3 class="text-xl font-bold text-coffee-dark mb-2 leading-tight group-hover:text-accent-primary transition duration-300">
+            {post.data.title}
+        </h3>
+        
+        <p class="text-coffee-brown text-sm mb-4 line-clamp-2">
+            {post.data.description}
+        </p>
 
-        <p class="text-xs text-gray-400">
-            Published on {formattedDate}
-        </p>
-    </div>
+        <p class="text-xs text-coffee-brown/70">
+            Published on {formattedDate}
+        </p>
+    </div>
 </a>

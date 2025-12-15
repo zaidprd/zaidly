@@ -1,17 +1,19 @@
 ---
+// src/pages/blog/[...page].astro
+
 import { getCollection } from "astro:content";
 
-// Path komponen (Asumsi: dari src/pages/blog/)
+// Path komponen
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
-// HAPUS: import CategoryFilter dari sini
 import HeroBlog from '../../components/HeroBlog.astro';
 
-import type { GetStaticPaths } from 'astro';
+// Import Type Wajib
+import type { GetStaticPaths, Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
-import type { Page } from 'astro'; 
 
-// HAPUS: 'guides' | 'picks' dari type PostCollectionName
+
+// Definisi Type
 type PostCollectionName = 'blog'; 
 type CombinedPost = CollectionEntry<PostCollectionName>;
 
@@ -26,9 +28,7 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 
     // 1. PENGAMBILAN DATA
     const blogPosts = await getCollection("blog");
-    // HAPUS: const guidePosts = await getCollection("guides");
-    // HAPUS: const bestPicksPosts = await getCollection("picks");
-
+    
     // Hanya menggunakan blogPosts
     let allPosts: CombinedPost[] = [...blogPosts]; 
 
@@ -47,8 +47,9 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 
 
 // =====================================
-// PROPS
+// PROPS & DATA
 // =====================================
+// Menggunakan type assertion yang benar
 const { page } = Astro.props as { page: Page<CombinedPost> }; 
 
 // Ambil data yang dibutuhkan dari objek 'page'
@@ -56,7 +57,7 @@ const pageNum = page.currentPage;
 const posts = page.data;
 const nextUrl = page.url.next;
 
-// --- KOREKSI TITLE DI SINI ---
+// --- TITLE ---
 const baseTitle = 'Blog'; 
 const pageTitle = pageNum === 1 
     ? baseTitle 
@@ -65,18 +66,17 @@ const pageTitle = pageNum === 1
 ---
 
 <BaseLayout title={pageTitle}> 
-    <HeroBlog />
+    
+    {/* PERBAIKAN FINAL: Hero hanya muncul di halaman 1 */}
+    {pageNum === 1 && (
+        <HeroBlog />
+    )}
 
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
         
-        {/* HAPUS: Div yang memanggil CategoryFilter */}
-        {/* <div class="mb-10">
-            <CategoryFilter />
-        </div> */}
-
         <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {posts.map((post: CombinedPost) => (
-                // Pastikan postType hanya menggunakan 'blog' atau tidak perlu lagi jika semua sama
+                // postType dipertahankan sesuai permintaan Anda
                 <PostCard post={post} postType={post.collection} /> 
             ))}
         </section>

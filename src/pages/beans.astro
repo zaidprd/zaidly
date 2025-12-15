@@ -1,31 +1,29 @@
 ---
-// src/pages/beans.astro
+// src/pages/beans.astro (KODE FIX TERAKHIR)
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro'; 
-// --- Komponen Utama Biji Kopi ---
 import BeanHubSection from '../components/beans/BeanHub.astro'; 
 
-// --- Data Hero & SEO Saja ---
-const heroData = {
-    title: "Mengenal Biji Kopi: Asal, Proses, dan Rasa",
-    subtitle: "Pelajari perbedaan antara Arabika dan Robusta, profil rasa dari berbagai asal, hingga cara terbaik menyimpan biji kopi Anda.", 
-    linkText: "Jelajahi Panduan Biji Kopi", 
-    linkUrl: "#bean-hub", 
-    image: "/images/hero-beans.jpg"
-};
-const pageTitle = "Panduan Biji Kopi - Zaidly Coffee";
+const pageTitle = "Panduan Biji Kopi Lengkap - Zaidly Coffee";
 
-// TIDAK ADA: import { getCollection } dari 'astro:content';
-// TIDAK ADA: const allPosts = ...
-// TIDAK ADA: const beanPosts = ...
+const heroData = {
+    title: "Mengenal Kopi: Dari Biji Hingga Seduhan Sempurna",
+    subtitle: "Temukan semua yang perlu Anda ketahui tentang biji kopi, peralatan, dan metode *brewing*.",
+    image: "/images/hero/coffee-beans.jpg", 
+    
+    // --- SOLUSI UNTUK ERROR 2322 ---
+    linkText: "Lihat Semua Panduan", 
+    linkUrl: "#hub-content", // Atau link lain yang relevan
+};
+// --------------------------------------------------------
 ---
 
 <BaseLayout title={pageTitle}>
+    <Hero {...heroData} />
     
-    <Hero {...heroData} />
-
-    {/* Memanggil komponen TANPA mengirim prop posts */}
-    <BeanHubSection /> 
+    <section class="pb-20 bg-cream-latte border-t border-coffee-light">
+        <BeanHubSection /> 
+    </section>
 
 </BaseLayout>
