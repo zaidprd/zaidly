@@ -1,0 +1,16 @@
+---
+// src/pages/about.astro
+
+import BaseLayout from '../layouts/BaseLayout.astro';
+import AboutContent from '../components/AboutContent.astro';
+
+const pageTitle = "Tentang Zaidly - Misi Kami untuk Kopi Terbaik";
+const pageDescription = "Pelajari mengapa Zaidly didirikan dan bagaimana kami membantu penyeduh rumahan memilih alat kopi terbaik tanpa tebakan.";
+---
+
+<BaseLayout title={pageTitle} description={pageDescription}>
+    
+    {/* Panggil komponen konten yang sudah dibuat */}
+    <AboutContent />
+
+</BaseLayout>
