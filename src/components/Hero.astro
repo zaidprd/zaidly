@@ -2,47 +2,40 @@
 // src/components/Hero.astro
 
 interface Props {
-    title: string;
-    subtitle: string;
-    linkText: string;
-    linkUrl: string;
+  title: string;
+  subtitle: string;
+  linkText: string;
+  linkUrl: string;
 }
 
-const { title, subtitle, linkText, linkUrl } = Astro.props;
+const { title, subtitle, linkText, linkUrl } = Astro.props as Props;
 ---
 
-{/* 1. Ganti bg-gray-100 menjadi bg-cream-latte */}
-{/* 2. Ganti py-20 md:py-32 dengan pt-28 md:pt-40 (Kompensasi Header) + pb-20 md:pb-32 */}
-<section class="bg-cream-latte pt-28 md:pt-40 pb-20 md:pb-32"> 
-    
-    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-10 items-center">
-            
-            <div>
-                <img 
-                    src="/images/coffee-hero-bg.jpg" 
-                    alt="Espresso machine pulling a shot" 
-                    class="rounded-xl w-full h-auto" 
-                    loading="eager"
-                />
-            </div>
+<section
+  class="relative h-[400px] md:h-[800px] lg:h-[1000px] flex items-center justify-center bg-cover bg-center"
 
-            <div>
-                <h1 class="text-5xl md:text-7xl font-extrabold text-coffee-dark mb-4 leading-tight">
-                    {title}
-                </h1>
-                {/* Ganti text-gray-700 menjadi text-coffee-brown */}
-                <p class="text-xl text-coffee-brown mb-8">
-                    {subtitle}
-                </p>
-                <a 
-                    href={linkUrl} 
-                    class="inline-block bg-accent-primary text-white font-semibold px-8 py-4 rounded-lg hover:bg-coffee-dark transition duration-300 transform hover:scale-105">
-                    {linkText}
-                </a>
-            </div>
-            
-        </div>
-    </div>
+  style="background-image: url('/images/herozaildy.webp');"
+>
+
+  {/* START: KODE UNTUK OVERLAY AGAR GELAP */}
+  <div class="absolute inset-0 bg-black/50"></div> {/* <-- Ganti bg-black/40 menjadi bg-black/50 atau bg-black/60 jika ingin lebih gelap */}
+  {/* END: KODE UNTUK OVERLAY AGAR GELAP */}
+
+  <div class="relative z-10 container mx-auto max-w-6xl px-4 text-center text-white">
+    <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight drop-shadow-lg">
+      {title}
+    </h1>
+
+    <p class="text-lg mb-8 drop-shadow-md">
+      {subtitle}
+    </p>
+
+    <a
+      href={linkUrl}
+      class="inline-block bg-accent-primary text-white font-semibold px-8 py-4 rounded-lg hover:bg-coffee-dark transition duration-300 transform hover:scale-105"
+    >
+      {linkText}
+    </a>
+  </div>
+
 </section>
