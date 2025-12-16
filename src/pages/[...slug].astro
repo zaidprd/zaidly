@@ -1,48 +1,69 @@
 ---
-import { getCollection } from "astro:content";
+// ===============================================
+// FILE: src/pages/[...slug].astro (FINAL VERSION)
+// FIX: Menghilangkan prefix 'blog/' dari URL dan mengelola slug yang dikecualikan
+// ===============================================
+
+// 1. IMPOR WAJIB DARI ASTRO CONTENT COLLECTIONS
+import { getCollection } from "astro:content"; 
+import type { CollectionEntry } from 'astro:content'; 
+
+// 2. IMPOR KOMPONEN DAN LAYOUT
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleLayout from '../layouts/ArticleLayout.astro'; 
 import Error404 from '../components/Error404.astro'; 
-import type { CollectionEntry } from 'astro:content';
 
-// Tipe gabungan untuk semua postingan
-type CombinedPost = CollectionEntry<'blog'> | CollectionEntry<'guides'> | CollectionEntry<'picks'>;
+// Definisi Tipe HANYA untuk blog
+type BlogPost = CollectionEntry<'blog'>;
 
 // --- Bagian 1: getStaticPaths (Menangani Routing) ---
 
 export async function getStaticPaths() {
-    // Ambil koleksi
-    const blog = await getCollection('blog');
-    const guides = await getCollection('guides'); 
-    const picks = await getCollection('picks'); 
+    // Ambil data HANYA dari koleksi 'blog'
+    const allPosts = await getCollection('blog');
     
-    const allPosts: CombinedPost[] = [...blog, ...guides, ...picks];
+    // SLUGS YANG DIKECUALIKAN
+    // 'blog' dipertahankan di sini untuk mencegah konflik dengan halaman 'blog.astro' statis
+    const excludedSlugs = ['admin', 'blog', 'about', 'gear', 'index']; 
 
-    return allPosts.map((post) => ({
-        params: { slug: post.slug },
-        props: { post },
-    }));
+    const paths = allPosts
+        // Filter: Hanya ambil postingan yang slug-nya TIDAK termasuk di daftar yang dikecualikan
+        .filter(post => !excludedSlugs.includes(post.slug)) 
+        .map((post) => ({
+            params: { 
+                // ✨ FIX KRUSIAL: Menghapus prefix 'blog/' dari slug untuk URL root.
+                slug: post.slug.replace('blog/', ''), 
+            }, 
+            props: { post },
+        }));
+
+    return paths;
 }
 
-// --- Bagian 2: Tampilan Halaman Dinamis ---
+// --- Bagian 2: PROPS & DATA Halaman Dinamis ---
 
-// Pastikan tipe props-nya sudah benar
-const { post } = Astro.props as { post: CombinedPost }; 
+const { post } = Astro.props as { post: BlogPost }; 
 
-// Render post dan ambil Content, dan yang terpenting: headings
-const { Content, headings } = await post.render();
+// Deklarasi variabel dengan tipe aman (untuk menghindari error 'Content is not a valid component')
+let Content: any = () => null; 
+let headings: any[] = [];
+let postData: any = {};
 
-// Ambil postData dengan type assertion yang aman jika diperlukan, 
-// tetapi seharusnya post.data sudah cukup untuk TypeScript jika layout diperbaiki.
-const postData = post.data;
+// Hanya render dan ambil data jika 'post' ada
+if (post) { 
+    // Mengambil Content dan Headings dengan aman
+    const rendered = await post.render();
+    Content = rendered.Content; 
+    headings = rendered.headings;
+    postData = post.data;
+}
 
-// Fix: Kita harus memastikan post.data memiliki tipe yang kompatibel 
-// dengan CustomFrontmatter di ArticleLayout.
-
+// --- END OF FRONTMATTER ---
 ---
 
+{/* Tampilan Artikel atau 404 */}
 {post ? (
-    <ArticleLayout frontmatter={postData as any} headings={headings}> 
+    <ArticleLayout frontmatter={postData} headings={headings}> 
         <Content />
     </ArticleLayout>
 ) : (

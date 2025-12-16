@@ -1,0 +1,35 @@
+# public/admin/config.yml
+
+backend:
+  name: github
+  repo: zaidprd/zaidly
+  branch: main
+
+publish_mode: editorial_workflow
+
+media_folder: "public/images"
+public_folder: "/images"
+media_library:
+  name: uploadcare
+
+collections:
+  - name: "blog"
+    label: "Blog Posts"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    # =================================================================
+    # INI TAMBAHAN KUNCINYA
+    # Memberitahu CMS: "Gunakan field 'body' sebagai konten utama,
+    # jangan masukkan ke dalam frontmatter."
+    body_field: "body"
+    # =================================================================
+    fields:
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "SEO Description", name: "description", widget: "string", required: true }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
+      - { label: "Author Name", name: "author", widget: "string", required: true }
+      - { label: "Feature Image URL", name: "image", widget: "image", required: false }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+      # Editor teks sekarang akan muncul kembali dan berfungsi dengan benar
+      - { label: "Body", name: "body", widget: "markdown", required: true }

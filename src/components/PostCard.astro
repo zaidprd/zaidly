@@ -1,12 +1,13 @@
 ---
-// src/components/PostCard.astro
+// src/components/PostCard.astro (FINAL VERSION)
+// FIX: Menghilangkan prefix 'blog/' dari tag <a> href
 
 import type { CollectionEntry } from 'astro:content';
 type CombinedPost = CollectionEntry<'blog'>; 
 
 interface Props {
-  post: CombinedPost;
-  postType: string; 
+    post: CombinedPost;
+    postType: string; 
 }
 
 const { post, postType } = Astro.props;
@@ -15,48 +16,52 @@ const imagePath = post.data.image;
 
 // Format Tanggal
 const formattedDate = post.data.pubDate 
-    ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    : 'Date not available';
+    ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
+    : 'Date not available';
 
-// Tentukan URL Dinamis: /collection/slug
-const postUrl = `/${post.collection}/${post.slug}`;
+// ✨ FIX KRUSIAL DI SINI:
+// 1. Bersihkan slug dari prefix 'blog/' yang mungkin masih ada.
+const cleanSlug = post.slug.replace('blog/', '');
+// 2. Buat URL hanya dari slug yang sudah bersih (misal: /judul-postingan)
+const postUrl = `/${cleanSlug}`; 
+// ----------------------------------------------------
 ---
 
 <a href={postUrl} 
-   class="block overflow-hidden rounded-xl shadow-md hover:shadow-xl transition duration-300 bg-white 
-          border border-transparent hover:border-accent-primary transform hover:-translate-y-1">
-    
-    <div class="h-48 w-full bg-coffee-light overflow-hidden">
-        {imagePath ? (
-            <img 
-                src={imagePath} 
-                alt={post.data.title}
-                class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
-                loading="lazy"
-            />
-        ) : (
-            <div class="w-full h-full flex items-center justify-center text-coffee-brown/50 font-medium">
-                No Image Available
-            </div>
-        )}
-    </div>
+    class="block overflow-hidden rounded-xl shadow-md hover:shadow-xl transition duration-300 bg-white 
+           border border-transparent hover:border-accent-primary transform hover:-translate-y-1">
+    
+    <div class="h-48 w-full bg-coffee-light overflow-hidden">
+        {imagePath ? (
+            <img 
+                src={imagePath} 
+                alt={post.data.title}
+                class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+                loading="lazy"
+            />
+        ) : (
+            <div class="w-full h-full flex items-center justify-center text-coffee-brown/50 font-medium">
+                No Image Available
+            </div>
+        )}
+    </div>
 
-    <div class="p-5">
-        
-        <span class="inline-block bg-accent-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase">
-            {postType} 
-        </span>
+    <div class="p-5">
+        
+        <span class="inline-block bg-accent-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase">
+            {postType} 
+        </span>
 
-        <h3 class="text-xl font-bold text-coffee-dark mb-2 leading-tight group-hover:text-accent-primary transition duration-300">
-            {post.data.title}
-        </h3>
-        
-        <p class="text-coffee-brown text-sm mb-4 line-clamp-2">
-            {post.data.description}
-        </p>
+        <h3 class="text-xl font-bold text-coffee-dark mb-2 leading-tight group-hover:text-accent-primary transition duration-300">
+            {post.data.title}
+        </h3>
+        
+        <p class="text-coffee-brown text-sm mb-4 line-clamp-2">
+            {post.data.description}
+        </p>
 
-        <p class="text-xs text-coffee-brown/70">
-            Published on {formattedDate}
-        </p>
-    </div>
+        <p class="text-xs text-coffee-brown/70">
+            Published on {formattedDate}
+        </p>
+    </div>
 </a>

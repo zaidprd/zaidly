@@ -1,0 +1,9 @@
+---
+// src/pages/admin.astro
+// Ini berfungsi sebagai route guard untuk mencegah [...slug].astro mengambil alih /admin
+
+// Astro.redirect akan bekerja di server (dev dan build)
+return Astro.redirect('/admin/index.html');
+---
+
+<meta http-equiv="refresh" content="0; url=/admin/index.html">
