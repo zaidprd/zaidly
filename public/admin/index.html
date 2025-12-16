@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="id">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Admin CMS</title>
-  
-  <base href="/admin/"> 
-
-</head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Zaidly Coffee Gear</title>
+  
+  <script>
+    // Memeriksa jika URL memiliki token (dari email undangan/reset password Netlify)
+    if (window.location.hash.includes('invite_token') || window.location.hash.includes('recovery_token')) {
+      // Jika ya, paksa redirect ke halaman /admin/ agar Decap CMS bisa memproses token tersebut
+      window.location.pathname = '/admin/';
+    }
+  </script>
+  </head>
 <body>
-    <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
-</body>
+  </body>
 </html>
