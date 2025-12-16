@@ -1,0 +1,15 @@
+# FILE: public/_headers
+# Mengizinkan Decap CMS (di Cloudflare) untuk berkomunikasi dengan Netlify Identity
+
+/admin/*
+  Access-Control-Allow-Origin: https://shimmering-llama-ae3600.netlify.app
+  Access-Control-Allow-Headers: Authorization, Content-Type, *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Credentials: true
+  
+# Secara umum, untuk semua aset Decap CMS
+/admin/
+  Access-Control-Allow-Origin: https://shimmering-llama-ae3600.netlify.app
+  Access-Control-Allow-Headers: Authorization, Content-Type, *
+  Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS
+  Access-Control-Allow-Credentials: true
