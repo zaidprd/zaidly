@@ -1,35 +1,45 @@
-# public/admin/config.yml
+# =======================================================
+# public/admin/config.yml (KODE FINAL)
+# Setup: Astro + Decap CMS + GitHub + Cloudflare Pages
+# URL Autentikasi Netlify: https://shimmering-llama-ae3600.netlify.app
+# =======================================================
 
+# 1. Backend Configuration (GitHub + Auth Proxy)
 backend:
   name: github
-  repo: zaidprd/zaidly
+  repo: zaidprd/zaidly # Repository GitHub Anda
   branch: main
+  
+  # 💥 KUNCI: MENGGUNAKAN NETLIFY GIT GATEWAY SEBAGAI PROXY AUTENTIKASI
+  auth_proxy_url: https://shimmering-llama-ae3600.netlify.app/.netlify/git/github 
 
 publish_mode: editorial_workflow
 
-media_folder: "public/images"
-public_folder: "/images"
+# 2. Media & Asset Setup
+media_folder: "public/images" 
+public_folder: "/images" 
 media_library:
-  name: uploadcare
+  name: uploadcare 
 
+# 3. Collection Structure
 collections:
   - name: "blog"
     label: "Blog Posts"
     folder: "src/content/blog"
     create: true
     slug: "{{slug}}"
-    # =================================================================
-    # INI TAMBAHAN KUNCINYA
-    # Memberitahu CMS: "Gunakan field 'body' sebagai konten utama,
-    # jangan masukkan ke dalam frontmatter."
-    body_field: "body"
-    # =================================================================
+    
+    # KUNCI: Memberitahu CMS body field bukan bagian dari frontmatter
+    body_field: "body" 
+    
     fields:
-      - { label: "Title", name: "title", widget: "string", required: true }
-      - { label: "SEO Description", name: "description", widget: "string", required: true }
+      # Field Wajib Astro/SEO
+      - { label: "Title", name: "title", widget: "string", required: true, hint: "Judul utama (H1)." }
+      - { label: "SEO Description", name: "description", widget: "string", required: true, hint: "Deskripsi singkat (Max 160 Karakter). Wajib diisi." }
       - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
-      - { label: "Author Name", name: "author", widget: "string", required: true }
-      - { label: "Feature Image URL", name: "image", widget: "image", required: false }
-      - { label: "Tags", name: "tags", widget: "list", required: false }
-      # Editor teks sekarang akan muncul kembali dan berfungsi dengan benar
-      - { label: "Body", name: "body", widget: "markdown", required: true }
+      - { label: "Author Name", name: "author", widget: "string", required: true, hint: "Nama penulis." }
+      - { label: "Feature Image URL", name: "image", widget: "image", required: false, hint: "Gambar utama artikel." } 
+      - { label: "Tags", name: "tags", widget: "list", required: false, hint: "Tag atau kategori artikel." } 
+      
+      # Field Konten Utama
+      - { label: "Body", name: "body", widget: "markdown", required: true, hint: "Gunakan Mode Raw (<>) untuk Tabel dan Pastikan Ada Baris Kosong Antar Paragraf." }
