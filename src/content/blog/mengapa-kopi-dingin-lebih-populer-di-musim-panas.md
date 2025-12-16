@@ -4,7 +4,7 @@ description: Perbedaan mendasar antara cold brew dan kopi es biasa, dan cara
   membuat cold brew yang sempurna di rumah.
 pubDate: 2025-12-16T06:27:00.000+07:00
 author: zaid
-image: /images/1-3-14-1-106x73.jpg
+image: /images/beans-1.jpg.jpg
 tags:
   - zaid
 ---
