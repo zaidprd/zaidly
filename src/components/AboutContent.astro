@@ -1,20 +1,18 @@
 ---
-// src/components/AboutContent.astro (FINAL STRUCTURE DENGAN KONTEN BAHASA INGGRIS)
-// Menggunakan warna kustom: coffee-dark, coffee-brown, accent-primary, cream-latte
+// src/components/AboutContent.astro (OPTIMIZED VISUALS)
 ---
 
 <section class="bg-cream-latte py-16 sm:py-24">
-    <div class="container mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
-      
-
+    <div class="container mx-auto max-w-4xl px-4 sm:px-6 lg:px-8">
+        
         {/* 1. OUR STORY */}
-        <div class="mb-12">
-            <h2 class="text-3xl font-bold text-coffee-dark mb-4 border-b-2 border-accent-primary/50 pb-2">
+        <div class="mb-16">
+            <h2 class="text-3xl font-black text-coffee-dark mb-6 uppercase tracking-widest border-l-4 border-accent-primary pl-4">
                 Our Story
             </h2>
-            <div class="text-lg text-coffee-brown space-y-4">
+            <div class="text-lg text-coffee-brown leading-relaxed space-y-6">
                 <p>
-                    Zaidly was created to help home coffee lovers make better coffee with the right tools. With so many coffee products on the market, choosing the best gear can be confusing. 
+                    <strong>Zaidly</strong> was created to help home coffee lovers make better coffee with the right tools. With so many coffee products on the market, choosing the best gear can be confusing. 
                 </p>
                 <p>
                     Our goal is simple: cut through the noise and provide clear, honest recommendations you can trust. We focus on coffee equipment that actually improves your brewing experience—espresso machines, grinders, coffee makers, and essential accessories—so you can enjoy café-quality coffee at home without guesswork.
@@ -23,65 +21,68 @@
         </div>
 
         {/* 2. WHAT WE DO */}
-        <div class="mb-12">
-            <h2 class="text-3xl font-bold text-coffee-dark mb-4 border-b-2 border-accent-primary/50 pb-2">
+        <div class="mb-16">
+            <h2 class="text-3xl font-black text-coffee-dark mb-6 uppercase tracking-widest border-l-4 border-accent-primary pl-4">
                 What We Do
             </h2>
-            <div class="text-lg text-coffee-brown space-y-4">
+            <div class="text-lg text-coffee-brown space-y-6">
                 <p>
                     At Zaidly, we research, compare, and review coffee gear to help you make informed buying decisions. Our content includes:
                 </p>
                 
-                <ul class="list-disc list-inside space-y-2 ml-4 marker:text-accent-primary">
-                    <li>In-depth coffee gear reviews</li>
-                    <li>Best-of buying guides</li>
-                    <li>Product comparisons</li>
-                    <li>Practical brewing guides for home use</li>
+                <ul class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {[
+                        'In-depth coffee gear reviews',
+                        'Best-of buying guides',
+                        'Product comparisons',
+                        'Practical brewing guides'
+                    ].map((item) => (
+                        <li class="flex items-center text-sm font-bold text-coffee-dark bg-white/50 border border-coffee-brown/10 p-4">
+                            <span class="w-2 h-2 bg-accent-primary mr-3"></span>
+                            {item}
+                        </li>
+                    ))}
                 </ul>
-                <p>
-                    Every guide is written with real users in mind, from beginners to experienced home brewers.
-                </p>
             </div>
         </div>
 
         {/* 3. HOW WE CHOOSE PRODUCTS */}
-        <div class="mb-12">
-            <h2 class="text-3xl font-bold text-coffee-dark mb-4 border-b-2 border-accent-primary/50 pb-2">
-                How We Choose Products
+        <div class="mb-16">
+            <h2 class="text-3xl font-black text-coffee-dark mb-6 uppercase tracking-widest border-l-4 border-accent-primary pl-4">
+                Selection Process
             </h2>
-            <p class="text-lg text-coffee-brown mb-6">
-                We evaluate coffee gear based on:
-            </p>
-            
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {['Build quality and durability', 'Performance and consistency', 'Ease of use for home brewing', 'Customer feedback and real-world use cases', 'Overall value for the price'].map((criterion) => (
-                    <div class="flex items-center p-4 bg-coffee-light rounded-lg shadow-sm">
-                        <i class="ri-checkbox-circle-fill text-2xl text-accent-primary mr-3 flex-shrink-0"></i>
-                        <p class="text-coffee-dark font-medium">{criterion}</p>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-px bg-coffee-brown/10 border border-coffee-brown/10">
+                {[
+                    'Build quality and durability', 
+                    'Performance and consistency', 
+                    'Ease of use for home brewing', 
+                    'Real-world use cases', 
+                    'Overall value for the price'
+                ].map((criterion) => (
+                    <div class="flex items-center p-5 bg-white">
+                        <svg class="w-5 h-5 text-accent-primary mr-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <p class="text-coffee-dark font-bold text-sm uppercase tracking-tight">{criterion}</p>
                     </div>
                 ))}
             </div>
-            <p class="mt-4 text-sm text-coffee-brown italic">
-                Our recommendations are regularly updated to reflect new models and changes in the market.
-            </p>
         </div>
 
         {/* 4. OUR PHILOSOPHY */}
-        <div class="mb-12">
-            <h2 class="text-3xl font-bold text-coffee-dark mb-4 border-b-2 border-accent-primary/50 pb-2">
-                Our Philosophy
-            </h2>
-            <p class="text-lg text-coffee-brown">
-                Good coffee doesn’t require complicated setups—just the right equipment and reliable guidance. We believe great coffee should be accessible, enjoyable, and easy to brew at home.
+        <div class="mb-20 bg-coffee-dark p-8 sm:p-12 text-center">
+            <h2 class="text-2xl font-black text-white mb-6 uppercase tracking-[0.2em]">Our Philosophy</h2>
+            <p class="text-xl text-cream-latte/80 leading-relaxed font-serif italic">
+                "Good coffee doesn’t require complicated setups—just the right equipment and reliable guidance. We believe great coffee should be accessible, enjoyable, and easy to brew at home."
             </p>
         </div>
 
         {/* 5. AFFILIATE DISCLOSURE */}
-        <div class="p-6 bg-coffee-light/70 rounded-xl border border-accent-primary/50">
-            <h3 class="text-xl font-bold text-coffee-dark mb-3 flex items-center">
-                <i class="ri-link-m text-2xl text-accent-primary mr-2"></i> Affiliate Disclosure
+        <div class="p-8 bg-white border-t-4 border-accent-primary">
+            <h3 class="text-xs font-black text-coffee-dark mb-4 uppercase tracking-[0.3em] flex items-center">
+                Affiliate Disclosure
             </h3>
-            <p class="text-sm text-coffee-brown">
+            <p class="text-sm text-coffee-brown leading-relaxed">
                 Zaidly is supported by readers. Some links on this site are affiliate links, which means we may earn a small commission at no extra cost to you. This helps us keep our content free and continuously updated. Our recommendations are always independent and based on research and experience.
             </p>
         </div>

@@ -1,62 +1,63 @@
 ---
 // src/pages/index.astro
 
-// 1. Ambil Layout Utama 
+// 1. Layout & Components
 import MainLayout from '../layouts/BaseLayout.astro';
-
-// 2. Component (ROOT components/ - PATH SUDAH BENAR)
 import Hero from '../components/Hero.astro'; 
-
-// 3. Section Component (components/section/)
 import WhoIsZaidly from '../components/section/WhoIsZaidly.astro'; 
 import FeaturedCategories from '../components/section/FeaturedCategories.astro';
+import TopPicks from '../components/section/TopPicks.astro'; 
 import CoffeeGearHub from '../components/section/CoffeeGearHub.astro'; 
 import LatestPosts from '../components/section/LatestArticles.astro'; 
 import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
 
-// 4. Ambil data Postingan
+// 2. Data Fetching
 import { getCollection } from 'astro:content';
 
-// Ambil semua postingan dan tambahkan pengamanan || []
 const allPosts = await getCollection('blog') || []; 
 
-// Filter 8 postingan terbaru
-const latestPosts = allPosts
-    .sort((a, b) => (b.data.pubDate as Date).getTime() - (a.data.pubDate as Date).getTime())
-    .slice(0, 3);
+// 3. Logic: Sorting & Filtering for SEO Topical Authority
+const sortedPosts = allPosts.sort((a, b) => 
+    (b.data.pubDate as Date).getTime() - (a.data.pubDate as Date).getTime()
+);
 
-// Filter 4 postingan dengan category: 'gear'
+const latestPosts = sortedPosts.slice(0, 3);
 const gearPosts = allPosts.filter(post => post.data.category === 'gear').slice(0, 4);
+const beanPosts = allPosts.filter(post => post.data.category === 'beans').slice(0, 4);
 
-// Data statis untuk Featured Categories
+// 4. Category Data
 const featuredCategories = [
-    { title: "Gear Guides", description: "Reviews & guides for all brewing equipment.", url: "#", icon: "ri:tools-line" },
-    { title: "Bean Types", description: "Explore origins, roasts, and flavor profiles.", url: "#", icon: "ri:seedling-line" },
-    { title: "Brew Methods", description: "Master various techniques from pour-over to espresso.", url: "#", icon: "ri:cup-line" },
-    { title: "Café Culture", description: "Stories, tips, and trends from the coffee world.", url: "#", icon: "ri:store-line" },
+    { title: "Gear Guides", description: "In-depth reviews of the latest brewing tools.", url: "/gear", icon: "ri:tools-line" },
+    { title: "Bean Types", description: "Discover origins, roasts, and flavor profiles.", url: "/beans", icon: "ri:seedling-line" },
+    { title: "Brew Methods", description: "Master techniques from pour-over to espresso.", url: "/guides", icon: "ri:cup-line" },
+    { title: "Café Culture", description: "Trends and stories from the specialty coffee world.", url: "/blog", icon: "ri:store-line" },
 ];
 ---
 
-<MainLayout title="Best Coffe Gear">
+<MainLayout title="Best Coffee Gear Reviews & Brewing Guides | Zaidly">
     
     <Hero 
-        title="Best Coffee Gear" 
-        subtitle="Upgrade your home coffee routine with expert-reviewed gear, brewing guides, and must-have accessories."
-        linkText="Explore Best Coffee Gear"
-        linkUrl="/guides" 
+        title="Premium Coffee Gear for Home Brewing" 
+        subtitle="Elevate your daily ritual with expert-reviewed espresso machines, precision grinders, and professional brewing techniques."
+        linkText="Explore Gear Reviews"
+        linkUrl="/gear" 
+        imageAlt="Collection of premium coffee brewing tools, grinders, and espresso machines - Zaidly Coffee Gear Reviews"
     />
 
     <FeaturedCategories categories={featuredCategories} />
 
+    <TopPicks />
+
     <WhoIsZaidly 
-        title="Who is Zaidly?" 
-        subtitle="Zaidly is an independent coffee gear guide built for home brewers who want better coffee without the guesswork. We research, test, and review coffee equipment—from espresso machines and grinders to brewing accessories—so you can choose the right tools with confidence."
-        linkText="Read Our Story →"
+        title="Independent Coffee Authority" 
+        subtitle="Zaidly is a dedicated coffee gear guide for home brewers. We research, test, and review equipment—from espresso machines to precision grinders—so you can invest in the right tools with total confidence."
+        linkText="Our Review Process →"
         linkUrl="/about" 
     />
     
-    <CoffeeGearHub posts={gearPosts || []} />
-    <CoffeeBeanGuides posts={gearPosts || []}  />
-    <LatestPosts posts={latestPosts || []} />
+    <CoffeeGearHub posts={gearPosts} />
+    <CoffeeBeanGuides posts={beanPosts} />
+    
+    <LatestPosts posts={latestPosts} />
 
 </MainLayout>

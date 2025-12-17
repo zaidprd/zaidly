@@ -1,126 +1,107 @@
----
-// Import komponen untuk Logo (jika Anda menggunakan Image atau SVG)
-// import { Image } from 'astro:assets'; 
-
-// Tidak ada frontmatter lain yang diperlukan di sini.
----
-
 <header 
     id="main-header" 
-    class="fixed w-full top-0 z-50 
-           /* WARNA AWAL: coffee-light sebagai putih */
-           bg-coffee-light border-b border-coffee-light/50 shadow-sm h-20 
-           transition-all duration-300"
+    class="fixed w-full top-0 z-50 bg-coffee-light border-b border-coffee-light/50 shadow-sm h-20 transition-all duration-300"
 >
-    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 
-                 flex justify-between items-center h-full">
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
         
-        <a 
-            href="/" 
-            id="header-logo" 
-            class="text-2xl font-bold text-coffee-dark tracking-wide 
-                    transition-all duration-300"
-        >
+        <a href="/" id="header-logo" class="text-2xl font-bold text-coffee-dark tracking-wide transition-all duration-300 hover:text-accent-primary">
             Zaidly
         </a>
 
         <nav class="hidden md:block">
-            {/* WARNA TEKS NAV: coffee-brown (untuk teks sekunder) */}
-            <ul class="flex space-x-6 text-coffee-brown font-semibold" id="main-nav-links">
-                <li><a href="/guides" class="hover:text-accent-primary transition">Brewing Guides</a></li>
-                <li><a href="/gear" class="hover:text-accent-primary transition">Gear</a></li>
-                <li><a href="/beans" class="hover:text-accent-primary transition">Beans</a></li>
-                <li><a href="/about" class="hover:text-accent-primary transition">About</a></li>
-                <li><a href="/blog" class="hover:text-accent-primary transition">Blog</a></li>
+            <ul class="flex space-x-6 font-semibold" id="main-nav-links">
+                <li><a href="/guides" class="nav-link transition-colors duration-300 hover:text-accent-primary">Brewing Guides</a></li>
+                <li><a href="/gear" class="nav-link transition-colors duration-300 hover:text-accent-primary">Gear</a></li>
+                <li><a href="/beans" class="nav-link transition-colors duration-300 hover:text-accent-primary">Beans</a></li>
+                <li><a href="/about" class="nav-link transition-colors duration-300 hover:text-accent-primary">About</a></li>
+                <li><a href="/blog" class="nav-link transition-colors duration-300 hover:text-accent-primary">Blog</a></li>
             </ul>
         </nav>
 
-        <button class="md:hidden text-coffee-dark">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+        <button id="mobile-menu-button" class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-300 hover:text-accent-primary">
+            <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            </svg>
+            <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
         </button>
+    </div>
+
+    <div id="mobile-menu" class="hidden md:hidden bg-coffee-light border-b border-coffee-brown/20 shadow-xl overflow-hidden transition-all duration-300">
+        <ul class="px-4 pt-2 pb-6 space-y-2">
+            <li><a href="/guides" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Brewing Guides</a></li>
+            <li><a href="/gear" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Gear</a></li>
+            <li><a href="/beans" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Beans</a></li>
+            <li><a href="/about" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">About</a></li>
+            <li><a href="/blog" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Blog</a></li>
+        </ul>
     </div>
 </header>
 
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
+    // Fungsi utama dibungkus agar bisa dipanggil ulang setiap pindah halaman
+    const initHeader = () => {
         const header = document.getElementById('main-header');
         const logo = document.getElementById('header-logo');
         const navLinksContainer = document.getElementById('main-nav-links');
+        const mobileMenuButton = document.getElementById('mobile-menu-button');
+        const mobileMenu = document.getElementById('mobile-menu');
+        const hamburgerIcon = document.getElementById('hamburger-icon');
+        const closeIcon = document.getElementById('close-icon');
 
-        const scrollThreshold = 50; 
+        if (!header || !logo || !navLinksContainer || !mobileMenuButton || !mobileMenu || !hamburgerIcon || !closeIcon) return;
 
-        // =========================================================================
-        // --- WARNA KUSTOM TAILWIND ---
-        // initialHeaderClasses: bg-coffee-light
-        // initialLogoClasses: text-coffee-dark
-        // initialNavLinkClasses: text-coffee-brown
-        // scrolledHeaderClasses: bg-coffee-dark/90
-        // scrolledLogoClasses: text-white
-        // scrolledNavLinkClasses: text-white
-        // scrolledNavLinkHoverClasses: hover:text-accent-primary (Menggunakan aksen utama Anda)
-        // =========================================================================
+        const mobileLinks = mobileMenu.querySelectorAll('.mobile-link');
+        const desktopLinks = navLinksContainer.querySelectorAll('.nav-link');
 
-        // Kelas untuk kondisi Awal (Initial State)
-        const initialHeaderClasses = ['bg-coffee-light', 'border-b', 'border-coffee-light/50', 'shadow-sm', 'h-14']; 
-        const initialLogoClasses = ['text-2xl', 'text-coffee-dark'];
-        const initialNavLinkClasses = ['text-coffee-brown']; // Menggunakan coffee-brown
-        const initialNavLinkHoverClasses = ['hover:text-accent-primary']; // Menggunakan accent-primary
-
-        // Kelas untuk kondisi Scroll (Scrolled State - Coffee Dark Semi-Transparant)
-        const scrolledHeaderClasses = ['bg-coffee-dark/90', 'backdrop-blur-sm', 'shadow-lg', 'h-16', 'border-b-coffee-dark'];
-        const scrolledLogoClasses = ['text-3xl', 'text-white']; // text-white karena background gelap
-        const scrolledNavLinkClasses = ['text-white'];
-        const scrolledNavLinkHoverClasses = ['hover:text-accent-primary']; // Aksen konsisten
-
-        // --- Perbaikan TypeScript: Pastikan elemen ada sebelum diakses ---
-        if (!header || !logo || !navLinksContainer) {
-            console.error('Header, Logo, or Nav element not found!');
-            return; 
-        }
-
-        const navLinks = navLinksContainer.querySelectorAll('a');
+        // Toggle Mobile Menu
+        mobileMenuButton.onclick = () => {
+            const isHidden = mobileMenu.classList.toggle('hidden');
+            hamburgerIcon.classList.toggle('hidden', !isHidden);
+            closeIcon.classList.toggle('hidden', isHidden);
+        };
 
         const updateHeader = () => {
-            if (window.scrollY > scrollThreshold) {
-                // SCROLLED STATE: COFFEE GELAP + PUTIH
-                
-                // HEADER
-                header.classList.remove(...initialHeaderClasses);
-                header.classList.add(...scrolledHeaderClasses);
-                
-                // LOGO
-                logo.classList.remove(...initialLogoClasses);
-                logo.classList.add(...scrolledLogoClasses);
-                
-                // MENU NAVIGASI
-                navLinks.forEach(link => {
-                    link.classList.remove(...initialNavLinkClasses, ...initialNavLinkHoverClasses);
-                    link.classList.add(...scrolledNavLinkClasses, ...scrolledNavLinkHoverClasses);
+            const isScrolled = window.scrollY > 50;
+
+            if (isScrolled) {
+                header.classList.replace('bg-coffee-light', 'bg-coffee-dark/95');
+                header.classList.add('backdrop-blur-md');
+                logo.classList.replace('text-coffee-dark', 'text-white');
+                mobileMenuButton.classList.replace('text-coffee-dark', 'text-white');
+                mobileMenu.classList.replace('bg-coffee-light', 'bg-coffee-dark/95');
+
+                desktopLinks.forEach(link => {
+                    link.classList.add('text-white');
+                    link.classList.remove('text-coffee-brown');
                 });
-
+                mobileLinks.forEach(link => {
+                    link.classList.add('text-white/90');
+                    link.classList.remove('text-coffee-dark');
+                });
             } else {
-                // INITIAL STATE: PUTIH + TEKS GELAP
-                
-                // HEADER
-                header.classList.remove(...scrolledHeaderClasses);
-                header.classList.add(...initialHeaderClasses);
-                
-                // LOGO
-                logo.classList.remove(...scrolledLogoClasses);
-                logo.classList.add(...initialLogoClasses);
+                header.classList.replace('bg-coffee-dark/95', 'bg-coffee-light');
+                header.classList.remove('backdrop-blur-md');
+                logo.classList.replace('text-white', 'text-coffee-dark');
+                mobileMenuButton.classList.replace('text-white', 'text-coffee-dark');
+                mobileMenu.classList.replace('bg-coffee-dark/95', 'bg-coffee-light');
 
-                // MENU NAVIGASI
-                navLinks.forEach(link => {
-                    link.classList.remove(...scrolledNavLinkClasses, ...scrolledNavLinkHoverClasses);
-                    link.classList.add(...initialNavLinkClasses, ...initialNavLinkHoverClasses);
+                desktopLinks.forEach(link => {
+                    link.classList.remove('text-white');
+                    link.classList.add('text-coffee-brown');
+                });
+                mobileLinks.forEach(link => {
+                    link.classList.remove('text-white/90');
+                    link.classList.add('text-coffee-dark');
                 });
             }
         };
 
-        // Jalankan sekali saat halaman dimuat
-        updateHeader();
-
-        // Jalankan saat pengguna scroll
         window.addEventListener('scroll', updateHeader);
-    });
+        updateHeader();
+    };
+
+    // PENTING: Gunakan 'astro:page-load' agar script jalan setiap pindah halaman
+    document.addEventListener('astro:page-load', initHeader);
 </script>

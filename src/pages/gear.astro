@@ -1,31 +1,40 @@
 ---
-// src/pages/gear.astro (KODE AKHIR)
+// src/pages/gear.astro (FINAL & FIX - GAMBAR BERBEDA)
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro'; 
 import GearHub from '../components/gear/GearHub.astro'; 
-// <<< IMPORT KOMPONEN TABEL BARU/LAMA
 import BonusGearTable from '../components/gear/BonusGearTable.astro'; 
 
 const heroData = {
-    title: "Perlengkapan Kopi Terbaik untuk Setiap Brewer",
-    subtitle: "Temukan ulasan, panduan pembelian, dan perbandingan mendalam untuk setiap peralatan kopi, dari grinder hingga mesin espresso.", 
-    linkText: "Lihat Semua Kategori", 
-    linkUrl: "#accessories-and-tools", 
-    image: "/images/hero-gear.jpg"
+    title: "The Ultimate Coffee Gear Guide",
+    subtitle: "In-depth reviews, buying guides, and precision comparisons for every piece of coffee equipment.", 
+    // INI DIA KUNCINYA: Mengirim gambar khusus Gear
+    image: "/images/IndependentCoffeeAuthority.webp", 
+    imageAlt: "High-end espresso machine and grinders setup",
+    // linkText & linkUrl dikosongkan agar tombol hilang otomatis
 };
 
-const pageTitle = "Perlengkapan Kopi Terbaik - Zaidly Gear Hub";
+const pageTitle = "Best Coffee Gear & Equipment Reviews - Zaidly";
 ---
 
 <BaseLayout title={pageTitle}>
-    
-    <Hero {...heroData} />
+    
+    <Hero {...heroData} />
 
-    {/* SEMUA SECTION UTAMA DARI HUB */}
-    <GearHub /> 
+    <main class="bg-cream-latte pt-24 pb-12">
+        
+        {/* SEMUA SECTION UTAMA */}
+        <GearHub /> 
 
-    {/* TABEL BONUS DITAMPILKAN TERPISAH DI BAGIAN PALING BAWAH */}
-    <BonusGearTable />
+        {/* TABEL BONUS */}
+        <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 mt-16">
+            <h2 class="text-3xl font-black text-coffee-dark mb-8 text-center uppercase tracking-widest">
+                Quick Comparison Guide
+            </h2>
+            <BonusGearTable />
+        </div>
+
+    </main>
 
 </BaseLayout>

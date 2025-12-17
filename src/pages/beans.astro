@@ -1,29 +1,27 @@
 ---
-// src/pages/beans.astro (KODE FIX TERAKHIR)
+// src/pages/beans.astro (FINAL & PREMIUM VERSION)
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro'; 
 import BeanHubSection from '../components/beans/BeanHub.astro'; 
 
-const pageTitle = "Panduan Biji Kopi Lengkap - Zaidly Coffee";
+const pageTitle = "Coffee Bean Mastery & Brewing Guides - Zaidly";
 
 const heroData = {
-    title: "Mengenal Kopi: Dari Biji Hingga Seduhan Sempurna",
-    subtitle: "Temukan semua yang perlu Anda ketahui tentang biji kopi, peralatan, dan metode *brewing*.",
-    image: "/images/hero/coffee-beans.jpg", 
-    
-    // --- SOLUSI UNTUK ERROR 2322 ---
-    linkText: "Lihat Semua Panduan", 
-    linkUrl: "#hub-content", // Atau link lain yang relevan
+    title: "From Seed to Sip: The Coffee Journey",
+    subtitle: "Explore the profound world of coffee beans, roast profiles, and the artisanal techniques of manual brewing.",
+    image: "/images/HowtoStoreBeans.webp", // Gambar khusus untuk halaman Beans
+    imageAlt: "High-quality roasted coffee beans in a wooden scoop",
+    // linkText & linkUrl dikosongkan agar tombol hilang sesuai desain minimalis kita
 };
-// --------------------------------------------------------
 ---
 
 <BaseLayout title={pageTitle}>
-    <Hero {...heroData} />
     
-    <section class="pb-20 bg-cream-latte border-t border-coffee-light">
+    <Hero {...heroData} />
+    
+    <main class="bg-cream-latte pt-24 pb-20">
         <BeanHubSection /> 
-    </section>
+    </main>
 
 </BaseLayout>

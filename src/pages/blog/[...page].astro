@@ -1,6 +1,5 @@
 ---
 // src/pages/blog/[...page].astro
-
 import { getCollection } from "astro:content";
 
 // Path komponen
@@ -12,81 +11,74 @@ import HeroBlog from '../../components/HeroBlog.astro';
 import type { GetStaticPaths, Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-
 // Definisi Type
 type PostCollectionName = 'blog'; 
 type CombinedPost = CollectionEntry<PostCollectionName>;
 
-
-// =====================================
-// STATIC PATHS (GETSTATICPATHS)
-// =====================================
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-    
-    // POSTS_PER_PAGE di dalam scope untuk mencegah ReferenceError
     const POSTS_PER_PAGE = 9; 
-
-    // 1. PENGAMBILAN DATA
     const blogPosts = await getCollection("blog");
     
-    // Hanya menggunakan blogPosts
     let allPosts: CombinedPost[] = [...blogPosts]; 
 
-    // 2. PENGURUTAN DATA
     allPosts.sort((a, b) => {
         const aDate = a.data.pubDate ? a.data.pubDate.getTime() : 0;
         const bDate = b.data.pubDate ? b.data.pubDate.getTime() : 0;
         return bDate - aDate;
     });
 
-    // 3. PAGINATION
     return paginate(allPosts, {
         pageSize: POSTS_PER_PAGE,
     });
 };
 
-
-// =====================================
-// PROPS & DATA
-// =====================================
-// Menggunakan type assertion yang benar
 const { page } = Astro.props as { page: Page<CombinedPost> }; 
 
-// Ambil data yang dibutuhkan dari objek 'page'
+// Ambil semua kategori unik dari folder blog untuk menu filter
+const allPostsForFilter = await getCollection("blog");
+const categories = ['all', ...new Set(allPostsForFilter.map((post) => post.data.category))];
+
 const pageNum = page.currentPage;
 const posts = page.data;
 const nextUrl = page.url.next;
 
-// --- TITLE ---
-const baseTitle = 'Blog'; 
-const pageTitle = pageNum === 1 
-    ? baseTitle 
-    : `${baseTitle} - Page ${pageNum}`;
-
+const baseTitle = 'Journal'; // Nama lebih mewah dibanding 'Blog'
+const pageTitle = pageNum === 1 ? baseTitle : `${baseTitle} - Page ${pageNum}`;
 ---
 
 <BaseLayout title={pageTitle}> 
     
-    {/* PERBAIKAN FINAL: Hero hanya muncul di halaman 1 */}
     {pageNum === 1 && (
         <HeroBlog />
     )}
 
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
         
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        {/* 1. KATEGORI FILTER (MENU HORIZONTAL) */}
+        <div class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-10">
+            {categories.map((cat) => (
+                <a 
+                    href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
+                    class="text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border border-coffee-dark/10 hover:border-accent-primary hover:text-accent-primary transition-all duration-300 bg-white"
+                >
+                    {cat.replace('-', ' ')}
+                </a>
+            ))}
+        </div>
+
+        {/* 2. GRID ARTIKEL */}
+        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
             {posts.map((post: CombinedPost) => (
-                // postType dipertahankan sesuai permintaan Anda
                 <PostCard post={post} postType={post.collection} /> 
             ))}
         </section>
 
-        {/* Menggunakan nextUrl yang otomatis dihasilkan oleh paginate */}
+        {/* 3. PAGINATION (FLAT STYLE) */}
         {nextUrl && (
-            <div class="text-center mt-12">
+            <div class="text-center mt-20">
                 <a
                     href={nextUrl}
-                    class="inline-block bg-accent-primary text-white font-semibold px-10 py-3 rounded-lg shadow-lg hover:bg-coffee-dark transition duration-300"
+                    class="inline-block bg-coffee-dark text-white text-[11px] font-black uppercase tracking-[0.3em] px-12 py-5 hover:bg-accent-primary transition-colors duration-300"
                 >
                     Load More Articles
                 </a>

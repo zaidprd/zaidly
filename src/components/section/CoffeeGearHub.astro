@@ -1,4 +1,5 @@
 ---
+// src/components/section/CoffeeGearHub.astro
 interface Post {
   slug: string;
   data: {
@@ -13,86 +14,90 @@ interface Props {
 
 const { posts } = Astro.props;
 
-// Daftar link statis untuk Bean Guides
-const staticFeaturedLinks = [
-  { title: "Best Coffee Beans", url: "#", image: "/images/who-we-are.jpg" },
-  { title: "Single Origin vs Blends", url: "#", image: "/images/who-we-are.jpg" },
-  { title: "Light vs Dark Roast", url: "#", image: "/images/who-we-are.jpg" },
-  { title: "How to Store Beans", url: "#", image: "/images/who-we-are.jpg" },
+const gearFeaturedLinks = [
+  { 
+    title: "Best Espresso Machines", 
+    url: "/gear/best-espresso-machines", 
+    image: "/images/BestEspressoMachines.webp" 
+  },
+  { 
+    title: "Top Coffee Grinders", 
+    url: "/gear/best-coffee-grinders", 
+    image: "/images/TopCoffeeGrinders.webp" 
+  },
+  { 
+    title: "Pour Over Essentials", 
+    url: "/gear/pour-over-guide", 
+    image: "/images/PourOverEssentials.webp" 
+  },
+  { 
+    title: "Maintenance Tools", 
+    url: "/gear/cleaning-maintenance", 
+    image: "/images/MaintenanceTool.webp" 
+  },
 ];
 ---
 
-<section class="pt-0 pb-0 bg-cream-latte"> {/* Ganti bg-white menjadi bg-cream-latte */}
-  <div class="container mx-auto max-w-6xl p-0">
+<section class="w-full bg-coffee-light pt-16 pb-8 border-t border-coffee-brown/10">
+  
+  <div class="container mx-auto max-w-6xl px-6 md:px-12">
 
-    <div class="max-w-7xl mx-auto mb-0">
-      <div class="bg-coffee-light p-8 rounded-xl border border-transparent shadow-none drop-shadow-none"> {/* Ganti bg-white menjadi bg-coffee-light */}
+    <h2 class="text-4xl md:text-5xl font-black text-coffee-dark mb-6 tracking-tight">
+      Coffee Gear Authority
+    </h2>
 
-        <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
-          Coffee Bean 
-        </h2>
+    <p class="text-lg md:text-xl text-coffee-brown mb-10 leading-relaxed max-w-3xl">
+      Investing in the right tools is the secret to cafe-quality coffee at home. We rigorously test grinders, brewers, and machines to ensure you get the best performance for your budget.
+    </p>
 
-        <p class="text-lg text-coffee-brown mb-8"> {/* Ganti text-gray-700 menjadi text-coffee-brown */}
-          The journey to the perfect cup starts with the bean. We break down the world of coffee beans, from different origins and roasts to buying tips and storage hacks.
-        </p>
-
-        <p class="font-bold text-coffee-dark mb-3 text-lg">In our coffee bean hub, you’ll learn about:</p>
-
-        <ul class="list-disc list-inside text-coffee-brown space-y-2 ml-4 mb-10"> {/* Ganti text-gray-700 menjadi text-coffee-brown */}
-          <li><strong>Origins:</strong> Unique flavor profiles from Africa, the Americas, and Asia.</li>
-          <li><strong>Roasting Levels:</strong> Differences between light, medium, and dark roasts.</li>
-          <li><strong>Buying Tips:</strong> Certifications, freshness, and spotting quality beans.</li>
-          <li><strong>Storage:</strong> How to store beans to keep them fresh.</li>
-          <li><strong>Preparation:</strong> Grinding methods for optimal extraction.</li>
-        </ul>
-
-        <h3 class="text-2xl font-bold text-coffee-dark mt-8 mb-6">
-          Explore these essential bean guides:
-        </h3>
-
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {staticFeaturedLinks.map((link) => (
-            <a href={link.url} 
-               class="block bg-coffee-light rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-md hover:shadow-lg hover:shadow-accent-primary/20"
-               aria-label={link.title}
-            > {/* Ganti bg-white menjadi bg-coffee-light */}
-              <img
-                src={link.image}
-                alt={link.title}
-                class="w-full h-32 object-cover"
-                style={{ aspectRatio: '4/3' }}
-              />
-              <div class="p-3 text-center">
-                <p class="text-sm font-bold text-coffee-dark hover:text-accent-primary transition duration-300">
-                  {link.title}
-                </p>
-              </div>
-            </a>
-          ))}
-        </div>
-      </div>
+    <div class="mb-14">
+      <p class="font-bold text-coffee-dark mb-5 text-xl">In our coffee gear hub, you’ll learn about:</p>
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-coffee-brown text-lg">
+        <li class="flex items-start gap-x-3">
+          <span class="text-accent-primary mt-1">⚙️</span>
+          <span><strong class="text-coffee-dark">Precision:</strong>&nbsp;Choosing grinders for consistency.</span>
+        </li>
+        <li class="flex items-start gap-x-3">
+          <span class="text-accent-primary mt-1">⚙️</span>
+          <span><strong class="text-coffee-dark">Durability:</strong>&nbsp;Equipment built to last for years.</span>
+        </li>
+        <li class="flex items-start gap-x-3">
+          <span class="text-accent-primary mt-1">⚙️</span>
+          <span><strong class="text-coffee-dark">Workflow:</strong>&nbsp;Speed and ease of use in the morning.</span>
+        </li>
+        <li class="flex items-start gap-x-3">
+          <span class="text-accent-primary mt-1">⚙️</span>
+          <span><strong class="text-coffee-dark">Maintenance:</strong>&nbsp;Keeping your gear in peak condition.</span>
+        </li>
+      </ul>
     </div>
 
-    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-      {posts.map((post) => (
-        <a href={`/${post.slug}`} 
-           class="block group relative bg-coffee-light rounded-lg overflow-hidden transition duration-300 transform hover:-translate-y-1 shadow-lg hover:shadow-xl hover:shadow-accent-primary/30"
-        > {/* Ganti bg-white menjadi bg-coffee-light, tambahkan shadow aksen */}
+    <h3 class="text-2xl font-bold text-coffee-dark mb-8 uppercase tracking-wider">
+      Expert Gear Comparisons:
+    </h3>
 
-          <img
-            src={post.data.image || '/images/default-post.jpg'}
-            alt={post.data.title}
-            class="w-full h-56 object-cover"
-            style={{ aspectRatio: '4/3' }}
-          />
-
-          <div class="absolute inset-0 bg-gradient-to-t from-coffee-dark/80 via-coffee-dark/40 to-transparent p-4 flex flex-col justify-end"> {/* Ganti black/60 dan black/30 menjadi coffee-dark/80 dan coffee-dark/40 */}
-            <h3 class="text-lg font-bold text-white group-hover:text-accent-primary transition duration-300">
-              {post.data.title}
-            </h3>
+    <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+      {gearFeaturedLinks.map((link) => (
+        <a
+          href={link.url}
+          class="group block bg-white/30 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 border border-coffee-brown/10 hover:bg-white/60"
+          aria-label={link.title}
+        >
+          <div class="aspect-[4/3] overflow-hidden border-b border-coffee-brown/5">
+            <img
+              src={link.image}
+              alt={link.title}
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+            />
+          </div>
+          <div class="p-5 text-center">
+            <p class="text-sm font-black text-coffee-dark group-hover:text-accent-primary transition-colors uppercase tracking-widest leading-tight">
+              {link.title}
+            </p>
           </div>
         </a>
       ))}
     </div>
+
   </div>
 </section>

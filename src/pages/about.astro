@@ -1,16 +1,25 @@
 ---
-// src/pages/about.astro
+// src/pages/about.astro (MINIMALIST NO-HERO VERSION)
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import AboutContent from '../components/AboutContent.astro';
 
-const pageTitle = "Tentang Zaidly - Misi Kami untuk Kopi Terbaik";
-const pageDescription = "Pelajari mengapa Zaidly didirikan dan bagaimana kami membantu penyeduh rumahan memilih alat kopi terbaik tanpa tebakan.";
+const pageTitle = "About Zaidly - Our Mission for Better Coffee";
+const pageDescription = "Learn why Zaidly was founded and how we help home brewers choose the best coffee gear without the guesswork.";
 ---
 
 <BaseLayout title={pageTitle} description={pageDescription}>
     
-    {/* Panggil komponen konten yang sudah dibuat */}
-    <AboutContent />
+    <main class="bg-cream-latte min-h-screen">
+        <div class="container mx-auto max-w-4xl px-4 pt-24 pb-8 text-center">
+            <h1 class="text-4xl md:text-6xl font-black text-coffee-dark uppercase tracking-tighter">
+                About Zaidly
+            </h1>
+            <div class="w-20 h-1.5 bg-accent-primary mx-auto mt-6"></div>
+        </div>
+
+        {/* Komponen konten utama */}
+        <AboutContent />
+    </main>
 
 </BaseLayout>

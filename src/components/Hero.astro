@@ -1,41 +1,50 @@
 ---
 // src/components/Hero.astro
-
 interface Props {
-  title: string;
-  subtitle: string;
-  linkText: string;
-  linkUrl: string;
+  title: string;
+  subtitle: string;
+  linkText?: string; // Jadi opsional
+  linkUrl?: string;  // Jadi opsional
+  imageAlt: string;
+  image?: string;
 }
 
-const { title, subtitle, linkText, linkUrl } = Astro.props as Props;
+const { 
+  title, 
+  subtitle, 
+  linkText, 
+  linkUrl, 
+  imageAlt, 
+  image = "/images/herozaildy.webp" 
+} = Astro.props;
 ---
 
-<section
-  class="relative h-[400px] md:h-[800px] lg:h-[1000px] flex items-center justify-center bg-cover bg-center"
+<section class="relative h-[400px] md:h-[700px] flex items-center justify-center overflow-hidden">
+  
+  <img 
+    src={image} 
+    alt={imageAlt} 
+    class="absolute inset-0 w-full h-full object-cover z-0"
+  />
 
-  style="background-image: url('/images/herozaildy.webp');"
->
+  <div class="absolute inset-0 bg-black/50 z-10"></div>
 
-  {/* START: KODE UNTUK OVERLAY AGAR GELAP */}
-  <div class="absolute inset-0 bg-black/50"></div> {/* <-- Ganti bg-black/40 menjadi bg-black/50 atau bg-black/60 jika ingin lebih gelap */}
-  {/* END: KODE UNTUK OVERLAY AGAR GELAP */}
+  <div class="relative z-20 container mx-auto max-w-6xl px-4 text-center text-white">
+    <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight drop-shadow-lg">
+      {title}
+    </h1>
 
-  <div class="relative z-10 container mx-auto max-w-6xl px-4 text-center text-white">
-    <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight drop-shadow-lg">
-      {title}
-    </h1>
+    <p class="text-lg mb-8 drop-shadow-md max-w-2xl mx-auto opacity-90">
+      {subtitle}
+    </p>
 
-    <p class="text-lg mb-8 drop-shadow-md">
-      {subtitle}
-    </p>
-
-    <a
-      href={linkUrl}
-      class="inline-block bg-accent-primary text-white font-semibold px-8 py-4 rounded-lg hover:bg-coffee-dark transition duration-300 transform hover:scale-105"
-    >
-      {linkText}
-    </a>
-  </div>
-
+    {linkText && linkUrl && (
+      <a
+        href={linkUrl}
+        class="inline-block bg-accent-primary text-white font-semibold px-8 py-4 rounded-lg hover:bg-coffee-dark transition duration-300 transform hover:scale-105"
+      >
+        {linkText}
+      </a>
+    )}
+  </div>
 </section>

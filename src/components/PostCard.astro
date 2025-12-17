@@ -1,7 +1,5 @@
 ---
-// src/components/PostCard.astro (FINAL VERSION)
-// FIX: Menghilangkan prefix 'blog/' dari tag <a> href
-
+// src/components/PostCard.astro (FLAT & PREMIUM DESIGN)
 import type { CollectionEntry } from 'astro:content';
 type CombinedPost = CollectionEntry<'blog'>; 
 
@@ -19,49 +17,53 @@ const formattedDate = post.data.pubDate
     ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
     : 'Date not available';
 
-// ✨ FIX KRUSIAL DI SINI:
-// 1. Bersihkan slug dari prefix 'blog/' yang mungkin masih ada.
+// FIX SLUG
 const cleanSlug = post.slug.replace('blog/', '');
-// 2. Buat URL hanya dari slug yang sudah bersih (misal: /judul-postingan)
 const postUrl = `/${cleanSlug}`; 
-// ----------------------------------------------------
 ---
 
 <a href={postUrl} 
-    class="block overflow-hidden rounded-xl shadow-md hover:shadow-xl transition duration-300 bg-white 
-           border border-transparent hover:border-accent-primary transform hover:-translate-y-1">
+    class="group block bg-white border border-coffee-brown/10 hover:border-accent-primary transition-all duration-300">
     
-    <div class="h-48 w-full bg-coffee-light overflow-hidden">
+    {/* Image Container: Hapus rounded, ganti ke Sharp Edge */}
+    <div class="relative h-56 w-full bg-coffee-light overflow-hidden">
         {imagePath ? (
             <img 
                 src={imagePath} 
                 alt={post.data.title}
-                class="w-full h-full object-cover transform hover:scale-105 transition duration-500"
+                class="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition duration-700"
                 loading="lazy"
             />
         ) : (
-            <div class="w-full h-full flex items-center justify-center text-coffee-brown/50 font-medium">
-                No Image Available
+            <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 font-bold uppercase tracking-widest text-xs">
+                Image coming soon
             </div>
         )}
+        
+        {/* Badge Type: Pindah ke pojok kiri atas gambar agar lebih modern */}
+        <div class="absolute top-4 left-4">
+             <span class="bg-coffee-dark text-white text-[10px] font-black px-3 py-1 tracking-[0.2em] uppercase">
+                {postType} 
+            </span>
+        </div>
     </div>
 
-    <div class="p-5">
-        
-        <span class="inline-block bg-accent-primary text-white text-xs font-semibold px-3 py-1 rounded-full mb-3 uppercase">
-            {postType} 
-        </span>
-
-        <h3 class="text-xl font-bold text-coffee-dark mb-2 leading-tight group-hover:text-accent-primary transition duration-300">
+    <div class="p-6">
+        <h3 class="text-xl font-black text-coffee-dark mb-3 leading-tight uppercase tracking-tight group-hover:text-accent-primary transition duration-300">
             {post.data.title}
         </h3>
         
-        <p class="text-coffee-brown text-sm mb-4 line-clamp-2">
+        <p class="text-coffee-brown text-sm mb-6 line-clamp-2 leading-relaxed opacity-80">
             {post.data.description}
         </p>
 
-        <p class="text-xs text-coffee-brown/70">
-            Published on {formattedDate}
-        </p>
+        <div class="flex items-center justify-between pt-4 border-t border-coffee-brown/5">
+            <span class="text-[10px] font-bold text-coffee-brown/50 uppercase tracking-widest">
+                {formattedDate}
+            </span>
+            <span class="text-accent-primary font-black text-xs uppercase tracking-widest group-hover:translate-x-1 transition-transform">
+                Read More →
+            </span>
+        </div>
     </div>
 </a>

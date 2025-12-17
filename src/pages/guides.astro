@@ -1,25 +1,27 @@
 ---
-// src/pages/guides.astro (KODE CLEAN DAN FINAL)
+// src/pages/guides.astro (FINAL VERSION)
 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro'; 
 import GuidesHub from '../components/guides/GuideHub.astro'; 
 
 const heroData = {
-    title: "Master Semua Teknik Seduh Kopi",
-    subtitle: "Koleksi panduan paling lengkap untuk pemula hingga barista tingkat lanjut. Mulai dari V60, Chemex, hingga rahasia Cold Brew.", 
-    linkText: "Lihat Panduan Dasar", 
-    linkUrl: "#brewing-methods", 
-    image: "/images/hero-guides.jpg"
+    title: "The Ultimate Coffee Brewing Library",
+    subtitle: "From mastering the pour-over technique to dialing in the perfect espresso shot. Explore our comprehensive guides designed for both beginners and pro home baristas.", 
+    image: "/images/heroGuides.webp",
+    imageAlt: "Professional barista performing a V60 pour over coffee brew"
+    // linkText & linkUrl tidak dicantumkan agar tombol hilang
 };
 
-const pageTitle = "Panduan Kopi Lengkap - Zaidly Guides";
+const pageTitle = "Expert Coffee Guides & Gear Reviews - Zaidly";
 ---
 
 <BaseLayout title={pageTitle}>
-    
-    <Hero {...heroData} />
+    
+    <Hero {...heroData} />
 
-    <GuidesHub /> 
+    <main class="bg-cream-latte pt-24">
+        <GuidesHub /> 
+    </main>
 
 </BaseLayout>

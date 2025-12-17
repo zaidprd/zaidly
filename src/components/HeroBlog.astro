@@ -1,25 +1,43 @@
-<section class="bg-cream-latte pt-28 md:pt-40 pb-20 border-b border-coffee-light"> 
-    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
-        
-        <h1 class="text-5xl font-extrabold text-coffee-dark mb-4 tracking-tight">
-            The Best Coffee Blog For Home Baristas
-        </h1>
+---
+// Header Section untuk Halaman Blog (OPTIMIZED VISUALS)
+---
 
-        <p class="text-xl text-coffee-brown mb-6 max-w-3xl mx-auto">
-            Welcome to the Zaidly coffee blog! Here, you’ll find our latest articles designed to entertain and inform. Like all the best coffee blogs, this space is made for coffee lovers by coffee lovers. You come here to get your daily dose of coffee stuff. A cup of fun? Yes, please. 
-        </p>
+<section class="bg-cream-latte pt-28 md:pt-40 pb-20 border-b border-coffee-brown/10"> 
+    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 text-center">
+        
+        {/* Judul Utama: Pakai font-black dan uppercase agar satu bahasa dengan Hub */}
+        <h1 class="text-5xl md:text-7xl font-black text-coffee-dark mb-6 tracking-tighter uppercase">
+            The Best Coffee Blog
+        </h1>
 
-        {/* Background untuk sub-section diubah menjadi warna putih (bg-white) agar menonjol dari latar belakang (bg-cream-latte) */}
-        <div class="bg-white p-6 rounded-xl shadow-xl mt-10 text-left border border-accent-primary/20">
-            <h3 class="text-2xl font-bold text-coffee-dark mb-3">What Do We Cover?</h3>
-            <p class="text-coffee-brown mb-4">
-                Our coffee blog covers various topics within the industry, including coffee culture, coffee and your health, coffee drink comparisons, and much more. Be it the newest coffee trend, the history of coffee, the amounts of caffeine in certain drinks, or funny coffee quotes, we have it all.
-            </p>
-            
-            <p class="font-bold text-coffee-dark mb-2">Why visit our blog?</p>
-            <p class="text-coffee-brown">
-                Imagine the following situation. You’re going on a holiday and booked accommodation with no espresso machine. You need your morning cup of Joe, but no coffee shop surrounds you. What do you do? You visit our blog and search for answers on making coffee without the machine, making coffee with the gear you’ve never used, or looking for the nearest coffee shops. In the end, if you don’t find a solution to your morning caffeination problem, you can simply read about other people enjoying coffee. Not the best outcome, we know.
-            </p>
-        </div>
-    </div>
+        <p class="text-xl text-coffee-brown mb-12 max-w-3xl mx-auto leading-relaxed">
+            Welcome to the Zaidly coffee blog. Like all the best coffee blogs, this space is made for coffee lovers by coffee lovers. A daily dose of caffeine for your mind.
+        </p>
+
+        {/* BOX PUTIH: Sekarang Tanpa Shadow, Tanpa Rounded Lebay */}
+        <div class="bg-white border border-coffee-brown/10 p-8 md:p-12 text-left relative overflow-hidden">
+            {/* Garis Aksen di pojok agar terlihat didesain dengan serius */}
+            <div class="absolute top-0 left-0 w-2 h-full bg-accent-primary"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-10">
+                <div>
+                    <h3 class="text-2xl font-black text-coffee-dark mb-4 uppercase tracking-tight">
+                        What Do We Cover?
+                    </h3>
+                    <p class="text-coffee-brown leading-relaxed opacity-90">
+                        Our coffee blog covers various topics within the industry, including coffee culture, coffee and your health, coffee drink comparisons, and much more. Be it the newest coffee trend, the history of coffee, or the science of caffeine—we have it all.
+                    </p>
+                </div>
+                
+                <div class="border-t md:border-t-0 md:border-l border-coffee-brown/10 pt-8 md:pt-0 md:pl-10">
+                    <h3 class="text-xl font-black text-coffee-dark mb-4 uppercase tracking-tight">
+                        Why visit our blog?
+                    </h3>
+                    <p class="text-coffee-brown leading-relaxed italic opacity-80 text-sm">
+                        Imagine you’re on holiday with no espresso machine. You need your morning cup of Joe, but no coffee shop surrounds you. What do you do? You visit Zaidly. We help you find answers on making coffee with minimal gear, mastering new techniques, or simply enjoying stories about the craft when you can't have a cup yourself.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
 </section>

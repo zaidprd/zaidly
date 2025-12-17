@@ -1,151 +1,130 @@
 ---
-// src/components/gear/GearHub.astro (5 BLOK DATA POLIMORFIK, MENGGUNAKAN ContentSection.astro)
+// src/components/gear/GearHub.astro
+import ContentSection from '../ContentSection.astro';
 
-import ContentSection from '../ContentSection.astro'; // <<< MEMANGGIL HELPER YANG SAMA
-
-// --- INTERFACE POLIMORFIK (Sama persis dengan BeanHub) ---
-interface GuideLink {
-	title: string;
-	url: string;
-	image: string;
-}
-
-interface BodyElement {
-    type: 'paragraph' | 'list' | 'grid';
-    title?: string;
-    text?: string;
-    listItems?: string[];
-    guides?: GuideLink[];
-}
-
-interface ContentBlockData {
-	sectionId: string;
-	sectionTitle: string;
-	sectionSubtitle: string;
-	bodyContent: BodyElement[]; 
-}
-
-// --- DATA UTAMA: 5 BLOK GEAR (Setiap Grid memiliki TEPAT 4 elemen) ---
-const ALL_GEAR_BLOCKS: ContentBlockData[] = [
-	// BLOK 1: ACCESSORIES (SUDAH 4 GRID)
-	{
-		sectionId: "accessories-and-tools",
-		sectionTitle: "1. Accessories and Tools",
-		sectionSubtitle: "Detail kecil yang membuat perbedaan besar. Panduan lengkap untuk timbangan, teko leher angsa, dan filter.",
-		bodyContent: [
+// --- DATA UTAMA: 5 BLOK GEAR DENGAN OPTIMASI SEO ---
+const ALL_GEAR_BLOCKS = [
+    // BLOK 1: ACCESSORIES (Fokus pada "Precision Brewing")
+    {
+        sectionId: "precision-brewing-tools",
+        sectionTitle: "1. Essential Brewing Accessories",
+        sectionSubtitle: "The small details that make the biggest difference. Master your brew with the right scales, kettles, and filtration systems.",
+        bodyContent: [
             {
                 type: 'list',
-                title: 'In this section, we cover:',
+                title: 'Master the essentials:',
                 listItems: [
-                    "<strong>Scales:</strong> Mengapa akurasi penting dalam rasio kopi.",
-                    "<strong>Kettles:</strong> Kontrol suhu dan aliran air.",
-                    "<strong>Filters:</strong> Perbedaan antara kertas, kain, dan filter metal.",
+                    "<strong>Digital Scales:</strong> Why precision weight is the key to repeatability.",
+                    "<strong>Gooseneck Kettles:</strong> Mastering flow rate for perfect extraction.",
+                    "<strong>Filter Science:</strong> Choosing between paper, metal, and cloth filters.",
                 ]
             },
             {
                 type: 'grid',
-                title: 'Featured Accessory Guides:',
+                title: 'Expert Accessory Reviews:',
                 guides: [
-                    { title: "Best Scales Review", url: "#", image: "/images/gear/scale-featured.jpg" },
-                    { title: "Gooseneck Kettles", url: "#", image: "/images/gear/kettle-featured.jpg" },
-                    { title: "Filter Paper Comparison", url: "#", image: "/images/gear/filter-featured.jpg" },
-                    // ELEMEN KE-4 DITAMBAHKAN UNTUK MEMENUHI 4 KOLOM
-                    { title: "Cleaning Tools Essentials", url: "#", image: "/images/gear/cleaning-placeholder.jpg" }, 
+                    { title: "Top 5 Coffee Scales", url: "/gear/best-coffee-scales", image: "/images/gear/scale-featured.jpg" },
+                    { title: "Best Gooseneck Kettles", url: "/gear/best-gooseneck-kettles", image: "/images/gear/kettle-featured.jpg" },
+                    { title: "Paper vs Metal Filters", url: "/gear/filter-comparison", image: "/images/gear/filter-featured.jpg" },
+                    { title: "Barista Cleaning Kits", url: "/gear/essential-cleaning-tools", image: "/images/gear/cleaning-placeholder.jpg" }, 
                 ]
             }
-		],
-	},
-	// BLOK 2: GRINDERS (SUDAH 4 GRID)
-	{
-		sectionId: "grinders-section",
-		sectionTitle: "2. Coffee Grinders: The Heart of Brewing",
-		sectionSubtitle: "Menggiling biji kopi tepat sebelum menyeduh adalah perubahan terbesar yang dapat Anda lakukan. Pelajari mengapa burr grinder mengalahkan blade grinder.",
-		bodyContent: [
+        ],
+    },
+    // BLOK 2: GRINDERS (Fokus pada "Consistency")
+    {
+        sectionId: "coffee-grinders-hub",
+        sectionTitle: "2. Grinders: The Heart of Your Setup",
+        sectionSubtitle: "Freshly ground coffee is the single biggest upgrade you can make. Learn why burr grinders are mandatory for quality brewing.",
+        bodyContent: [
             {
                 type: 'list',
-                title: 'What to learn about Grinders:',
+                title: 'Grinder fundamentals:',
                 listItems: [
-                    "Burr vs Blade: Konsistensi gilingan sangat krusial.",
-                    "Manual vs Electric: Sesuai anggaran dan gaya hidup.",
+                    "<strong>Burr vs Blade:</strong> Avoiding inconsistent 'coffee dust'.",
+                    "<strong>Conical vs Flat Burrs:</strong> Understanding flavor profiles.",
+                    "<strong>Manual vs Electric:</strong> Finding the best value for your workflow.",
                 ]
             },
             {
                 type: 'grid',
-                title: 'Featured Grinder Reviews:',
+                title: 'Top Rated Grinder Guides:',
                 guides: [
-                    { title: "Baratza Encore Review", url: "#", image: "/images/gear/grinder-encore.jpg" },
-                    { title: "Manual Grinder Terbaik", url: "#", image: "/images/gear/grinder-manual.jpg" },
-                    // ELEMEN KE-3 & KE-4 DITAMBAHKAN UNTUK MEMENUHI 4 KOLOM
-                    { title: "Grinder Maintenance Tips", url: "#", image: "/images/gear/maintenance-placeholder.jpg" },
-                    { title: "Budget Electric Grinders", url: "#", image: "/images/gear/budget-placeholder.jpg" },
+                    { title: "Best Burr Grinders", url: "/gear/best-burr-grinders", image: "/images/gear/grinder-encore.jpg" },
+                    { title: "Top Manual Grinders", url: "/gear/best-hand-grinders", image: "/images/gear/grinder-manual.jpg" },
+                    { title: "Grinder Cleaning Tips", url: "/gear/how-to-clean-grinder", image: "/images/gear/maintenance-placeholder.jpg" },
+                    { title: "Budget Electric Picks", url: "/gear/best-budget-grinders", image: "/images/gear/budget-placeholder.jpg" },
                 ]
             }
-		],
-	},
-    // BLOK 3: MAKERS (SUDAH 4 GRID)
-	{
-		sectionId: "makers-section",
-		sectionTitle: "3. Brewing Makers (Pour Over & Immersion)",
-		sectionSubtitle: "Jelajahi berbagai dripper dan pembuat kopi yang digunakan untuk metode pour over dan immersion.",
-		bodyContent: [
-            // Blok ini sudah 4 elemen, jadi aman.
+        ],
+    },
+    // BLOK 3: MAKERS (Fokus pada "Methods")
+    {
+        sectionId: "manual-brew-methods",
+        sectionTitle: "3. Manual Brewers & Drippers",
+        sectionSubtitle: "From pour-over elegance to immersion strength. Choose the brewing method that fits your taste profile.",
+        bodyContent: [
             {
                 type: 'grid',
-                title: 'Popular Brewing Makers Guides:',
+                title: 'Popular Brewer Comparisons:',
                 guides: [
-                    { title: "Hario V60", url: "#", image: "/images/gear/dripper-v60.jpg" },
-                    { title: "Chemex", url: "#", image: "/images/gear/dripper-chemex.jpg" },
-                    { title: "Aeropress", url: "#", image: "/images/gear/dripper-aeropress.jpg" },
-                    { title: "French Press", url: "#", image: "/images/gear/dripper-frenchpress.jpg" },
+                    { title: "Hario V60 Guide", url: "/gear/hario-v60-review", image: "/images/gear/dripper-v60.jpg" },
+                    { title: "Chemex Masterclass", url: "/gear/chemex-brewing-guide", image: "/images/gear/dripper-chemex.jpg" },
+                    { title: "Aeropress Recipes", url: "/gear/aeropress-guide", image: "/images/gear/dripper-aeropress.jpg" },
+                    { title: "French Press Basics", url: "/gear/french-press-guide", image: "/images/gear/dripper-frenchpress.jpg" },
                 ]
             }
-		],
-	},
-    // BLOK 4: ESPRESSO (DITAMBAH 4 GRID)
+        ],
+    },
+    // BLOK 4: ESPRESSO (Fokus pada "Home Barista")
     {
-		sectionId: "espresso-section",
-		sectionTitle: "4. Espresso at Home",
-		sectionSubtitle: "Panduan dan tips untuk barista rumahan yang ingin memasuki dunia espresso yang kompleks.",
-		bodyContent: [
+        sectionId: "home-espresso-guide",
+        sectionTitle: "4. Home Espresso Mastery",
+        sectionSubtitle: "Dive into the complex world of espresso. We break down the gear you need to pull the perfect cafe-quality shot at home.",
+        bodyContent: [
             {
                 type: 'paragraph',
-                text: "Membuat espresso yang enak membutuhkan investasi yang signifikan. Kami memecah komponen penting yang perlu Anda ketahui sebelum membeli."
-            },
-            {
-                type: 'grid', // GRID BARU DITAMBAH DI SINI
-                title: 'Featured Espresso Gear:',
-                guides: [
-                    { title: "Best Budget Machines", url: "#", image: "/images/gear/espresso-budget.jpg" },
-                    { title: "Mid-Range Machine Guide", url: "#", image: "/images/gear/espresso-mid.jpg" },
-                    { title: "Essential Tampers & Distrib.", url: "#", image: "/images/gear/tamper-placeholder.jpg" },
-                    { title: "Milk Steaming Guide", url: "#", image: "/images/gear/steamer-placeholder.jpg" },
-                ]
-            },
-		],
-	},
-    // BLOK 5: BONUS GEAR (SUDAH 4 GRID)
-    {
-		sectionId: "bonus-gear-section",
-		sectionTitle: "5. Bonus Gear and Maintenance",
-		sectionSubtitle: "Alat-alat kecil yang sering diabaikan, namun penting untuk menjaga kualitas kopi dan peralatan Anda.",
-		bodyContent: [
-            {
-                type: 'paragraph',
-                text: "Bagian ini membahas pembersihan rutin, penyimpanan biji yang benar, dan barang-barang yang diremehkan lainnya."
+                text: "Great espresso requires a balance of pressure, temperature, and technique. Our guides help you choose the right machine without breaking the bank."
             },
             {
                 type: 'grid',
-                title: 'Maintenance Guides:',
+                title: 'Espresso Equipment Guides:',
                 guides: [
-                    { title: "Cleaning Your Grinder", url: "#", image: "/images/gear/cleaning.jpg" },
-                    { title: "Coffee Storage Best Practices", url: "#", image: "/images/gear/storage.jpg" },
-                    // ELEMEN KE-3 & KE-4 DITAMBAHKAN UNTUK MEMENUHI 4 KOLOM
-                    { title: "Water Quality & Filtration", url: "#", image: "/images/gear/water-placeholder.jpg" },
-                    { title: "The Perfect Travel Kit", url: "#", image: "/images/gear/travel-placeholder.jpg" },
+                    { title: "Best Entry Machines", url: "/gear/best-budget-espresso-machines", image: "/images/gear/espresso-budget.jpg" },
+                    { title: "Mid-Range Showdown", url: "/gear/best-prosumer-espresso-machines", image: "/images/gear/espresso-mid.jpg" },
+                    { title: "Precision Tampers", url: "/gear/best-espresso-accessories", image: "/images/gear/tamper-placeholder.jpg" },
+                    { title: "Milk Frothing Tips", url: "/gear/how-to-steam-milk", image: "/images/gear/steamer-placeholder.jpg" },
+                ]
+            },
+        ],
+    },
+    // BLOK 5: MAINTENANCE (Fokus pada "Longevity")
+    {
+        sectionId: "gear-longevity",
+        sectionTitle: "5. Maintenance & Coffee Storage",
+        sectionSubtitle: "Protect your investment. Learn how to clean your equipment and store your beans to ensure peak flavor every morning.",
+        bodyContent: [
+            {
+                type: 'list',
+                title: 'Keep it fresh and clean:',
+                listItems: [
+                    "<strong>Deep Cleaning:</strong> Descaling machines and oil removal.",
+                    "<strong>Storage Hacks:</strong> Air-tight solutions for bean freshness.",
+                    "<strong>Water Quality:</strong> The role of filtered water in gear life.",
+                ]
+            },
+            {
+                type: 'grid',
+                title: 'Longevity & Storage Guides:',
+                guides: [
+                    { title: "Machine Descaling", url: "/gear/how-to-descale-machine", image: "/images/gear/cleaning.jpg" },
+                    { title: "Best Storage Canisters", url: "/gear/best-coffee-storage", image: "/images/gear/storage.jpg" },
+                    { title: "Water Filter Guide", url: "/gear/best-water-filtration", image: "/images/gear/water-placeholder.jpg" },
+                    { title: "Travel Coffee Kits", url: "/gear/best-travel-coffee-gear", image: "/images/gear/travel-placeholder.jpg" },
                 ]
             }
-		],
-	},
+        ],
+    },
 ];
 ---
 
