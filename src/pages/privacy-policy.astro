@@ -1,0 +1,81 @@
+---
+// src/pages/privacy-policy.astro
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout title="Privacy Policy - Zaidly Blog">
+  <main class="bg-cream-latte min-h-screen pt-32 pb-20 text-coffee-dark">
+    <div class="container mx-auto max-w-3xl px-6">
+      <header class="mb-16 border-b-4 border-coffee-dark pb-8">
+        <h1 class="text-4xl md:text-6xl font-black uppercase tracking-tighter leading-none mb-4 italic">
+          Privacy Policy
+        </h1>
+        <p class="text-[10px] font-bold uppercase tracking-[0.3em] text-coffee-brown/60">
+          Transparency & Integrity // Zaidly Blog Legal Documentation
+        </p>
+      </header>
+
+      <div class="prose prose-coffee max-w-none 
+                  prose-p:text-[17px] prose-p:leading-relaxed prose-p:mb-8 prose-p:text-coffee-dark/90
+                  prose-headings:font-black prose-headings:uppercase prose-headings:tracking-tight prose-headings:text-coffee-dark
+                  prose-headings:mt-12 prose-headings:mb-4">
+        
+        <section>
+          <h2>1. Blog Support Disclosure</h2>
+          <p>
+            To keep Zaidly Blog independent and free from intrusive advertisements, we participate in the <strong>Amazon Services LLC Associates Program</strong>. 
+          </p>
+          <p class="italic text-coffee-brown">
+            As an Amazon Associate, Zaidly earns from qualifying purchases. This means we may receive a small commission—at no cost to you—if you make a purchase through our links. This helps us continue to provide independent, high-quality reviews and deep-dives for the global coffee community.
+          </p>
+        </section>
+
+        <section>
+          <h2>2. Your Information</h2>
+          <p>
+            We believe in a minimalist approach to data. We do not require account registration to read our insights. Any non-personal data collected (such as browser type or IP address) is used strictly for technical performance and site security. Discussions in our comment section are managed through Cusdis, ensuring your interaction remains transparent and secure.
+          </p>
+        </section>
+
+        <section>
+          <h2>3. Cookies & Experience</h2>
+          <p>
+            Zaidly Blog uses cookies to understand how our readers interact with our content. This allows us to optimize the reading experience. Third-party partners, including Amazon, may use cookies to understand referral traffic. You can manage or disable these cookies through your personal browser settings at any time.
+          </p>
+        </section>
+
+        <section>
+          <h2>4. Data Integrity</h2>
+          <p>
+            Your trust is our most valuable asset. We do not sell, trade, or rent your information to third parties. While we implement standard security measures to protect the site, we encourage readers to always practice safe browsing habits.
+          </p>
+        </section>
+
+        <section>
+          <h2>5. Connecting with Us</h2>
+          <p>
+            If you have any questions about our privacy practices or our editorial integrity, please reach out:
+            <br />
+            <span class="text-accent-primary font-black border-b-2 border-accent-primary/20 pb-1 italic">
+              hello@zaidly.com
+            </span>
+          </p>
+        </section>
+      </div>
+
+      <div class="mt-20 pt-8 border-t border-coffee-brown/10">
+        <a href="/" class="group flex items-center gap-3 text-[11px] font-black uppercase tracking-[0.3em] text-coffee-dark hover:text-accent-primary transition-all">
+          <span class="group-hover:-translate-x-2 transition-transform duration-300">←</span> Back to Blog
+        </a>
+      </div>
+    </div>
+  </main>
+</BaseLayout>
+
+<style>
+  .prose h2 {
+    font-size: 1.25rem;
+    border-left: 4px solid #ae7c55; /* Accent Primary */
+    padding-left: 1rem;
+  }
+</style>

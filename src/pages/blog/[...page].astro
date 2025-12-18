@@ -30,7 +30,7 @@ const pageNum = page.currentPage;
 const posts = page.data;
 ---
 
-<BaseLayout title={pageNum === 1 ? 'Journal' : `Journal - Page ${pageNum}`}> 
+<BaseLayout title={pageNum === 1 ? 'Blog' : `Blog - Page ${pageNum}`}> 
     
     {pageNum === 1 && <HeroBlog />}
 
@@ -73,7 +73,7 @@ const posts = page.data;
                     </a>
                 ) : (
                     <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-coffee-brown/40 italic">
-                        End of Journal
+                        End of Blog
                     </span>
                 )}
             </div>

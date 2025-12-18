@@ -1,5 +1,5 @@
 ---
-// Import hanya tipe data yang dibutuhkan dari ArticleLayout
+// src/components/TableOfContents.astro
 import type { Heading } from '../layouts/ArticleLayout.astro'; 
 
 interface Props {
@@ -7,28 +7,24 @@ interface Props {
 }
 
 const { headings } = Astro.props;
-
-// Filter headings sama seperti di layout utama
 const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
 ---
 
-{/* HTML Komponen TOC */}
-<div class="p-4 border border-gray-200 rounded-lg shadow-sm bg-gray-200 mb-6">
-    <h2 class="font-extrabold text-lg text-coffee-dark mb-3 border-b pb-2 flex items-center justify-between">
-        Table of Contents
-        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-            <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd" />
-        </svg>
+{/* Langsung Render Nav tanpa wrapper div putih */}
+<nav class="mb-8">
+    <h2 class="font-black text-[10px] uppercase tracking-[0.3em] text-coffee-dark/40 mb-4">
+        On This Page
     </h2>
-    <nav>
-        <ul class="space-y-2 text-gray-700">
-            {filteredHeadings.map(h => (
-                <li class:list={[h.depth === 2 ? 'pl-0 font-medium' : 'pl-4 text-sm', 'hover:text-accent-primary transition duration-150']}>
-                    <a href={`#${h.slug}`}>
-                        {h.text}
-                    </a>
-                </li>
-            ))}
-        </ul>
-    </nav>
-</div>
+    <ul class="space-y-2 text-coffee-dark">
+        {filteredHeadings.map(h => (
+            <li class:list={[
+                h.depth === 2 ? 'pl-0 font-bold text-xs' : 'pl-4 text-[12px] opacity-70', 
+                'hover:text-accent-primary transition duration-150 leading-snug uppercase tracking-tight'
+            ]}>
+                <a href={`#${h.slug}`} class="block py-0.5">
+                    {h.text}
+                </a>
+            </li>
+        ))}
+    </ul>
+</nav>

@@ -6,7 +6,7 @@ author: "admin"
 # MANGGILNYA GINI (Mundur ke folder assets):
 image: "../../assets/images/BestEspressoMachines.webp"
 category: "gear-lab"
-tags: ["espresso machine", "home barista", "coffee gear", "reviews"]
+tags: ["gear-lab", "precision-tools", "brew-mastery", "buying-guides"]
 ---
 
 Achieving a perfect shot of espresso at home can feel like a daunting task. It’s an art form, a science, and a daily ritual that elevates your coffee experience. But let's be honest, finding the **best espresso machine** for your kitchen isn't always easy.

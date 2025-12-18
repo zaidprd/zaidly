@@ -2,92 +2,81 @@
 // src/components/section/TopPicks.astro
 import { Image } from "astro:assets";
 
-// Import gambar produk dari folder assets
-import imgFellowOde from "../../assets/images/BrewConicalBurr.webp"; // Contoh pakai gambar yang ada di folder
+import imgFellowOde from "../../assets/images/BrewConicalBurr.webp";
 import imgBambino from "../../assets/images/BrevilleBambinoPlus.webp";
-import imgAeropress from "../../assets/images/espresso.webp"; // Pastikan ganti ke gambar aeropress jika sudah ada
+import imgAeropress from "../../assets/images/AeroPressClear.webp";
 
 const topProducts = [
   {
     id: "01",
     name: "Fellow Ode Brew Grinder Gen 2",
-    badge: "Overall Winner",
     tag: "Best for Filter Coffee",
-    description: "The gold standard for home pour-over enthusiasts. Quiet, fast, and incredible grind consistency for the perfect cup.",
     amazonUrl: "https://amzn.to/3YEvz65",
     image: imgFellowOde
   },
   {
     id: "02",
     name: "Breville Bambino Plus",
-    badge: "Runner Up",
     tag: "Best for Beginners",
-    description: "Compact espresso machine that delivers cafe-quality shots without the steep learning curve of pro-sumer gear.",
     amazonUrl: "https://amzn.to/4qaaUTb", 
     image: imgBambino
   },
   {
     id: "03",
     name: "AeroPress Clear",
-    badge: "Best Value",
     tag: "Best for Travel",
-    description: "Indestructible, versatile, and now in a beautiful transparent finish. The ultimate tool for consistent brewing anywhere.",
     amazonUrl: "https://amzn.to/3KWyx2P",
     image: imgAeropress
   }
 ];
 ---
 
-<section class="py-20 bg-cream-latte">
+<section class="py-24 bg-cream-latte overflow-hidden">
   <div class="container mx-auto max-w-6xl px-4">
     <div class="text-center mb-16">
-      <h2 class="text-4xl md:text-5xl font-extrabold text-coffee-dark mb-6">Ultimate Coffee Gear Picks</h2>
-      <p class="text-coffee-brown text-lg max-w-2xl mx-auto font-medium leading-relaxed">
-        Expertly curated selection of essential brewing equipment tested and highly recommended by Zaidly.
+      <h2 class="text-4xl md:text-5xl font-extrabold text-coffee-dark mb-6 tracking-tight">Ultimate Coffee Gear Picks</h2>
+      <p class="text-coffee-brown text-lg max-w-2xl mx-auto font-medium leading-relaxed opacity-90">
+        Expertly curated selection of essential brewing equipment tested and highly recommended by Zaidly Blog.
       </p>
-      
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
       {topProducts.map((item) => (
-        <div class="bg-white rounded-3xl p-8 shadow-md border border-coffee-brown/10 hover:shadow-2xl transition-all duration-500 flex flex-col relative overflow-hidden group">
+        <div class="bg-white rounded-[2rem] p-8 shadow-sm border border-coffee-brown/10 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 flex flex-col relative group">
           
-          <div class="absolute -top-2 -right-2 text-8xl font-black text-coffee-dark/5 group-hover:text-accent-primary/10 transition-colors">
+          {/* Nomor ID yang besar dan estetik */}
+          <div class="absolute -top-4 -left-4 text-9xl font-black text-coffee-dark/[0.03] group-hover:text-accent-primary/5 transition-colors pointer-events-none">
             {item.id}
           </div>
 
-          <div class="mb-8 aspect-square rounded-2xl bg-gray-50 overflow-hidden border border-coffee-brown/5 p-4 flex items-center justify-center relative z-10">
+          <div class="mb-8 aspect-square rounded-2xl bg-gray-50/50 overflow-hidden border border-coffee-brown/5 p-6 flex items-center justify-center relative z-10">
              <Image 
                src={item.image} 
-               alt={item.name} 
-               width={300} 
-               height={300}
-               class="max-w-full h-auto object-contain transition-transform duration-700 group-hover:scale-110"
+               alt={`Photo of ${item.name} - ${item.tag}`} 
+               width={400} 
+               height={400}
+               class="max-w-full h-auto object-contain transition-transform duration-700 group-hover:scale-105"
              />
           </div>
 
-          <div class="mb-5 flex flex-wrap gap-2 relative z-10">
-            <span class="bg-accent-primary text-white text-[10px] font-black uppercase tracking-widest px-3 py-1 rounded-md shadow-sm">
-              {item.badge}
-            </span>
-            <span class="bg-coffee-brown text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-md">
+          <div class="mb-4 relative z-10">
+            <span class="inline-block bg-accent-primary/10 text-accent-primary text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1 rounded-full border border-accent-primary/20">
               {item.tag}
             </span>
           </div>
 
-          <h3 class="text-2xl font-bold text-coffee-dark mb-4 leading-tight relative z-10">{item.name}</h3>
-          
-          <p class="text-coffee-brown text-[15px] leading-relaxed mb-8 flex-grow font-normal relative z-10">
-            {item.description}
-          </p>
+          <h3 class="text-2xl font-bold text-coffee-dark mb-6 leading-tight relative z-10 flex-grow">
+            {item.name}
+          </h3>
           
           <a 
             href={item.amazonUrl} 
             target="_blank" 
             rel="noopener noreferrer sponsored" 
-            class="w-full py-4 px-6 bg-coffee-dark text-white text-center rounded-xl font-bold text-sm tracking-wide hover:bg-accent-primary shadow-lg transition-all duration-300 relative z-10"
+            aria-label={`Check price for ${item.name} on Amazon`}
+            class="w-full py-4 px-6 bg-coffee-dark text-white text-center rounded-xl font-bold text-sm tracking-widest hover:bg-accent-primary shadow-lg hover:shadow-accent-primary/30 transition-all duration-300 relative z-10 uppercase"
           >
-            Check Price on Amazon
+            Check Price
           </a>
         </div>
       ))}

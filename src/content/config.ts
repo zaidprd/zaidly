@@ -1,12 +1,12 @@
+// src/content/config.ts
 import { defineCollection, z } from 'astro:content';
 
-const articleSchema = ({ image }) => z.object({ // Tambahkan ({ image }) di sini
+// Gunakan 'any' pada parameter image untuk menghilangkan error TS 7031
+const articleSchema = ({ image }: { image: any }) => z.object({ 
   title: z.string(),
   description: z.string(),
   author: z.string(), 
-  
   pubDate: z.coerce.date(), 
-  
   category: z.enum([
     'gear-lab',      
     'bean-roastery', 
@@ -14,10 +14,8 @@ const articleSchema = ({ image }) => z.object({ // Tambahkan ({ image }) di sini
     'barista-life',  
     'buying-guides'  
   ]),
-  
-  // UBAH INI: Agar Astro bisa mengoptimasi gambar di assets
+  // Astro akan mengoptimasi gambar melalui fungsi image() ini
   image: image().optional(), 
-  
   layout: z.string().optional(),
   tags: z.array(z.string()).optional(),
 });

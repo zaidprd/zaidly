@@ -10,7 +10,7 @@ interface Props {
     postType?: string; 
 }
 
-const { post, postType = "Journal" } = Astro.props;
+const { post, postType = "Blog" } = Astro.props;
 
 // Ambil path image dari Frontmatter (Markdown)
 const imagePath = post.data.image; 
@@ -22,7 +22,7 @@ const formattedDate = post.data.pubDate
         month: 'short', 
         day: 'numeric' 
       })
-    : 'Journal';
+    : 'Blog';
 
 // Slug Fix (Menghilangkan folder 'blog/')
 const postUrl = `/${post.slug.split('/').pop()}`; 
@@ -82,7 +82,7 @@ const postUrl = `/${post.slug.split('/').pop()}`;
             </div>
             
             <span class="text-coffee-dark font-black text-[10px] uppercase tracking-[0.2em] group-hover:text-accent-primary transition-colors flex items-center gap-2">
-                View Journal <span class="group-hover:translate-x-2 transition-transform duration-300">→</span>
+                View Blog <span class="group-hover:translate-x-2 transition-transform duration-300">→</span>
             </span>
         </div>
     </div>

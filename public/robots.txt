@@ -2,5 +2,5 @@
 User-agent: *
 Allow: /
 
-# Link ke sitemap agar Google mudah mengindeks semua artikel Journal
+# Link ke sitemap agar Google mudah mengindeks semua artikel Blog
 Sitemap: https://zaidly.com/sitemap-index.xml

@@ -1,0 +1,55 @@
+---
+// Lokasi file: src/pages/category/[category].astro
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+
+export async function getStaticPaths() {
+  const allPosts = await getCollection('blog');
+  
+  // Mengambil kategori langsung dari config kamu
+  const categories = [
+    'gear-lab',
+    'bean-roastery',
+    'brew-mastery',
+    'barista-life',
+    'buying-guides'
+  ];
+
+  return categories.map((cat) => {
+    const filteredPosts = allPosts.filter((post) => post.data.category === cat);
+    return {
+      params: { category: cat },
+      props: { posts: filteredPosts, categoryName: cat },
+    };
+  });
+}
+
+const { category } = Astro.params;
+const { posts, categoryName } = Astro.props;
+---
+
+<BaseLayout title={`${categoryName.replace('-', ' ')} - Zaidly Blog`}>
+  <main class="bg-cream-latte min-h-screen pt-32 pb-20">
+    <div class="container mx-auto max-w-6xl px-4">
+      <header class="mb-12 border-b-2 border-coffee-dark pb-6">
+        <h1 class="text-5xl font-black uppercase italic text-coffee-dark">
+          {categoryName.replace('-', ' ')}
+        </h1>
+      </header>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {posts.map(post => (
+          <a href={`/blog/${post.slug}`} class="group bg-white p-3 border border-coffee-brown/10 shadow-sm">
+            {post.data.image && (
+              <Image src={post.data.image} alt={post.data.title} width={500} height={300} class="w-full aspect-video object-cover mb-4" />
+            )}
+            <h2 class="font-black text-xl uppercase leading-tight group-hover:text-accent-primary transition-colors">
+              {post.data.title}
+            </h2>
+          </a>
+        ))}
+      </div>
+    </div>
+  </main>
+</BaseLayout>

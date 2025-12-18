@@ -8,7 +8,7 @@ import type { CollectionEntry } from 'astro:content';
 import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
 import adBambinoImg from '../assets/images/BrevilleBambinoPlus.webp';
 
-interface Heading {
+export interface Heading {
     depth: number; 
     slug: string; 
     text: string; 
@@ -105,11 +105,33 @@ const ads = {
                         prose-strong:font-black
                         prose-a:text-accent-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline">
                         <slot /> 
+                        <div class="prose prose-coffee max-w-none ...">
+                        <slot /> 
                     </div>
 
-                    <p class="mt-12 text-[11px] italic text-coffee-brown/60 leading-relaxed border-t border-coffee-brown/10 pt-6">
-                        *As an Amazon Associate, Zaidly earns from qualifying purchases. This helps us keep the coffee brewing and our reviews independent.
-                    </p>
+                    {frontmatter.tags && (
+                        <div class="mt-12 flex flex-wrap gap-3">
+                            {frontmatter.tags.slice(0, 4).map((tag: string) => (
+                                <a 
+                                    href="/" 
+                                    class="relative group overflow-hidden bg-white border-2 border-coffee-dark px-5 py-2 transition-all duration-300 ease-in-out"
+                                >
+                                    {/* Text Layer */}
+                                    <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-coffee-dark group-hover:text-white transition-colors duration-300 italic">
+                                        # {tag.replace('-', ' ')}
+                                    </span>
+                                    
+                                    {/* Slide-up Background Effect */}
+                                    <div class="absolute inset-0 bg-coffee-dark transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+                                </a>
+                            ))}
+                        </div>
+                    )}
+
+                    <div class="mt-20 border-t-4 border-coffee-dark pt-16">
+                    </div>
+
+
 
                     <div class="mt-20 border-t-4 border-coffee-dark pt-16">
                         <div class="mb-20">
@@ -138,32 +160,49 @@ const ads = {
                 </article>
 
                 {showSidebar && (
-                    <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start">
-                        <div class="space-y-12">
-                            <div class="bg-white border border-coffee-brown/15 p-8 shadow-sm">
-                                <h3 class="text-[10px] font-black text-coffee-dark uppercase tracking-[0.3em] mb-6 border-b border-coffee-brown/5 pb-3">Table of Contents</h3>
-                                <TableOfContents headings={headings} />
-                            </div>
+    <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start">
+        <div class="space-y-12">
+            {/* 1. Table of Contents */}
+            <TableOfContents headings={headings} />
 
-                            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
-                                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">The Top Choice</h3>
-                                <a href={ads.topPick.link} target="_blank" rel="nofollow" class="group block">
-                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
-                                        <Image 
-                                            src={ads.topPick.img} 
-                                            alt={ads.topPick.title} 
-                                            width={300} 
-                                            height={300} 
-                                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" 
-                                        />
-                                    </div>
-                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
-                                </a>
-                            </div>
-                        </div>
-                    </aside>
-                )}
+            {/* 2. Iklan Pertama: Top Pick (Grinder) */}
+            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
+                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">The Top Choice</h3>
+                <a href={ads.topPick.link} target="_blank" rel="nofollow sponsored" class="group block">
+                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
+                        <Image 
+                            src={ads.topPick.img} 
+                            alt={ads.topPick.title} 
+                            width={300} 
+                            height={300} 
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" 
+                        />
+                    </div>
+                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
+                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
+                </a>
+            </div>
+
+            {/* 3. Iklan Kedua: Essential Gear (Bambino) */}
+            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
+                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Essential Gear</h3>
+                <a href={ads.essential.link} target="_blank" rel="nofollow sponsored" class="group block">
+                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
+                        <Image 
+                            src={ads.essential.img} 
+                            alt={ads.essential.title} 
+                            width={300} 
+                            height={300} 
+                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" 
+                        />
+                    </div>
+                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.essential.title}</h4>
+                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
+                </a>
+            </div>
+        </div>
+    </aside>
+)}
             </div>
         </div>
     </main>
