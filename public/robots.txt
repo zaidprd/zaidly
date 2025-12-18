@@ -1,0 +1,6 @@
+# Segala jenis robot diizinkan menjelajahi situs
+User-agent: *
+Allow: /
+
+# Link ke sitemap agar Google mudah mengindeks semua artikel Journal
+Sitemap: https://zaidly.com/sitemap-index.xml
