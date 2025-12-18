@@ -1,3 +1,6 @@
+---
+// Header.astro
+---
 <header 
     id="main-header" 
     class="fixed w-full top-0 z-50 bg-coffee-light border-b border-coffee-light/50 shadow-sm h-20 transition-all duration-300"
@@ -18,7 +21,11 @@
             </ul>
         </nav>
 
-        <button id="mobile-menu-button" class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-300 hover:text-accent-primary">
+        <button 
+            id="mobile-menu-button" 
+            aria-label="Toggle Navigation Menu" 
+            class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-300 hover:text-accent-primary"
+        >
             <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -34,13 +41,12 @@
             <li><a href="/gear" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Gear</a></li>
             <li><a href="/beans" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Beans</a></li>
             <li><a href="/about" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">About</a></li>
-            <li><a href="/blog" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Blog</a></li>
+            <li><a href="/blog" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Journal</a></li>
         </ul>
     </div>
 </header>
 
 <script>
-    // Fungsi utama dibungkus agar bisa dipanggil ulang setiap pindah halaman
     const initHeader = () => {
         const header = document.getElementById('main-header');
         const logo = document.getElementById('header-logo');
@@ -102,6 +108,6 @@
         updateHeader();
     };
 
-    // PENTING: Gunakan 'astro:page-load' agar script jalan setiap pindah halaman
+    // Pastikan jalan saat initial load dan saat navigasi ViewTransitions
     document.addEventListener('astro:page-load', initHeader);
 </script>
