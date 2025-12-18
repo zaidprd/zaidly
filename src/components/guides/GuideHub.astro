@@ -2,10 +2,9 @@
 // src/components/guides/GuideHub.astro
 import ContentSection from '../ContentSection.astro';
 
-// Ambil semua gambar di folder guides secara otomatis
-const guideImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/guides/*.{jpeg,jpg,png,gif,webp}');
+// Ambil semua gambar di folder images secara rekursif agar folder Brewing terbaca
+const guideImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/**/*.{jpeg,jpg,png,gif,webp}');
 
-// --- DATA LENGKAP 5 BLOK SEO ---
 const ALL_GUIDE_BLOCKS = [
     {
         sectionId: "brewing-foundations",
@@ -25,10 +24,10 @@ const ALL_GUIDE_BLOCKS = [
                 type: 'grid',
                 title: 'Foundational Guides:',
                 guides: [
-                    { title: "Coffee-to-Water Ratio", url: "/guides/coffee-ratio-guide", imgKey: "../../assets/images/guides/ratio-featured.jpg" },
-                    { title: "Water Temperature Masterclass", url: "/guides/brewing-temperature", imgKey: "../../assets/images/guides/temp-featured.jpg" },
-                    { title: "Understanding Extraction", url: "/guides/coffee-extraction-basics", imgKey: "../../assets/images/guides/extraction-featured.jpg" },
-                    { title: "Coffee Storage Hacks", url: "/guides/how-to-store-coffee", imgKey: "../../assets/images/guides/storage-featured.jpg" },
+                    { title: "Coffee-to-Water Ratio", url: "/", imgKey: "../../assets/images/Brewing/Brewing3.webp" },
+                    { title: "Water Temperature Masterclass", url: "/", imgKey: "../../assets/images/Brewing/Brewing2.webp" },
+                    { title: "Understanding Extraction", url: "/", imgKey: "../../assets/images/Brewing/Brewing1.webp" },
+                    { title: "Coffee Storage Hacks", url: "/", imgKey: "../../assets/images/Brewing/Brewing4.webp" },
                 ]
             }
         ],
@@ -42,10 +41,10 @@ const ALL_GUIDE_BLOCKS = [
                 type: 'grid',
                 title: 'Manual Dripper Guides:',
                 guides: [
-                    { title: "Hario V60 Technique", url: "/guides/v60-brew-guide", imgKey: "../../assets/images/guides/v60-featured.jpg" },
-                    { title: "Chemex Masterclass", url: "/guides/chemex-brew-guide", imgKey: "../../assets/images/guides/chemex-featured.jpg" },
-                    { title: "Kalita Wave Recipe", url: "/guides/kalita-wave-guide", imgKey: "../../assets/images/guides/kalita-featured.jpg" },
-                    { title: "Fellow Stagg [X] Guide", url: "/guides/stagg-x-guide", imgKey: "../../assets/images/guides/stagg-featured.jpg" },
+                    { title: "Hario V60 Technique", url: "/", imgKey: "../../assets/images/guides/v60-featured.jpg" },
+                    { title: "Chemex Masterclass", url: "/", imgKey: "../../assets/images/guides/chemex-featured.jpg" },
+                    { title: "Kalita Wave Recipe", url: "/", imgKey: "../../assets/images/guides/kalita-featured.jpg" },
+                    { title: "Fellow Stagg [X] Guide", url: "/", imgKey: "../../assets/images/guides/stagg-featured.jpg" },
                 ]
             }
         ],
@@ -59,10 +58,10 @@ const ALL_GUIDE_BLOCKS = [
                 type: 'grid',
                 title: 'Immersion Method Guides:',
                 guides: [
-                    { title: "The Ultimate AeroPress", url: "/guides/aeropress-guide", imgKey: "../../assets/images/guides/aeropress-featured.jpg" },
-                    { title: "Perfect French Press", url: "/guides/french-press-guide", imgKey: "../../assets/images/guides/frenchpress-featured.jpg" },
-                    { title: "Clever Dripper Secrets", url: "/guides/clever-dripper-guide", imgKey: "../../assets/images/guides/clever-featured.jpg" },
-                    { title: "Cold Brew at Home", url: "/guides/cold-brew-guide", imgKey: "../../assets/images/guides/coldbrew-featured.jpg" },
+                    { title: "The Ultimate AeroPress", url: "/", imgKey: "../../assets/images/guides/aeropress-featured.jpg" },
+                    { title: "Perfect French Press", url: "/", imgKey: "../../assets/images/guides/frenchpress-featured.jpg" },
+                    { title: "Clever Dripper Secrets", url: "/", imgKey: "../../assets/images/guides/clever-featured.jpg" },
+                    { title: "Cold Brew at Home", url: "/", imgKey: "../../assets/images/guides/coldbrew-featured.jpg" },
                 ]
             }
         ],
@@ -85,10 +84,10 @@ const ALL_GUIDE_BLOCKS = [
                 type: 'grid',
                 title: 'Espresso Focus Guides:',
                 guides: [
-                    { title: "Dialing In Espresso", url: "/guides/dialing-in-espresso", imgKey: "../../assets/images/guides/espresso-featured.jpg" },
-                    { title: "Latte Art for Beginners", url: "/guides/latte-art-guide", imgKey: "../../assets/images/guides/latte-art-featured.jpg" },
-                    { title: "Moka Pot 'Espresso'", url: "/guides/moka-pot-guide", imgKey: "../../assets/images/guides/mokapot-featured.jpg" },
-                    { title: "Espresso Maintenance", url: "/guides/clean-espresso-machine", imgKey: "../../assets/images/guides/maintenance-featured.jpg" },
+                    { title: "Dialing In Espresso", url: "/", imgKey: "../../assets/images/guides/espresso-featured.jpg" },
+                    { title: "Latte Art for Beginners", url: "/", imgKey: "../../assets/images/guides/latte-art-featured.jpg" },
+                    { title: "Moka Pot 'Espresso'", url: "/", imgKey: "../../assets/images/guides/mokapot-featured.jpg" },
+                    { title: "Espresso Maintenance", url: "/", imgKey: "../../assets/images/guides/maintenance-featured.jpg" },
                 ]
             }
         ],
@@ -106,10 +105,10 @@ const ALL_GUIDE_BLOCKS = [
                 type: 'grid',
                 title: 'Deep Dive Articles:',
                 guides: [
-                    { title: "Coffee Water Chemistry", url: "/guides/water-science", imgKey: "../../assets/images/guides/chemistry-featured.jpg" },
-                    { title: "Altitude & Flavor", url: "/guides/coffee-altitude-impact", imgKey: "../../assets/images/guides/altitude-featured.jpg" },
-                    { title: "Processing Methods", url: "/guides/coffee-processing-washed-natural", imgKey: "../../assets/images/guides/processing-featured.jpg" },
-                    { title: "Roast Profile Impact", url: "/guides/roast-profiles-explained", imgKey: "../../assets/images/guides/roast-featured.jpg" },
+                    { title: "Coffee Water Chemistry", url: "/", imgKey: "../../assets/images/guides/chemistry-featured.jpg" },
+                    { title: "Altitude & Flavor", url: "/", imgKey: "../../assets/images/guides/altitude-featured.jpg" },
+                    { title: "Processing Methods", url: "/", imgKey: "../../assets/images/guides/processing-featured.jpg" },
+                    { title: "Roast Profile Impact", url: "/", imgKey: "../../assets/images/guides/roast-featured.jpg" },
                 ]
             }
         ],
