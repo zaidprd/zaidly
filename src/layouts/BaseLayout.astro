@@ -1,7 +1,6 @@
 ---
 import '../styles/global.css';
 import { ViewTransitions } from 'astro:transitions';
-
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
@@ -12,16 +11,16 @@ export interface Props {
   canonical?: string;
 }
 
-// FIX: Buat URL Absolut secara otomatis
+// FIX: Pastikan URL Absolut benar
 const siteOrigin = "https://zaidly.com"; 
 const currentPath = Astro.url.pathname;
 const absoluteURL = new URL(currentPath, siteOrigin).href;
 
 const {
   title = "Zaidly - Your Trusted Resource For All Things Coffee",
-  description = "Zaidly is your leading coffee website online. Our team of specialty coffee experts cover everything from gear reviews to brewing guides.",
+  description = "Zaidly is your leading coffee website online.",
   image = "/images/zaidly-logo-social.png",
-  // Gunakan absoluteURL sebagai default jika prop canonical tidak diisi
+  // Gunakan absoluteURL agar skor SEO 100
   canonical = absoluteURL 
 } = Astro.props;
 
@@ -39,7 +38,7 @@ const siteName = "Zaidly";
   <title>{title}</title>
   <meta name="description" content={description} />
   
-  {/* SEKARANG SUDAH ABSOLUT (https://zaidly.com/...) */}
+  {/* Link Canonical Absolut */}
   <link rel="canonical" href={canonical} />
 
   <meta property="og:type" content="website" />
@@ -49,4 +48,20 @@ const siteName = "Zaidly";
   <meta property="og:image" content={image} />
   <meta property="og:site_name" content={siteName} />
 
-  </head>
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:title" content={title} />
+  <meta name="twitter:description" content={description} />
+  <meta name="twitter:image" content={image} />
+
+  <link rel="icon" href="/images/zaidly-favicon.png" />
+</head>
+
+<body class="flex flex-col min-h-screen antialiased bg-cream-latte">
+  <Header />
+
+  <main class="flex-grow pt-16">
+    <slot /> </main>
+
+  <Footer />
+</body>
+</html>
