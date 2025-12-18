@@ -1,49 +1,55 @@
 ---
 // src/components/gear/BonusGearTable.astro
+import { Image } from 'astro:assets';
+
+// 1. Ambil semua gambar produk & brand dari assets
+// Pastikan gambar diletakkan di src/assets/images/products/
+const productImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/products/*.{jpeg,jpg,png,webp}');
 
 interface GearItem {
     type: string;
-    image: string;
+    imgKey: string; // Menggunakan imgKey bukan image path statis
     product: string;
     details: string[];
-    brandImage?: string;
+    brandImgKey?: string;
     amazonUrl: string;
 }
 
 const gearPicks: GearItem[] = [
     {
         type: "BEST AUTOMATIC DRIP",
-        image: "/images/technivorm.jpg",
+        imgKey: "../../assets/images/products/technivorm.jpg",
         product: "TECHNIVORM MOCCAMASTER KBGV SELECT",
         details: ["10 cups capacity", "Cone filter", "Glass carafe"],
-        brandImage: "/images/coffee-roastery.png",
+        brandImgKey: "../../assets/images/products/coffee-roastery.png",
         amazonUrl: "#" 
     },
     {
         type: "BEST ESPRESSO MACHINE",
-        image: "/images/breville.jpg",
+        imgKey: "../../assets/images/products/breville.jpg",
         product: "BREVILLE BES840XL INFUSER",
         details: ["Semi-automatic machine", "Manual steam wand", "61 ounces water tank"],
-        brandImage: "/images/amazon-logo.png",
+        brandImgKey: "../../assets/images/products/amazon-logo.png",
         amazonUrl: "#"
     },
     {
         type: "BEST POUR-OVER BREWER",
-        image: "/images/kalita.jpg",
+        imgKey: "../../assets/images/products/kalita.jpg",
         product: "KALITA WAVE",
         details: ["Stainless steel, ceramic, glass, copper", "2 or 4 cups capacity", "Kalita filters"],
-        brandImage: "/images/amazon-logo.png",
+        brandImgKey: "../../assets/images/products/amazon-logo.png",
         amazonUrl: "#"
     },
 ];
 ---
 
-<section class="py-16 bg-cream-latte"> <div class="container mx-auto max-w-6xl px-4">
+<section class="py-16 bg-cream-latte">
+    <div class="container mx-auto max-w-6xl px-4">
         <h2 class="text-3xl font-black text-coffee-dark mb-10 text-center uppercase tracking-wider">
             A Bonus List Of 15 Best Coffee Gear Picks
         </h2>
 
-        <div class="bg-white border border-coffee-brown/10 overflow-hidden">
+        <div class="bg-white border border-coffee-brown/10 overflow-hidden shadow-xl">
             {gearPicks.map((item) => (
                 <div class="flex flex-col md:flex-row items-center border-b border-coffee-brown/10 last:border-b-0 p-6 sm:p-8 hover:bg-coffee-light/20 transition-colors">
                     
@@ -52,16 +58,24 @@ const gearPicks: GearItem[] = [
                         <span class="inline-block bg-coffee-dark text-white text-[10px] font-bold px-3 py-1 rounded-full mb-4 tracking-widest uppercase">
                             {item.type}
                         </span>
-                        <img 
-                            src={item.image} 
-                            alt={item.product} 
-                            class="h-40 w-auto object-contain mx-auto transition-transform hover:scale-105 duration-300" 
-                        />
+                        <div class="h-40 flex items-center justify-center overflow-hidden">
+                            {productImages[item.imgKey] ? (
+                                <Image 
+                                    src={productImages[item.imgKey]()} 
+                                    alt={item.product}
+                                    width={200}
+                                    height={160}
+                                    class="h-full w-auto object-contain mx-auto transition-transform hover:scale-105 duration-300"
+                                />
+                            ) : (
+                                <div class="text-gray-400 text-[10px]">Product Image Missing</div>
+                            )}
+                        </div>
                     </div>
 
                     {/* Kolom 2: Product Name & Details */}
                     <div class="flex-grow w-full md:w-1/2 px-0 md:px-10 mb-6 md:mb-0">
-                        <h3 class="text-2xl font-black text-coffee-dark mb-4 leading-tight">{item.product}</h3>
+                        <h3 class="text-2xl font-black text-coffee-dark mb-4 leading-tight uppercase tracking-tighter italic">{item.product}</h3>
                         <ul class="space-y-2">
                             {item.details.map(detail => (
                                 <li class="flex items-start text-sm text-gray-600">
@@ -76,18 +90,20 @@ const gearPicks: GearItem[] = [
 
                     {/* Kolom 3: Brand & CTA */}
                     <div class="flex-shrink-0 w-full md:w-1/4 text-center flex flex-col items-center justify-center border-t md:border-t-0 md:border-l border-gray-100 pt-6 md:pt-0">
-                        {item.brandImage && (
-                            <img 
-                                src={item.brandImage} 
-                                alt="Brand Logo" 
-                                class="h-8 w-auto object-contain mb-6 opacity-70 grayscale hover:grayscale-0 transition-all" 
+                        {item.brandImgKey && productImages[item.brandImgKey] && (
+                            <Image 
+                                src={productImages[item.brandImgKey]()} 
+                                alt="Brand Logo"
+                                width={100}
+                                height={40}
+                                class="h-8 w-auto object-contain mb-6 opacity-60 grayscale hover:grayscale-0 transition-all"
                             />
                         )}
                         <a 
                             href={item.amazonUrl} 
                             target="_blank" 
                             rel="noopener noreferrer"
-                            class="w-full md:w-auto bg-coffee-dark hover:bg-accent-primary text-white text-xs font-bold py-4 px-8 tracking-widest transition duration-300"
+                            class="w-full md:w-auto bg-coffee-dark hover:bg-accent-primary text-white text-xs font-bold py-4 px-10 tracking-[0.2em] transition duration-300"
                         >
                             CHECK PRICE
                         </a>

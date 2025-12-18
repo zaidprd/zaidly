@@ -1,68 +1,88 @@
 ---
-// src/components/PostCard.astro (FLAT & PREMIUM DESIGN)
+// src/components/PostCard.astro - DEFINITIVE FIX
 import type { CollectionEntry } from 'astro:content';
+import { Image } from 'astro:assets';
+
 type CombinedPost = CollectionEntry<'blog'>; 
 
 interface Props {
     post: CombinedPost;
-    postType: string; 
+    postType?: string; 
 }
 
-const { post, postType } = Astro.props;
+const { post, postType = "Journal" } = Astro.props;
 
+// Ambil path image dari Frontmatter (Markdown)
 const imagePath = post.data.image; 
 
 // Format Tanggal
 const formattedDate = post.data.pubDate 
-    ? post.data.pubDate.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })
-    : 'Date not available';
+    ? post.data.pubDate.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'short', 
+        day: 'numeric' 
+      })
+    : 'Journal';
 
-// FIX SLUG
-const cleanSlug = post.slug.replace('blog/', '');
-const postUrl = `/${cleanSlug}`; 
+// Slug Fix (Menghilangkan folder 'blog/')
+const postUrl = `/${post.slug.split('/').pop()}`; 
 ---
 
 <a href={postUrl} 
-    class="group block bg-white border border-coffee-brown/10 hover:border-accent-primary transition-all duration-300">
+    class="group block bg-white border border-coffee-brown/10 hover:border-accent-primary transition-all duration-500 shadow-sm hover:shadow-xl">
     
-    {/* Image Container: Hapus rounded, ganti ke Sharp Edge */}
-    <div class="relative h-56 w-full bg-coffee-light overflow-hidden">
+    {/* Image Container */}
+    <div class="relative h-64 w-full bg-coffee-light overflow-hidden">
         {imagePath ? (
-            <img 
+            <Image 
                 src={imagePath} 
                 alt={post.data.title}
-                class="w-full h-full object-cover grayscale-[30%] group-hover:grayscale-0 group-hover:scale-105 transition duration-700"
-                loading="lazy"
+                width={800}
+                height={450}
+                class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s] ease-out"
             />
         ) : (
-            <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 font-bold uppercase tracking-widest text-xs">
+            <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 font-bold uppercase tracking-[0.3em] text-[10px] bg-coffee-light/50">
                 Image coming soon
             </div>
         )}
         
-        {/* Badge Type: Pindah ke pojok kiri atas gambar agar lebih modern */}
-        <div class="absolute top-4 left-4">
-             <span class="bg-coffee-dark text-white text-[10px] font-black px-3 py-1 tracking-[0.2em] uppercase">
+        <div class="absolute top-0 left-0 z-10">
+             <span class="bg-coffee-dark text-white text-[9px] font-black px-4 py-2 tracking-[0.3em] uppercase inline-block">
                 {postType} 
             </span>
         </div>
     </div>
 
-    <div class="p-6">
-        <h3 class="text-xl font-black text-coffee-dark mb-3 leading-tight uppercase tracking-tight group-hover:text-accent-primary transition duration-300">
+    <div class="p-8">
+        {/* Category dinamis dari Markdown */}
+        {post.data.category && (
+            <span class="text-accent-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2 block">
+                {post.data.category.replace('-', ' ')}
+            </span>
+        )}
+
+        <h3 class="text-xl font-black text-coffee-dark mb-4 leading-tight uppercase tracking-tight group-hover:text-accent-primary transition duration-300">
             {post.data.title}
         </h3>
         
-        <p class="text-coffee-brown text-sm mb-6 line-clamp-2 leading-relaxed opacity-80">
+        {/* FIX DESKRIPSI: Hanya tampilkan jika ada di data markdown */}
+        <p class="text-coffee-brown text-base mb-8 line-clamp-3 leading-relaxed opacity-80 italic">
             {post.data.description}
         </p>
 
-        <div class="flex items-center justify-between pt-4 border-t border-coffee-brown/5">
-            <span class="text-[10px] font-bold text-coffee-brown/50 uppercase tracking-widest">
-                {formattedDate}
-            </span>
-            <span class="text-accent-primary font-black text-xs uppercase tracking-widest group-hover:translate-x-1 transition-transform">
-                Read More →
+        <div class="flex items-center justify-between pt-6 border-t border-coffee-brown/10">
+            <div class="flex flex-col">
+                <span class="text-[9px] font-bold text-coffee-brown/40 uppercase tracking-[0.2em]">
+                    Published
+                </span>
+                <span class="text-[10px] font-black text-coffee-dark uppercase tracking-widest">
+                    {formattedDate}
+                </span>
+            </div>
+            
+            <span class="text-coffee-dark font-black text-[10px] uppercase tracking-[0.2em] group-hover:text-accent-primary transition-colors flex items-center gap-2">
+                View Journal <span class="group-hover:translate-x-2 transition-transform duration-300">→</span>
             </span>
         </div>
     </div>

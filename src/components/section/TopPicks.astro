@@ -1,5 +1,11 @@
 ---
 // src/components/section/TopPicks.astro
+import { Image } from "astro:assets";
+
+// Import gambar produk dari folder assets
+import imgFellowOde from "../../assets/images/BrewConicalBurr.webp"; // Contoh pakai gambar yang ada di folder
+import imgBambino from "../../assets/images/BrevilleBambinoPlus.webp";
+import imgAeropress from "../../assets/images/espresso.webp"; // Pastikan ganti ke gambar aeropress jika sudah ada
 
 const topProducts = [
   {
@@ -9,6 +15,7 @@ const topProducts = [
     tag: "Best for Filter Coffee",
     description: "The gold standard for home pour-over enthusiasts. Quiet, fast, and incredible grind consistency for the perfect cup.",
     amazonUrl: "https://amzn.to/3YEvz65",
+    image: imgFellowOde
   },
   {
     id: "02",
@@ -17,6 +24,7 @@ const topProducts = [
     tag: "Best for Beginners",
     description: "Compact espresso machine that delivers cafe-quality shots without the steep learning curve of pro-sumer gear.",
     amazonUrl: "https://amzn.to/4qaaUTb", 
+    image: imgBambino
   },
   {
     id: "03",
@@ -25,27 +33,37 @@ const topProducts = [
     tag: "Best for Travel",
     description: "Indestructible, versatile, and now in a beautiful transparent finish. The ultimate tool for consistent brewing anywhere.",
     amazonUrl: "https://amzn.to/3KWyx2P",
+    image: imgAeropress
   }
 ];
 ---
 
-<section class="py-20 bg-cream-latte"> <div class="container mx-auto max-w-6xl px-4">
+<section class="py-20 bg-cream-latte">
+  <div class="container mx-auto max-w-6xl px-4">
     <div class="text-center mb-16">
       <h2 class="text-4xl md:text-5xl font-extrabold text-coffee-dark mb-6">Ultimate Coffee Gear Picks</h2>
       <p class="text-coffee-brown text-lg max-w-2xl mx-auto font-medium leading-relaxed">
         Expertly curated selection of essential brewing equipment tested and highly recommended by Zaidly.
       </p>
-      <p class="text-[10px] text-coffee-brown/60 italic mt-4">
-        *As an Amazon Associate, Zaidly earns from qualifying purchases.
-      </p>
+      
     </div>
 
     <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
       {topProducts.map((item) => (
-        <div class="bg-white rounded-3xl p-10 shadow-md border border-coffee-brown/10 hover:shadow-2xl transition-all duration-500 flex flex-col relative overflow-hidden group">
+        <div class="bg-white rounded-3xl p-8 shadow-md border border-coffee-brown/10 hover:shadow-2xl transition-all duration-500 flex flex-col relative overflow-hidden group">
           
           <div class="absolute -top-2 -right-2 text-8xl font-black text-coffee-dark/5 group-hover:text-accent-primary/10 transition-colors">
             {item.id}
+          </div>
+
+          <div class="mb-8 aspect-square rounded-2xl bg-gray-50 overflow-hidden border border-coffee-brown/5 p-4 flex items-center justify-center relative z-10">
+             <Image 
+               src={item.image} 
+               alt={item.name} 
+               width={300} 
+               height={300}
+               class="max-w-full h-auto object-contain transition-transform duration-700 group-hover:scale-110"
+             />
           </div>
 
           <div class="mb-5 flex flex-wrap gap-2 relative z-10">

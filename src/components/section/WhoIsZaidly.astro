@@ -1,5 +1,9 @@
 ---
-// Tentukan Props yang diterima
+// Import Image dari Astro
+import { Image } from "astro:assets";
+// Import gambar dari folder assets
+import authImage from "../../assets/images/IndependentCoffeeAuthority.webp";
+
 interface Props {
     title: string;
     subtitle: string;
@@ -7,11 +11,10 @@ interface Props {
     linkUrl: string;
 }
 
-// Ambil Props
 const { title, subtitle, linkText, linkUrl } = Astro.props;
 ---
 
-<section class="py-20 bg-cream-latte"> {/* Ganti bg-gray-50 menjadi bg-cream-latte */}
+<section class="py-20 bg-cream-latte">
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             
@@ -19,14 +22,13 @@ const { title, subtitle, linkText, linkUrl } = Astro.props;
                 <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
                     {title}
                 </h2>
-                <p class="text-coffee-brown text-lg mb-6"> {/* Ganti text-gray-700 menjadi text-coffee-brown untuk teks tubuh */}
+                <p class="text-coffee-brown text-lg mb-6">
                     {subtitle}
                 </p>
                 <a 
                     href={linkUrl} 
-                    class="inline-block 
-                           border border-coffee-dark text-coffee-dark font-semibold px-8 py-3 rounded-lg 
-                           hover:bg-accent-primary hover:text-white hover:border-accent-primary /* Hover CTA menggunakan aksen utama */
+                    class="inline-block border border-coffee-dark text-coffee-dark font-semibold px-8 py-3 rounded-lg 
+                           hover:bg-accent-primary hover:text-white hover:border-accent-primary
                            transition duration-300"
                 >
                     {linkText}
@@ -34,9 +36,12 @@ const { title, subtitle, linkText, linkUrl } = Astro.props;
             </div>
             
             <div>
-                <img 
-                    src="/images/IndependentCoffeeAuthority.webp" 
-                    alt="A person preparing a coffee shot" 
+                <Image 
+                    src={authImage} 
+                    alt="Independent Coffee Authority" 
+                    width={600} 
+                    height={400}
+                    loading="lazy"
                     class="rounded-lg w-full h-auto shadow-xl"
                 />
             </div>

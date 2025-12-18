@@ -16,14 +16,22 @@ import { getCollection } from 'astro:content';
 
 const allPosts = await getCollection('blog') || []; 
 
-// 3. Logic: Sorting & Filtering for SEO Topical Authority
+// 3. Logic: Sorting & Filtering
+// Menggunakan as Date untuk memastikan TypeScript senang
 const sortedPosts = allPosts.sort((a, b) => 
-    (b.data.pubDate as Date).getTime() - (a.data.pubDate as Date).getTime()
+    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
 );
 
 const latestPosts = sortedPosts.slice(0, 3);
-const gearPosts = allPosts.filter(post => post.data.category === 'gear').slice(0, 4);
-const beanPosts = allPosts.filter(post => post.data.category === 'beans').slice(0, 4);
+
+// SINKRONISASI KATEGORI: Sesuaikan dengan schema di config.ts
+const gearPosts = allPosts.filter(post => 
+    post.data.category === 'gear-lab' || post.data.category === 'buying-guides'
+).slice(0, 4);
+
+const beanPosts = allPosts.filter(post => 
+    post.data.category === 'bean-roastery'
+).slice(0, 4);
 
 // 4. Category Data
 const featuredCategories = [

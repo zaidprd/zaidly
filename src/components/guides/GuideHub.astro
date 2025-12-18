@@ -1,126 +1,115 @@
 ---
-// src/components/gear/GearHub.astro
+// src/components/guides/GuideHub.astro
 import ContentSection from '../ContentSection.astro';
 
-// --- DATA UTAMA: 5 BLOK GEAR DENGAN OPTIMASI SEO ---
-const ALL_GEAR_BLOCKS = [
-    // BLOK 1: ACCESSORIES (Fokus pada "Precision Brewing")
+// Ambil semua gambar di folder guides secara otomatis
+const guideImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/guides/*.{jpeg,jpg,png,gif,webp}');
+
+// --- DATA LENGKAP 5 BLOK SEO ---
+const ALL_GUIDE_BLOCKS = [
     {
-        sectionId: "precision-brewing-tools",
-        sectionTitle: "1. Essential Brewing Accessories",
-        sectionSubtitle: "The small details that make the biggest difference. Master your brew with the right scales, kettles, and filtration systems.",
+        sectionId: "brewing-foundations",
+        sectionTitle: "1. Coffee Brewing Foundations",
+        sectionSubtitle: "Master the fundamental variables that dictate the quality of every cup you brew at home.",
         bodyContent: [
             {
                 type: 'list',
-                title: 'Master the essentials:',
+                title: 'Core Brewing Variables:',
                 listItems: [
-                    "<strong>Digital Scales:</strong> Why precision weight is the key to repeatability.",
-                    "<strong>Gooseneck Kettles:</strong> Mastering flow rate for perfect extraction.",
-                    "<strong>Filter Science:</strong> Choosing between paper, metal, and cloth filters.",
+                    "<strong>Water Quality:</strong> Why filtered water is non-negotiable for flavor and gear longevity.",
+                    "<strong>Brew Ratios:</strong> Finding the 'Golden Ratio' for your specific taste preference.",
+                    "<strong>Grind Size:</strong> Matching your grind to your brew method for ideal extraction.",
                 ]
             },
             {
                 type: 'grid',
-                title: 'Expert Accessory Reviews:',
+                title: 'Foundational Guides:',
                 guides: [
-                    { title: "Top 5 Coffee Scales", url: "/gear/best-coffee-scales", image: "/images/gear/scale-featured.jpg" },
-                    { title: "Best Gooseneck Kettles", url: "/gear/best-gooseneck-kettles", image: "/images/gear/kettle-featured.jpg" },
-                    { title: "Paper vs Metal Filters", url: "/gear/filter-comparison", image: "/images/gear/filter-featured.jpg" },
-                    { title: "Barista Cleaning Kits", url: "/gear/essential-cleaning-tools", image: "/images/gear/cleaning-placeholder.jpg" }, 
+                    { title: "Coffee-to-Water Ratio", url: "/guides/coffee-ratio-guide", imgKey: "../../assets/images/guides/ratio-featured.jpg" },
+                    { title: "Water Temperature Masterclass", url: "/guides/brewing-temperature", imgKey: "../../assets/images/guides/temp-featured.jpg" },
+                    { title: "Understanding Extraction", url: "/guides/coffee-extraction-basics", imgKey: "../../assets/images/guides/extraction-featured.jpg" },
+                    { title: "Coffee Storage Hacks", url: "/guides/how-to-store-coffee", imgKey: "../../assets/images/guides/storage-featured.jpg" },
                 ]
             }
         ],
     },
-    // BLOK 2: GRINDERS (Fokus pada "Consistency")
     {
-        sectionId: "coffee-grinders-hub",
-        sectionTitle: "2. Grinders: The Heart of Your Setup",
-        sectionSubtitle: "Freshly ground coffee is the single biggest upgrade you can make. Learn why burr grinders are mandatory for quality brewing.",
-        bodyContent: [
-            {
-                type: 'list',
-                title: 'Grinder fundamentals:',
-                listItems: [
-                    "<strong>Burr vs Blade:</strong> Avoiding inconsistent 'coffee dust'.",
-                    "<strong>Conical vs Flat Burrs:</strong> Understanding flavor profiles.",
-                    "<strong>Manual vs Electric:</strong> Finding the best value for your workflow.",
-                ]
-            },
-            {
-                type: 'grid',
-                title: 'Top Rated Grinder Guides:',
-                guides: [
-                    { title: "Best Burr Grinders", url: "/gear/best-burr-grinders", image: "/images/gear/grinder-encore.jpg" },
-                    { title: "Top Manual Grinders", url: "/gear/best-hand-grinders", image: "/images/gear/grinder-manual.jpg" },
-                    { title: "Grinder Cleaning Tips", url: "/gear/how-to-clean-grinder", image: "/images/gear/maintenance-placeholder.jpg" },
-                    { title: "Budget Electric Picks", url: "/gear/best-budget-grinders", image: "/images/gear/budget-placeholder.jpg" },
-                ]
-            }
-        ],
-    },
-    // BLOK 3: MAKERS (Fokus pada "Methods")
-    {
-        sectionId: "manual-brew-methods",
-        sectionTitle: "3. Manual Brewers & Drippers",
-        sectionSubtitle: "From pour-over elegance to immersion strength. Choose the brewing method that fits your taste profile.",
+        sectionId: "pour-over-guides",
+        sectionTitle: "2. The Art of Pour-Over",
+        sectionSubtitle: "Precision brewing for those who appreciate clarity and complex acidity in their coffee.",
         bodyContent: [
             {
                 type: 'grid',
-                title: 'Popular Brewer Comparisons:',
+                title: 'Manual Dripper Guides:',
                 guides: [
-                    { title: "Hario V60 Guide", url: "/gear/hario-v60-review", image: "/images/gear/dripper-v60.jpg" },
-                    { title: "Chemex Masterclass", url: "/gear/chemex-brewing-guide", image: "/images/gear/dripper-chemex.jpg" },
-                    { title: "Aeropress Recipes", url: "/gear/aeropress-guide", image: "/images/gear/dripper-aeropress.jpg" },
-                    { title: "French Press Basics", url: "/gear/french-press-guide", image: "/images/gear/dripper-frenchpress.jpg" },
+                    { title: "Hario V60 Technique", url: "/guides/v60-brew-guide", imgKey: "../../assets/images/guides/v60-featured.jpg" },
+                    { title: "Chemex Masterclass", url: "/guides/chemex-brew-guide", imgKey: "../../assets/images/guides/chemex-featured.jpg" },
+                    { title: "Kalita Wave Recipe", url: "/guides/kalita-wave-guide", imgKey: "../../assets/images/guides/kalita-featured.jpg" },
+                    { title: "Fellow Stagg [X] Guide", url: "/guides/stagg-x-guide", imgKey: "../../assets/images/guides/stagg-featured.jpg" },
                 ]
             }
         ],
     },
-    // BLOK 4: ESPRESSO (Fokus pada "Home Barista")
     {
-        sectionId: "home-espresso-guide",
+        sectionId: "immersion-brewing",
+        sectionTitle: "3. Immersion & Full-Body Brewing",
+        sectionSubtitle: "Simple, consistent, and bold. Perfect for those who love a heavy mouthfeel.",
+        bodyContent: [
+            {
+                type: 'grid',
+                title: 'Immersion Method Guides:',
+                guides: [
+                    { title: "The Ultimate AeroPress", url: "/guides/aeropress-guide", imgKey: "../../assets/images/guides/aeropress-featured.jpg" },
+                    { title: "Perfect French Press", url: "/guides/french-press-guide", imgKey: "../../assets/images/guides/frenchpress-featured.jpg" },
+                    { title: "Clever Dripper Secrets", url: "/guides/clever-dripper-guide", imgKey: "../../assets/images/guides/clever-featured.jpg" },
+                    { title: "Cold Brew at Home", url: "/guides/cold-brew-guide", imgKey: "../../assets/images/guides/coldbrew-featured.jpg" },
+                ]
+            }
+        ],
+    },
+    {
+        sectionId: "espresso-at-home",
         sectionTitle: "4. Home Espresso Mastery",
-        sectionSubtitle: "Dive into the complex world of espresso. We break down the gear you need to pull the perfect cafe-quality shot at home.",
+        sectionSubtitle: "The hardest method to master, but the most rewarding. Learn to pull cafe-quality shots.",
+        bodyContent: [
+            {
+                type: 'list',
+                title: 'Espresso Essentials:',
+                listItems: [
+                    "<strong>Dialing In:</strong> Adjusting your grinder for the perfect 1:2 shot ratio.",
+                    "<strong>Milk Texturing:</strong> Achieving silky micro-foam for latte art.",
+                    "<strong>Puck Prep:</strong> The importance of distribution and tamping.",
+                ]
+            },
+            {
+                type: 'grid',
+                title: 'Espresso Focus Guides:',
+                guides: [
+                    { title: "Dialing In Espresso", url: "/guides/dialing-in-espresso", imgKey: "../../assets/images/guides/espresso-featured.jpg" },
+                    { title: "Latte Art for Beginners", url: "/guides/latte-art-guide", imgKey: "../../assets/images/guides/latte-art-featured.jpg" },
+                    { title: "Moka Pot 'Espresso'", url: "/guides/moka-pot-guide", imgKey: "../../assets/images/guides/mokapot-featured.jpg" },
+                    { title: "Espresso Maintenance", url: "/guides/clean-espresso-machine", imgKey: "../../assets/images/guides/maintenance-featured.jpg" },
+                ]
+            }
+        ],
+    },
+    {
+        sectionId: "advanced-coffee-science",
+        sectionTitle: "5. Advanced Coffee Science",
+        sectionSubtitle: "Go beyond the basics and understand the chemistry behind the cup.",
         bodyContent: [
             {
                 type: 'paragraph',
-                text: "Great espresso requires a balance of pressure, temperature, and technique. Our guides help you choose the right machine without breaking the bank."
+                text: "Understanding coffee on a molecular level helps you troubleshoot bad brews and unlock the full potential of expensive specialty beans."
             },
             {
                 type: 'grid',
-                title: 'Espresso Equipment Guides:',
+                title: 'Deep Dive Articles:',
                 guides: [
-                    { title: "Best Entry Machines", url: "/gear/best-budget-espresso-machines", image: "/images/gear/espresso-budget.jpg" },
-                    { title: "Mid-Range Showdown", url: "/gear/best-prosumer-espresso-machines", image: "/images/gear/espresso-mid.jpg" },
-                    { title: "Precision Tampers", url: "/gear/best-espresso-accessories", image: "/images/gear/tamper-placeholder.jpg" },
-                    { title: "Milk Frothing Tips", url: "/gear/how-to-steam-milk", image: "/images/gear/steamer-placeholder.jpg" },
-                ]
-            },
-        ],
-    },
-    // BLOK 5: MAINTENANCE (Fokus pada "Longevity")
-    {
-        sectionId: "gear-longevity",
-        sectionTitle: "5. Maintenance & Coffee Storage",
-        sectionSubtitle: "Protect your investment. Learn how to clean your equipment and store your beans to ensure peak flavor every morning.",
-        bodyContent: [
-            {
-                type: 'list',
-                title: 'Keep it fresh and clean:',
-                listItems: [
-                    "<strong>Deep Cleaning:</strong> Descaling machines and oil removal.",
-                    "<strong>Storage Hacks:</strong> Air-tight solutions for bean freshness.",
-                    "<strong>Water Quality:</strong> The role of filtered water in gear life.",
-                ]
-            },
-            {
-                type: 'grid',
-                title: 'Longevity & Storage Guides:',
-                guides: [
-                    { title: "Machine Descaling", url: "/gear/how-to-descale-machine", image: "/images/gear/cleaning.jpg" },
-                    { title: "Best Storage Canisters", url: "/gear/best-coffee-storage", image: "/images/gear/storage.jpg" },
-                    { title: "Water Filter Guide", url: "/gear/best-water-filtration", image: "/images/gear/water-placeholder.jpg" },
-                    { title: "Travel Coffee Kits", url: "/gear/best-travel-coffee-gear", image: "/images/gear/travel-placeholder.jpg" },
+                    { title: "Coffee Water Chemistry", url: "/guides/water-science", imgKey: "../../assets/images/guides/chemistry-featured.jpg" },
+                    { title: "Altitude & Flavor", url: "/guides/coffee-altitude-impact", imgKey: "../../assets/images/guides/altitude-featured.jpg" },
+                    { title: "Processing Methods", url: "/guides/coffee-processing-washed-natural", imgKey: "../../assets/images/guides/processing-featured.jpg" },
+                    { title: "Roast Profile Impact", url: "/guides/roast-profiles-explained", imgKey: "../../assets/images/guides/roast-featured.jpg" },
                 ]
             }
         ],
@@ -128,9 +117,10 @@ const ALL_GEAR_BLOCKS = [
 ];
 ---
 
-{ALL_GEAR_BLOCKS.map((data, index) => (
+{ALL_GUIDE_BLOCKS.map((data, index) => (
     <ContentSection 
         data={data} 
         isFirst={index === 0} 
+        images={guideImages}
     />
 ))}

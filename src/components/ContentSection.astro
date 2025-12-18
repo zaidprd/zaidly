@@ -1,72 +1,52 @@
 ---
-// src/components/ContentSection.astro (FINAL TEMPLATE FLEKSIBEL)
+// src/components/ContentSection.astro
+import { Image } from 'astro:assets';
 
-// Menerima data dari Parent (BeanHub.astro)
 interface Props {
     data: any; 
-    isFirst: boolean;
+    isFirst?: boolean;
+    images?: any;
 }
 
-const { data, isFirst } = Astro.props;
+const { data, isFirst = false, images = {} } = Astro.props;
 
-// Mengatur padding atas: pt-0 untuk blok pertama, pt-12 untuk blok berikutnya
-const paddingTopClass = isFirst ? 'pt-0' : 'pt-12';
+// PENGAMAN: Jika data tidak sengaja kosong, komponen tidak akan merusak seluruh halaman
+if (!data || !data.bodyContent) return null;
+
+const paddingTopClass = isFirst ? 'pt-0' : 'pt-20';
 ---
 
-<div id={data.sectionId} class:list={[paddingTopClass, 'container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8']}>
-    {/* JUDUL UTAMA SECTION */}
-    <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">
-        {data.sectionTitle}
-    </h2>
+<section id={data.sectionId} class:list={[paddingTopClass, "container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8"]}>
+    <h2 class="text-4xl font-extrabold text-coffee-dark mb-4">{data.sectionTitle}</h2>
+    <p class="text-lg text-coffee-brown mb-12">{data.sectionSubtitle}</p>
 
-    {/* SUBTITLE SECTION */}
-    <p class="text-lg text-coffee-brown mb-8">
-        {data.sectionSubtitle}
-    </p>
-    
-    {/* LOOP BODY CONTENT (INI ADALAH KUNCI FLEKSIBILITAS) */}
     {data.bodyContent.map((element: any) => (
-        <div class="mb-8">
-            {/* 1. RENDER JUDUL ELEMEN (Jika ada) */}
+        <div class="mb-10">
             {element.title && (
-                <p class:list={[
-                    "font-bold text-coffee-dark mb-3 text-lg",
-                    { "text-2xl mt-8 mb-6 border-b pb-2 border-coffee-light": element.type === 'grid' } // Judul Grid Lebih Besar
-                ]}>
-                    {element.title}
-                </p>
-            )}
-
-            {/* 2. RENDER BERDASARKAN TYPE */}
-            {element.type === 'paragraph' && (
-                <p class="text-coffee-brown mb-4">
-                    {element.text}
-                </p>
-            )}
-
-            {element.type === 'list' && (
-                <ul class="list-disc list-inside text-coffee-brown space-y-2 ml-4 mb-10 marker:text-accent-primary">
-                    {element.listItems.map((point: string) => ( 
-                        <li class="pl-2" set:html={point} />
-                    ))}
-                </ul>
+                <p class="font-bold text-coffee-dark mb-4 text-xl">{element.title}</p>
             )}
 
             {element.type === 'grid' && element.guides && (
-                <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {element.guides.map((link: any) => ( 
-                        <a
-                            href={link.url}
-                            class="group block bg-coffee-light rounded-xl overflow-hidden shadow-md transition duration-300 transform hover:shadow-xl hover:-translate-y-1 border border-transparent hover:border-accent-primary"
-                            aria-label={link.title}
-                        >
-                            <img
-                                src={link.image}
-                                alt={link.title}
-                                class="w-full h-32 object-cover transition duration-500 group-hover:scale-105"
-                            />
-                            <div class="p-3 text-center">
-                                <p class="text-sm font-bold text-coffee-dark group-hover:text-accent-primary transition duration-300">
+                <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
+                    {element.guides.map((link: any) => (
+                        <a href={link.url} class="group block bg-white rounded-xl overflow-hidden shadow-sm border border-coffee-brown/5">
+                            <div class="aspect-square overflow-hidden bg-gray-100">
+                                {images[link.imgKey] ? (
+                                    <Image 
+                                        src={images[link.imgKey]()} 
+                                        alt={link.title}
+                                        width={400}
+                                        height={400}
+                                        class="w-full h-full object-cover group-hover:scale-105 transition-all duration-500"
+                                    />
+                                ) : (
+                                    <div class="flex items-center justify-center h-full text-[10px] text-gray-400 p-4 text-center italic">
+                                        Image Missing: {link.imgKey?.split('/').pop()}
+                                    </div>
+                                )}
+                            </div>
+                            <div class="p-4 text-center">
+                                <p class="text-sm font-black text-coffee-dark group-hover:text-accent-primary uppercase tracking-tight">
                                     {link.title}
                                 </p>
                             </div>
@@ -74,6 +54,18 @@ const paddingTopClass = isFirst ? 'pt-0' : 'pt-12';
                     ))}
                 </div>
             )}
+            
+            {/* List Render */}
+            {element.type === 'list' && (
+                <ul class="space-y-3 ml-2">
+                    {element.listItems.map((item: string) => (
+                        <li class="flex gap-3 text-coffee-brown">
+                            <span class="text-accent-primary">☕</span>
+                            <span set:html={item} />
+                        </li>
+                    ))}
+                </ul>
+            )}
         </div>
     ))}
-</div>
+</section>

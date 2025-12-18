@@ -1,10 +1,18 @@
 ---
 // src/components/section/CoffeeGearHub.astro
+import { Image } from "astro:assets";
+
+// Import gambar dari assets sesuai nama file di screenshot kamu
+import imgEspresso from "../../assets/images/BestEspressoMachines.webp";
+import imgGrinders from "../../assets/images/TopCoffeeGrinders.webp";
+import imgPourOver from "../../assets/images/PourOverEssentials.webp";
+import imgMaintenance from "../../assets/images/MaintenanceTool.webp"; // Sesuai screenshot
+
 interface Post {
   slug: string;
   data: {
     title: string;
-    image?: string;
+    image?: any;
   };
 }
 
@@ -18,31 +26,30 @@ const gearFeaturedLinks = [
   { 
     title: "Best Espresso Machines", 
     url: "/gear/best-espresso-machines", 
-    image: "/images/BestEspressoMachines.webp" 
+    image: imgEspresso 
   },
   { 
     title: "Top Coffee Grinders", 
     url: "/gear/best-coffee-grinders", 
-    image: "/images/TopCoffeeGrinders.webp" 
+    image: imgGrinders 
   },
   { 
     title: "Pour Over Essentials", 
     url: "/gear/pour-over-guide", 
-    image: "/images/PourOverEssentials.webp" 
+    image: imgPourOver 
   },
   { 
     title: "Maintenance Tools", 
     url: "/gear/cleaning-maintenance", 
-    image: "/images/MaintenanceTool.webp" 
+    image: imgMaintenance 
   },
 ];
 ---
 
-<section class="w-full bg-coffee-light pt-16 pb-8 border-t border-coffee-brown/10">
-  
+<section class="w-full bg-coffee-light pt-16 pb-20 border-t border-coffee-brown/10">
   <div class="container mx-auto max-w-6xl px-6 md:px-12">
 
-    <h2 class="text-4xl md:text-5xl font-black text-coffee-dark mb-6 tracking-tight">
+    <h2 class="text-4xl md:text-5xl font-black text-coffee-dark mb-6 tracking-tight italic">
       Coffee Gear Authority
     </h2>
 
@@ -50,9 +57,9 @@ const gearFeaturedLinks = [
       Investing in the right tools is the secret to cafe-quality coffee at home. We rigorously test grinders, brewers, and machines to ensure you get the best performance for your budget.
     </p>
 
-    <div class="mb-14">
-      <p class="font-bold text-coffee-dark mb-5 text-xl">In our coffee gear hub, you’ll learn about:</p>
-      <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-4 text-coffee-brown text-lg">
+    <div class="mb-14 bg-white/40 p-8 rounded-2xl border border-coffee-brown/5">
+      <p class="font-black text-coffee-dark mb-6 text-xl uppercase tracking-tight">In our coffee gear hub, you’ll learn about:</p>
+      <ul class="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-5 text-coffee-brown text-lg">
         <li class="flex items-start gap-x-3">
           <span class="text-accent-primary mt-1">⚙️</span>
           <span><strong class="text-coffee-dark">Precision:</strong>&nbsp;Choosing grinders for consistency.</span>
@@ -72,7 +79,7 @@ const gearFeaturedLinks = [
       </ul>
     </div>
 
-    <h3 class="text-2xl font-bold text-coffee-dark mb-8 uppercase tracking-wider">
+    <h3 class="text-xs font-black text-coffee-brown/60 mb-8 uppercase tracking-[0.3em]">
       Expert Gear Comparisons:
     </h3>
 
@@ -80,24 +87,26 @@ const gearFeaturedLinks = [
       {gearFeaturedLinks.map((link) => (
         <a
           href={link.url}
-          class="group block bg-white/30 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 border border-coffee-brown/10 hover:bg-white/60"
+          class="group block bg-white rounded-2xl overflow-hidden transition-all duration-500 hover:-translate-y-2 border border-coffee-brown/10 hover:shadow-2xl hover:shadow-accent-primary/10"
           aria-label={link.title}
         >
-          <div class="aspect-[4/3] overflow-hidden border-b border-coffee-brown/5">
-            <img
+          <div class="aspect-[4/3] overflow-hidden border-b border-coffee-brown/5 bg-gray-100">
+            <Image
               src={link.image}
               alt={link.title}
-              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+              width={400}
+              height={300}
+              loading="lazy"
+              class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
             />
           </div>
           <div class="p-5 text-center">
-            <p class="text-sm font-black text-coffee-dark group-hover:text-accent-primary transition-colors uppercase tracking-widest leading-tight">
+            <p class="text-[11px] font-black text-coffee-dark group-hover:text-accent-primary transition-colors uppercase tracking-[0.15em] leading-tight">
               {link.title}
             </p>
           </div>
         </a>
       ))}
     </div>
-
   </div>
 </section>

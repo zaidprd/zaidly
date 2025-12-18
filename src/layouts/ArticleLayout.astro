@@ -1,7 +1,12 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
+import { Image } from 'astro:assets';
 import type { CollectionEntry } from 'astro:content'; 
+
+// Import Gambar Iklan dari Assets (Sesuaikan nama file dengan screenshot kamu)
+import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
+import adBambinoImg from '../assets/images/BrevilleBambinoPlus.webp';
 
 interface Heading {
     depth: number; 
@@ -14,7 +19,7 @@ interface CustomFrontmatter {
     description: string;
     pubDate: Date; 
     author: string; 
-    image?: string; 
+    image?: any; // Diubah ke any agar bisa menerima objek image dari Astro
     tags?: string[];
 }
 
@@ -31,18 +36,16 @@ const formattedDate = frontmatter.pubDate
     ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
     : 'Date not available';
 
-const headerImage = frontmatter.image || '/default-header.jpg';
-
-// DATA IKLAN
+// DATA IKLAN MENGGUNAKAN IMAGE ASSETS
 const ads = {
     topPick: {
         title: "Brew Conical Burr Coffee Grinder",
-        img: "/images/BrewConicalBurr.webp", 
+        img: adGrinderImg, 
         link: "https://amzn.to/3YEvz65" 
     },
     essential: {
         title: "Breville Bambino Plus",
-        img: "/images/BrevilleBambinoPlus.webp", 
+        img: adBambinoImg, 
         link: "https://amzn.to/your-link-2" 
     }
 };
@@ -73,9 +76,17 @@ const ads = {
                 
                 <article class:list={[showSidebar ? 'lg:w-3/4' : 'w-full', 'w-full']}>
                     
-                    {headerImage && (
+                    {frontmatter.image && (
                         <div class="mb-16 border border-coffee-brown/15 bg-white p-2 shadow-sm"> 
-                            <img src={headerImage} alt={frontmatter.title} class="w-full aspect-video object-cover" />
+                            <Image 
+                                src={frontmatter.image} 
+                                alt={frontmatter.title} 
+                                width={1200} 
+                                height={675} 
+                                loading="eager"
+                                fetchpriority="high"
+                                class="w-full aspect-video object-cover" 
+                            />
                         </div>
                     )}
                     
@@ -92,26 +103,26 @@ const ads = {
                         prose-headings:mb-8
                         prose-strong:text-coffee-dark
                         prose-strong:font-black
-                        prose-a:text-accent-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline
-                        prose-img:border prose-img:border-coffee-brown/10 prose-img:p-1">
+                        prose-a:text-accent-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline">
                         <slot /> 
                     </div>
 
-                    <div class="mt-24 border-t-4 border-coffee-dark pt-16">
-                        
+                    <p class="mt-12 text-[11px] italic text-coffee-brown/60 leading-relaxed border-t border-coffee-brown/10 pt-6">
+                        *As an Amazon Associate, Zaidly earns from qualifying purchases. This helps us keep the coffee brewing and our reviews independent.
+                    </p>
+
+                    <div class="mt-20 border-t-4 border-coffee-dark pt-16">
                         <div class="mb-20">
                             <h3 class="text-[11px] font-black text-coffee-dark uppercase tracking-[0.3em] mb-8">Share this insight</h3>
                             <div class="flex flex-wrap gap-4">
                                 <a href={`https://www.facebook.com/sharer/sharer.php?u=${Astro.url}`} target="_blank" class="bg-white border-2 border-coffee-dark px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">Facebook</a>
                                 <a href={`https://twitter.com/intent/tweet?url=${Astro.url}&text=${frontmatter.title}`} target="_blank" class="bg-white border-2 border-coffee-dark px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">X (Twitter)</a>
-                                <a href={`https://pinterest.com/pin/create/button/?url=${Astro.url}&media=${headerImage}&description=${frontmatter.title}`} target="_blank" class="bg-white border-2 border-coffee-dark px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-[#BD081C] hover:border-[#BD081C] hover:text-white transition-all">Pinterest</a>
-                                <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied to clipboard!')" class="bg-coffee-dark text-white px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-accent-primary transition-all">Copy Link</button>
+                                <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!')" class="bg-coffee-dark text-white px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-accent-primary transition-all">Copy Link</button>
                             </div>
                         </div>
 
                         <div class="bg-white border border-coffee-brown/20 p-8 md:p-12 shadow-sm">
                             <h3 class="text-sm font-black text-coffee-dark uppercase tracking-[0.2em] mb-12 border-b border-coffee-brown/10 pb-6">Community Discussion</h3>
-                            
                             <div 
                                 id="cusdis_thread"
                                 data-host="https://cusdis.com"
@@ -129,7 +140,6 @@ const ads = {
                 {showSidebar && (
                     <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start">
                         <div class="space-y-12">
-                            
                             <div class="bg-white border border-coffee-brown/15 p-8 shadow-sm">
                                 <h3 class="text-[10px] font-black text-coffee-dark uppercase tracking-[0.3em] mb-6 border-b border-coffee-brown/5 pb-3">Table of Contents</h3>
                                 <TableOfContents headings={headings} />
@@ -139,13 +149,18 @@ const ads = {
                                 <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">The Top Choice</h3>
                                 <a href={ads.topPick.link} target="_blank" rel="nofollow" class="group block">
                                     <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
-                                        <img src={ads.topPick.img} alt={ads.topPick.title} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
+                                        <Image 
+                                            src={ads.topPick.img} 
+                                            alt={ads.topPick.title} 
+                                            width={300} 
+                                            height={300} 
+                                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" 
+                                        />
                                     </div>
                                     <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
                                     <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
                                 </a>
                             </div>
-
                         </div>
                     </aside>
                 )}

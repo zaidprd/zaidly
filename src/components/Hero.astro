@@ -1,12 +1,15 @@
 ---
 // src/components/Hero.astro
+import { Image } from 'astro:assets';
+// Kita import langsung filenya agar Astro bisa melakukan optimasi (resize & webp)
+import heroImg from '../assets/images/herozaildy.webp';
+
 interface Props {
   title: string;
   subtitle: string;
-  linkText?: string; // Jadi opsional
-  linkUrl?: string;  // Jadi opsional
+  linkText?: string;
+  linkUrl?: string;
   imageAlt: string;
-  image?: string;
 }
 
 const { 
@@ -14,34 +17,38 @@ const {
   subtitle, 
   linkText, 
   linkUrl, 
-  imageAlt, 
-  image = "/images/herozaildy.webp" 
+  imageAlt 
 } = Astro.props;
 ---
 
-<section class="relative h-[400px] md:h-[700px] flex items-center justify-center overflow-hidden">
+<section class="relative h-[400px] md:h-[700px] flex items-center justify-center overflow-hidden bg-coffee-dark">
   
-  <img 
-    src={image} 
-    alt={imageAlt} 
+  <Image 
+    src={heroImg} 
+    alt={imageAlt}
+    width={1200}
+    height={700}
+    loading="eager"
+    fetchpriority="high"
+    decoding="async"
     class="absolute inset-0 w-full h-full object-cover z-0"
   />
 
   <div class="absolute inset-0 bg-black/50 z-10"></div>
 
   <div class="relative z-20 container mx-auto max-w-6xl px-4 text-center text-white">
-    <h1 class="text-4xl md:text-6xl font-extrabold mb-4 leading-tight drop-shadow-lg">
+    <h1 class="text-4xl md:text-7xl font-black mb-6 leading-[1.1] uppercase tracking-tighter drop-shadow-2xl italic">
       {title}
     </h1>
 
-    <p class="text-lg mb-8 drop-shadow-md max-w-2xl mx-auto opacity-90">
+    <p class="text-lg md:text-xl mb-10 drop-shadow-md max-w-2xl mx-auto opacity-95 font-medium leading-relaxed">
       {subtitle}
     </p>
 
     {linkText && linkUrl && (
       <a
         href={linkUrl}
-        class="inline-block bg-accent-primary text-white font-semibold px-8 py-4 rounded-lg hover:bg-coffee-dark transition duration-300 transform hover:scale-105"
+        class="inline-block bg-accent-primary text-white font-black px-10 py-5 tracking-widest uppercase text-xs hover:bg-white hover:text-coffee-dark transition-all duration-300 transform hover:-translate-y-1 shadow-xl"
       >
         {linkText}
       </a>

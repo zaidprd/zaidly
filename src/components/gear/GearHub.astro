@@ -1,30 +1,12 @@
 ---
-// src/components/gear/GearHub.astro (OPTIMIZED FOR SEO & PREMIUM TONE)
+// src/components/gear/GearHub.astro
 import ContentSection from '../ContentSection.astro';
 
-interface GuideLink {
-    title: string;
-    url: string;
-    image: string;
-}
+// 1. Ambil semua gambar dari folder gear secara otomatis
+const gearImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/gear/*.{jpeg,jpg,png,gif,webp}');
 
-interface BodyElement {
-    type: 'paragraph' | 'list' | 'grid';
-    title?: string;
-    text?: string;
-    listItems?: string[];
-    guides?: GuideLink[];
-}
-
-interface ContentBlockData {
-    sectionId: string;
-    sectionTitle: string;
-    sectionSubtitle: string;
-    bodyContent: BodyElement[]; 
-}
-
-const ALL_GEAR_BLOCKS: ContentBlockData[] = [
-    // BLOK 1: ACCESSORIES
+// 2. Data Utama (Optimasi SEO & imgKey untuk Asset Service)
+const ALL_GEAR_BLOCKS = [
     {
         sectionId: "precision-tools",
         sectionTitle: "1. Precision Accessories & Tools",
@@ -43,15 +25,14 @@ const ALL_GEAR_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Featured Accessory Reviews:',
                 guides: [
-                    { title: "Best Coffee Scales", url: "/gear/best-coffee-scales", image: "/images/gear/scale-featured.jpg" },
-                    { title: "Top Gooseneck Kettles", url: "/gear/best-gooseneck-kettles", image: "/images/gear/kettle-featured.jpg" },
-                    { title: "Filter Paper Comparison", url: "/gear/filter-paper-guide", image: "/images/gear/filter-featured.jpg" },
-                    { title: "Essential Cleaning Tools", url: "/gear/coffee-cleaning-essentials", image: "/images/gear/cleaning-placeholder.jpg" }, 
+                    { title: "Best Coffee Scales", url: "/gear/best-coffee-scales", imgKey: "../../assets/images/gear/scale-featured.jpg" },
+                    { title: "Top Gooseneck Kettles", url: "/gear/best-gooseneck-kettles", imgKey: "../../assets/images/gear/kettle-featured.jpg" },
+                    { title: "Filter Paper Comparison", url: "/gear/filter-paper-guide", imgKey: "../../assets/images/gear/filter-featured.jpg" },
+                    { title: "Essential Cleaning Tools", url: "/gear/coffee-cleaning-essentials", imgKey: "../../assets/images/gear/cleaning-placeholder.jpg" }, 
                 ]
             }
         ],
     },
-    // BLOK 2: GRINDERS
     {
         sectionId: "grinders-hub",
         sectionTitle: "2. Coffee Grinders: The Heart of Extraction",
@@ -69,15 +50,14 @@ const ALL_GEAR_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Top Grinder Guides:',
                 guides: [
-                    { title: "Best Burr Grinder Review", url: "/gear/best-burr-grinders", image: "/images/gear/grinder-encore.jpg" },
-                    { title: "Top Rated Hand Grinders", url: "/gear/best-manual-grinders", image: "/images/gear/grinder-manual.jpg" },
-                    { title: "Grinder Maintenance Tips", url: "/gear/how-to-clean-grinder", image: "/images/gear/maintenance-placeholder.jpg" },
-                    { title: "Budget Electric Grinders", url: "/gear/best-budget-grinders", image: "/images/gear/budget-placeholder.jpg" },
+                    { title: "Best Burr Grinder Review", url: "/gear/best-burr-grinders", imgKey: "../../assets/images/gear/grinder-encore.jpg" },
+                    { title: "Top Rated Hand Grinders", url: "/gear/best-manual-grinders", imgKey: "../../assets/images/gear/grinder-manual.jpg" },
+                    { title: "Grinder Maintenance Tips", url: "/gear/how-to-clean-grinder", imgKey: "../../assets/images/gear/maintenance-placeholder.jpg" },
+                    { title: "Budget Electric Grinders", url: "/gear/best-budget-grinders", imgKey: "../../assets/images/gear/budget-placeholder.jpg" },
                 ]
             }
         ],
     },
-    // BLOK 3: MAKERS
     {
         sectionId: "brewing-makers",
         sectionTitle: "3. Manual Brewers (Pour Over & Immersion)",
@@ -87,15 +67,14 @@ const ALL_GEAR_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Master These Brewing Methods:',
                 guides: [
-                    { title: "Hario V60 Masterclass", url: "/gear/hario-v60-guide", image: "/images/gear/dripper-v60.jpg" },
-                    { title: "Chemex Brewing Tips", url: "/gear/chemex-guide", image: "/images/gear/dripper-chemex.jpg" },
-                    { title: "Aeropress Recipes", url: "/gear/aeropress-guide", image: "/images/gear/dripper-aeropress.jpg" },
-                    { title: "French Press Perfection", url: "/gear/french-press-guide", image: "/images/gear/dripper-frenchpress.jpg" },
+                    { title: "Hario V60 Masterclass", url: "/gear/hario-v60-guide", imgKey: "../../assets/images/gear/dripper-v60.jpg" },
+                    { title: "Chemex Brewing Tips", url: "/gear/chemex-guide", imgKey: "../../assets/images/gear/dripper-chemex.jpg" },
+                    { title: "Aeropress Recipes", url: "/gear/aeropress-guide", imgKey: "../../assets/images/gear/dripper-aeropress.jpg" },
+                    { title: "French Press Perfection", url: "/gear/french-press-guide", imgKey: "../../assets/images/gear/dripper-frenchpress.jpg" },
                 ]
             }
         ],
     },
-    // BLOK 4: ESPRESSO
     {
         sectionId: "espresso-mastery",
         sectionTitle: "4. Home Espresso Mastery",
@@ -109,15 +88,14 @@ const ALL_GEAR_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Essential Espresso Gear:',
                 guides: [
-                    { title: "Best Entry Machines", url: "/gear/best-budget-espresso-machines", image: "/images/gear/espresso-budget.jpg" },
-                    { title: "Mid-Range Machines", url: "/gear/best-prosumer-espresso-machines", image: "/images/gear/espresso-mid.jpg" },
-                    { title: "Tampers & Distribution", url: "/gear/best-espresso-accessories", image: "/images/gear/tamper-placeholder.jpg" },
-                    { title: "Milk Steaming Guide", url: "/gear/how-to-steam-milk", image: "/images/gear/steamer-placeholder.jpg" },
+                    { title: "Best Entry Machines", url: "/gear/best-budget-espresso-machines", imgKey: "../../assets/images/gear/espresso-budget.jpg" },
+                    { title: "Mid-Range Machines", url: "/gear/best-prosumer-espresso-machines", imgKey: "../../assets/images/gear/espresso-mid.jpg" },
+                    { title: "Tampers & Distribution", url: "/gear/best-espresso-accessories", imgKey: "../../assets/images/gear/tamper-placeholder.jpg" },
+                    { title: "Milk Steaming Guide", url: "/gear/how-to-steam-milk", imgKey: "../../assets/images/gear/steamer-placeholder.jpg" },
                 ]
             },
         ],
     },
-    // BLOK 5: MAINTENANCE
     {
         sectionId: "maintenance-longevity",
         sectionTitle: "5. Gear Maintenance & Longevity",
@@ -131,10 +109,10 @@ const ALL_GEAR_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Care & Maintenance Guides:',
                 guides: [
-                    { title: "Grinder Deep Cleaning", url: "/gear/how-to-deep-clean-grinder", image: "/images/gear/cleaning.jpg" },
-                    { title: "Smart Coffee Storage", url: "/gear/best-coffee-storage-tips", image: "/images/gear/storage.jpg" },
-                    { title: "Water Quality Guide", url: "/gear/coffee-water-filtration", image: "/images/gear/water-placeholder.jpg" },
-                    { title: "Professional Travel Kits", url: "/gear/best-travel-coffee-gear", image: "/images/gear/travel-placeholder.jpg" },
+                    { title: "Grinder Deep Cleaning", url: "/gear/how-to-deep-clean-grinder", imgKey: "../../assets/images/gear/cleaning.jpg" },
+                    { title: "Smart Coffee Storage", url: "/gear/best-coffee-storage-tips", imgKey: "../../assets/images/gear/storage.jpg" },
+                    { title: "Water Quality Guide", url: "/gear/coffee-water-filtration", imgKey: "../../assets/images/gear/water-placeholder.jpg" },
+                    { title: "Professional Travel Kits", url: "/gear/best-travel-coffee-gear", imgKey: "../../assets/images/gear/travel-placeholder.jpg" },
                 ]
             }
         ],
@@ -146,5 +124,6 @@ const ALL_GEAR_BLOCKS: ContentBlockData[] = [
     <ContentSection 
         data={data} 
         isFirst={index === 0} 
+        images={gearImages} 
     />
 ))}

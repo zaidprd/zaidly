@@ -1,10 +1,18 @@
 ---
 // src/components/section/CoffeeBeanGuides.astro
+import { Image } from "astro:assets";
+
+// Import gambar sesuai screenshot folder kamu
+import imgBestBeans from "../../assets/images/BestCoffeeBeans.webp";
+import imgOrigin from "../../assets/images/SingleOriginvsBlends.webp";
+import imgRoast from "../../assets/images/LightvsDarkRoast.webp";
+import imgStore from "../../assets/images/HowtoStoreBeans.webp";
+
 interface Post {
   slug: string;
   data: {
     title: string;
-    image?: string;
+    image?: any;
   };
 }
 
@@ -14,28 +22,11 @@ interface Props {
 
 const { posts } = Astro.props;
 
-// 4 Panduan Utama Biji Kopi (Bean Authority)
 const beanFeaturedLinks = [
-  { 
-    title: "Best Coffee Beans", 
-    url: "/beans/best-coffee-beans", 
-    image: "/images/BestCoffeeBeans.webp" 
-  },
-  { 
-    title: "Single Origin vs Blends", 
-    url: "/beans/origin-vs-blends", 
-    image: "/images/SingleOriginvsBlends.webp" 
-  },
-  { 
-    title: "Light vs Dark Roast", 
-    url: "/beans/roast-level-guide", 
-    image: "/images/LightvsDarkRoast.webp" 
-  },
-  { 
-    title: "How to Store Beans", 
-    url: "/beans/storing-coffee-guide", 
-    image: "/images/HowtoStoreBeans.webp" 
-  },
+  { title: "Best Coffee Beans", url: "/beans/best-coffee-beans", image: imgBestBeans },
+  { title: "Single Origin vs Blends", url: "/beans/origin-vs-blends", image: imgOrigin },
+  { title: "Light vs Dark Roast", url: "/beans/roast-level-guide", image: imgRoast },
+  { title: "How to Store Beans", url: "/beans/storing-coffee-guide", image: imgStore },
 ];
 ---
 
@@ -85,9 +76,12 @@ const beanFeaturedLinks = [
           aria-label={link.title}
         >
           <div class="aspect-[4/3] overflow-hidden border-b border-coffee-brown/5">
-            <img
+            <Image
               src={link.image}
               alt={link.title}
+              width={400}
+              height={300}
+              loading="lazy"
               class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
             />
           </div>

@@ -1,89 +1,82 @@
 ---
 // src/pages/blog/[...page].astro
 import { getCollection } from "astro:content";
-
-// Path komponen
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import HeroBlog from '../../components/HeroBlog.astro';
-
-// Import Type Wajib
 import type { GetStaticPaths, Page } from 'astro';
 import type { CollectionEntry } from 'astro:content';
 
-// Definisi Type
-type PostCollectionName = 'blog'; 
-type CombinedPost = CollectionEntry<PostCollectionName>;
+type CombinedPost = CollectionEntry<'blog'>;
 
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-    const POSTS_PER_PAGE = 9; 
     const blogPosts = await getCollection("blog");
     
-    let allPosts: CombinedPost[] = [...blogPosts]; 
+    // Sort by Date (Terbaru di atas)
+    const allPosts = blogPosts.sort((a, b) => 
+        (b.data.pubDate?.getTime() ?? 0) - (a.data.pubDate?.getTime() ?? 0)
+    );
 
-    allPosts.sort((a, b) => {
-        const aDate = a.data.pubDate ? a.data.pubDate.getTime() : 0;
-        const bDate = b.data.pubDate ? b.data.pubDate.getTime() : 0;
-        return bDate - aDate;
-    });
-
-    return paginate(allPosts, {
-        pageSize: POSTS_PER_PAGE,
-    });
+    return paginate(allPosts, { pageSize: 9 });
 };
 
 const { page } = Astro.props as { page: Page<CombinedPost> }; 
 
-// Ambil semua kategori unik dari folder blog untuk menu filter
+// Ambil kategori unik & bersihkan dari undefined/null
 const allPostsForFilter = await getCollection("blog");
-const categories = ['all', ...new Set(allPostsForFilter.map((post) => post.data.category))];
+const categories = ['all', ...new Set(allPostsForFilter.map((post) => post.data.category).filter(Boolean))];
 
 const pageNum = page.currentPage;
 const posts = page.data;
-const nextUrl = page.url.next;
-
-const baseTitle = 'Journal'; // Nama lebih mewah dibanding 'Blog'
-const pageTitle = pageNum === 1 ? baseTitle : `${baseTitle} - Page ${pageNum}`;
 ---
 
-<BaseLayout title={pageTitle}> 
+<BaseLayout title={pageNum === 1 ? 'Journal' : `Journal - Page ${pageNum}`}> 
     
-    {pageNum === 1 && (
-        <HeroBlog />
-    )}
+    {pageNum === 1 && <HeroBlog />}
 
-    <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-10">
-        
-        {/* 1. KATEGORI FILTER (MENU HORIZONTAL) */}
-        <div class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-10">
-            {categories.map((cat) => (
-                <a 
-                    href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
-                    class="text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border border-coffee-dark/10 hover:border-accent-primary hover:text-accent-primary transition-all duration-300 bg-white"
-                >
-                    {cat.replace('-', ' ')}
-                </a>
-            ))}
-        </div>
+    <main class="bg-cream-latte/30 min-h-screen">
+        <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
+            
+            {/* 1. KATEGORI FILTER */}
+            <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12" aria-label="Blog categories">
+                {categories.map((cat) => (
+                    <a 
+                        href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
+                        class:list={[
+                            "text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border transition-all duration-300 bg-white shadow-sm hover:shadow-md",
+                            cat === 'all' ? "border-coffee-dark text-coffee-dark" : "border-coffee-dark/10 text-coffee-brown hover:border-accent-primary hover:text-accent-primary"
+                        ]}
+                    >
+                        {cat.replace('-', ' ')}
+                    </a>
+                ))}
+            </nav>
 
-        {/* 2. GRID ARTIKEL */}
-        <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-10">
-            {posts.map((post: CombinedPost) => (
-                <PostCard post={post} postType={post.collection} /> 
-            ))}
-        </section>
+            {/* 2. GRID ARTIKEL */}
+            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
+                {posts.map((post) => (
+                    <PostCard post={post} /> 
+                ))}
+            </section>
 
-        {/* 3. PAGINATION (FLAT STYLE) */}
-        {nextUrl && (
-            <div class="text-center mt-20">
-                <a
-                    href={nextUrl}
-                    class="inline-block bg-coffee-dark text-white text-[11px] font-black uppercase tracking-[0.3em] px-12 py-5 hover:bg-accent-primary transition-colors duration-300"
-                >
-                    Load More Articles
-                </a>
+            {/* 3. PAGINATION */}
+            <div class="mt-24 border-t border-coffee-brown/10 pt-16 flex flex-col items-center">
+                {page.url.next ? (
+                    <a
+                        href={page.url.next}
+                        class="group flex flex-col items-center gap-4"
+                    >
+                        <span class="text-[11px] font-black uppercase tracking-[0.4em] text-coffee-brown group-hover:text-accent-primary transition-colors">
+                            Next Page
+                        </span>
+                        <div class="w-12 h-[1px] bg-coffee-dark group-hover:w-24 group-hover:bg-accent-primary transition-all duration-500"></div>
+                    </a>
+                ) : (
+                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-coffee-brown/40 italic">
+                        End of Journal
+                    </span>
+                )}
             </div>
-        )}
-
-    </div>
+        </div>
+    </main>
 </BaseLayout>

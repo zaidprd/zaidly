@@ -3,7 +3,8 @@ title: "The Ultimate Guide: Best Espresso Machines for Home Baristas in 2026"
 description: "Unlock café-quality coffee at home. Our in-depth guide reveals the top espresso machines for every budget, from beginner-friendly to pro-grade."
 pubDate: 2024-07-29T09:00:00Z
 author: "admin"
-image: "/images/BestEspressoMachines.webp"
+# MANGGILNYA GINI (Mundur ke folder assets):
+image: "../../assets/images/BestEspressoMachines.webp"
 category: "gear-lab"
 tags: ["espresso machine", "home barista", "coffee gear", "reviews"]
 ---

@@ -1,30 +1,12 @@
 ---
-// src/components/beans/BeanHub.astro (PREMIUM & OPTIMIZED FOR BEANS/BREWING)
+// src/components/beans/BeanHub.astro
 import ContentSection from '../ContentSection.astro';
 
-interface GuideLink {
-    title: string;
-    url: string;
-    image: string;
-}
+// 1. Ambil semua gambar dari assets secara otomatis
+const beanImages = import.meta.glob<{ default: ImageMetadata }>('../../assets/images/{beans,brewing,gear}/*.{jpeg,jpg,png,webp}');
 
-interface BodyElement {
-    type: 'paragraph' | 'list' | 'grid';
-    title?: string;
-    text?: string;
-    listItems?: string[];
-    guides?: GuideLink[];
-}
-
-interface ContentBlockData {
-    sectionId: string;
-    sectionTitle: string;
-    sectionSubtitle: string;
-    bodyContent: BodyElement[];
-}
-
-const ALL_CONTENT_BLOCKS: ContentBlockData[] = [
-    // BLOK 1: COFFEE BEANS MASTERY
+// 2. Data Lengkap (SEO Optimized)
+const ALL_CONTENT_BLOCKS = [
     {
         sectionId: "coffee-beans-mastery",
         sectionTitle: "1. The Science of Coffee Beans",
@@ -44,16 +26,14 @@ const ALL_CONTENT_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Essential Bean Guides:',
                 guides: [
-                    { title: "Arabica vs Robusta Guide", url: "/beans/arabica-vs-robusta", image: "/images/beans/arabica-featured.jpg" },
-                    { title: "Processing Methods", url: "/beans/coffee-processing", image: "/images/beans/process-featured.jpg" },
-                    { title: "Roast Level Impact", url: "/beans/roast-levels", image: "/images/beans/roast-featured.jpg" },
-                    { title: "Global Origin Guide", url: "/beans/coffee-origins", image: "/images/beans/origin-featured.jpg" },
+                    { title: "Arabica vs Robusta Guide", url: "/beans/arabica-vs-robusta", imgKey: "../../assets/images/beans/arabica-featured.jpg" },
+                    { title: "Processing Methods", url: "/beans/coffee-processing", imgKey: "../../assets/images/beans/process-featured.jpg" },
+                    { title: "Roast Level Impact", url: "/beans/roast-levels", imgKey: "../../assets/images/beans/roast-featured.jpg" },
+                    { title: "Global Origin Guide", url: "/beans/coffee-origins", imgKey: "../../assets/images/beans/origin-featured.jpg" },
                 ]
             }
         ],
     },
-
-    // BLOK 2: MANUAL BREWING FUNDAMENTALS
     {
         sectionId: "manual-brewing-fundamentals",
         sectionTitle: "2. Manual Coffee Brewing Mastery",
@@ -67,16 +47,14 @@ const ALL_CONTENT_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Master These Methods:',
                 guides: [
-                    { title: "Hario V60 Masterclass", url: "/guides/v60-pour-over", image: "/images/brewing/v60-recipe.jpg" },
-                    { title: "Chemex Perfect Brew", url: "/guides/chemex-guide", image: "/images/brewing/chemex-masterclass.jpg" },
-                    { title: "Aeropress Techniques", url: "/guides/aeropress-guide", image: "/images/brewing/kalita-wave.jpg" },
-                    { title: "French Press Perfection", url: "/guides/french-press-basics", image: "/images/brewing/gino-basics.jpg" },
+                    { title: "Hario V60 Masterclass", url: "/guides/v60-pour-over", imgKey: "../../assets/images/brewing/v60-recipe.jpg" },
+                    { title: "Chemex Perfect Brew", url: "/guides/chemex-guide", imgKey: "../../assets/images/brewing/chemex-masterclass.jpg" },
+                    { title: "Aeropress Techniques", url: "/guides/aeropress-guide", imgKey: "../../assets/images/brewing/kalita-wave.jpg" },
+                    { title: "French Press Perfection", url: "/guides/french-press-basics", imgKey: "../../assets/images/brewing/gino-basics.jpg" },
                 ]
             }
         ],
     },
-
-    // BLOK 3: ADVANCED BREWING & COLD BREW
     {
         sectionId: "advanced-brewing-guides",
         sectionTitle: "3. Advanced Techniques & Cold Brew",
@@ -95,10 +73,10 @@ const ALL_CONTENT_BLOCKS: ContentBlockData[] = [
                 type: 'grid',
                 title: 'Advanced Guides:',
                 guides: [
-                    { title: "Ultimate Cold Brew Guide", url: "/guides/best-cold-brew", image: "/images/gear/storage-featured.jpg" }, // Reuse relevant image
-                    { title: "Water Quality Tips", url: "/guides/coffee-water-science", image: "/images/gear/filter-featured.jpg" },
-                    { title: "Dialing In Your Brew", url: "/guides/extraction-guide", image: "/images/gear/scale-featured.jpg" },
-                    { title: "Iced Coffee Methods", url: "/guides/iced-coffee-techniques", image: "/images/gear/kettle-featured.jpg" },
+                    { title: "Ultimate Cold Brew Guide", url: "/guides/best-cold-brew", imgKey: "../../assets/images/gear/storage-featured.jpg" }, 
+                    { title: "Water Quality Tips", url: "/guides/coffee-water-science", imgKey: "../../assets/images/gear/filter-featured.jpg" },
+                    { title: "Dialing In Your Brew", url: "/guides/extraction-guide", imgKey: "../../assets/images/gear/scale-featured.jpg" },
+                    { title: "Iced Coffee Methods", url: "/guides/iced-coffee-techniques", imgKey: "../../assets/images/gear/kettle-featured.jpg" },
                 ]
             }
         ],
@@ -106,10 +84,13 @@ const ALL_CONTENT_BLOCKS: ContentBlockData[] = [
 ];
 ---
 
-{/* Map data ke ContentSection dengan prop isFirst untuk mengatur padding top otomatis */}
-{ALL_CONTENT_BLOCKS.map((data, index) => (
-    <ContentSection 
-        data={data} 
-        isFirst={index === 0} 
-    />
-))}
+{/* Render semua blok konten ke dalam template ContentSection yang konsisten */}
+<div class="bg-cream-latte pb-24">
+    {ALL_CONTENT_BLOCKS.map((data, index) => (
+        <ContentSection 
+            data={data} 
+            isFirst={index === 0} 
+            images={beanImages}
+        />
+    ))}
+</div>
