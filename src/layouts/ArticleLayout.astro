@@ -2,9 +2,8 @@
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import { Image } from 'astro:assets';
-import type { CollectionEntry } from 'astro:content'; 
 
-// Import Gambar Iklan dari Assets (Sesuaikan nama file dengan screenshot kamu)
+// Import Gambar Iklan dari Assets
 import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
 import adBambinoImg from '../assets/images/BrevilleBambinoPlus.webp';
 
@@ -19,7 +18,7 @@ interface CustomFrontmatter {
     description: string;
     pubDate: Date; 
     author: string; 
-    image?: any; // Diubah ke any agar bisa menerima objek image dari Astro
+    image?: any; 
     tags?: string[];
 }
 
@@ -36,7 +35,6 @@ const formattedDate = frontmatter.pubDate
     ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
     : 'Date not available';
 
-// DATA IKLAN MENGGUNAKAN IMAGE ASSETS
 const ads = {
     topPick: {
         title: "Brew Conical Burr Coffee Grinder",
@@ -72,21 +70,27 @@ const ads = {
         </header>
 
         <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
-            <div class="flex flex-wrap lg:flex-nowrap gap-16">
+            <div class="flex flex-col lg:flex-row gap-16">
                 
-                <article class:list={[showSidebar ? 'lg:w-3/4' : 'w-full', 'w-full']}>
+                <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
                     
                     {frontmatter.image && (
-                        <div class="mb-16 border border-coffee-brown/15 bg-white p-2 shadow-sm"> 
+                        <div class="mb-12 border border-coffee-brown/15 bg-white p-2 shadow-sm"> 
                             <Image 
                                 src={frontmatter.image} 
                                 alt={frontmatter.title} 
                                 width={1200} 
                                 height={675} 
                                 loading="eager"
-                                fetchpriority="high"
                                 class="w-full aspect-video object-cover" 
                             />
+                        </div>
+                    )}
+
+                    {showSidebar && (
+                        <div class="lg:hidden mb-12 bg-white border border-coffee-brown/15 p-6 shadow-sm">
+                             <p class="text-[10px] font-black uppercase tracking-[0.3em] text-accent-primary mb-4 italic">Quick Navigation</p>
+                             <TableOfContents headings={headings} />
                         </div>
                     )}
                     
@@ -105,33 +109,20 @@ const ads = {
                         prose-strong:font-black
                         prose-a:text-accent-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline">
                         <slot /> 
-                        <div class="prose prose-coffee max-w-none ...">
-                        <slot /> 
                     </div>
 
                     {frontmatter.tags && (
                         <div class="mt-12 flex flex-wrap gap-3">
                             {frontmatter.tags.slice(0, 4).map((tag: string) => (
-                                <a 
-                                    href="/" 
-                                    class="relative group overflow-hidden bg-white border-2 border-coffee-dark px-5 py-2 transition-all duration-300 ease-in-out"
-                                >
-                                    {/* Text Layer */}
-                                    <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-coffee-dark group-hover:text-white transition-colors duration-300 italic">
+                                <a href="/" class="relative group overflow-hidden bg-white border-2 border-coffee-dark px-5 py-2">
+                                    <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-coffee-dark group-hover:text-white transition-colors italic">
                                         # {tag.replace('-', ' ')}
                                     </span>
-                                    
-                                    {/* Slide-up Background Effect */}
-                                    <div class="absolute inset-0 bg-coffee-dark transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+                                    <div class="absolute inset-0 bg-coffee-dark transform translate-y-full group-hover:translate-y-0 transition-transform"></div>
                                 </a>
                             ))}
                         </div>
                     )}
-
-                    <div class="mt-20 border-t-4 border-coffee-dark pt-16">
-                    </div>
-
-
 
                     <div class="mt-20 border-t-4 border-coffee-dark pt-16">
                         <div class="mb-20">
@@ -145,64 +136,42 @@ const ads = {
 
                         <div class="bg-white border border-coffee-brown/20 p-8 md:p-12 shadow-sm">
                             <h3 class="text-sm font-black text-coffee-dark uppercase tracking-[0.2em] mb-12 border-b border-coffee-brown/10 pb-6">Community Discussion</h3>
-                            <div 
-                                id="cusdis_thread"
-                                data-host="https://cusdis.com"
-                                data-app-id="b93c1941-4385-44af-91c7-347e55b2fbc8"
-                                data-page-id={frontmatter.title}
-                                data-page-url={Astro.url}
-                                data-page-title={frontmatter.title}
-                                data-theme="light"
-                            ></div>
+                            <div id="cusdis_thread" data-host="https://cusdis.com" data-app-id="b93c1941-4385-44af-91c7-347e55b2fbc8" data-page-id={frontmatter.title} data-page-url={Astro.url} data-page-title={frontmatter.title} data-theme="light"></div>
                             <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
                         </div>
                     </div>
                 </article>
 
                 {showSidebar && (
-    <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start">
-        <div class="space-y-12">
-            {/* 1. Table of Contents */}
-            <TableOfContents headings={headings} />
+                    <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit">
+                        <div class="space-y-12">
+                            <TableOfContents headings={headings} />
 
-            {/* 2. Iklan Pertama: Top Pick (Grinder) */}
-            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
-                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">The Top Choice</h3>
-                <a href={ads.topPick.link} target="_blank" rel="nofollow sponsored" class="group block">
-                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
-                        <Image 
-                            src={ads.topPick.img} 
-                            alt={ads.topPick.title} 
-                            width={300} 
-                            height={300} 
-                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" 
-                        />
-                    </div>
-                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
-                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
-                </a>
-            </div>
+                            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
+                                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">The Top Choice</h3>
+                                <a href={ads.topPick.link} target="_blank" rel="nofollow sponsored" class="group block">
+                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
+                                        <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
+                                    </div>
+                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
+                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
+                                </a>
+                            </div>
 
-            {/* 3. Iklan Kedua: Essential Gear (Bambino) */}
-            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
-                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Essential Gear</h3>
-                <a href={ads.essential.link} target="_blank" rel="nofollow sponsored" class="group block">
-                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
-                        <Image 
-                            src={ads.essential.img} 
-                            alt={ads.essential.title} 
-                            width={300} 
-                            height={300} 
-                            class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" 
-                        />
-                    </div>
-                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.essential.title}</h4>
-                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
-                </a>
-            </div>
-        </div>
-    </aside>
-)}
+                            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
+                                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Essential Gear</h3>
+                                <a href={ads.essential.link} target="_blank" rel="nofollow sponsored" class="group block">
+                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
+                                        <Image src={ads.essential.img} alt={ads.essential.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
+                                    </div>
+                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.essential.title}</h4>
+                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
+                                </a>
+                            </div>
+                        </div>
+                    </aside>
+                )}
+
             </div>
         </div>
     </main>
