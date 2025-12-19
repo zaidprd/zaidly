@@ -29,7 +29,7 @@ interface Props {
 
 const { frontmatter, headings } = Astro.props; 
 
-// Logika untuk menampilkan sidebar jika ada Heading H2 atau H3
+// Logika Tampilkan Sidebar jika ada konten heading
 const showSidebar = headings.filter((h: Heading) => h.depth > 1 && h.depth < 4).length > 0;
 
 const formattedDate = frontmatter.pubDate 
@@ -84,7 +84,6 @@ const ads = {
                                 width={1200} 
                                 height={675} 
                                 loading="eager"
-                                fetchpriority="high"
                                 class="w-full aspect-video object-cover" 
                             />
                         </div>
@@ -123,29 +122,36 @@ const ads = {
                     {frontmatter.tags && (
                         <div class="mt-12 flex flex-wrap gap-3">
                             {frontmatter.tags.slice(0, 4).map((tag: string) => (
-                                <a href="/" class="relative group overflow-hidden bg-white border-2 border-coffee-dark px-5 py-2">
-                                    <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-coffee-dark group-hover:text-white transition-colors duration-300 italic">
+                                <a href="/" class="relative group overflow-hidden bg-white border-2 border-coffee-dark px-5 py-2 transition-all">
+                                    <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-coffee-dark group-hover:text-white italic">
                                         # {tag.replace('-', ' ')}
                                     </span>
-                                    <div class="absolute inset-0 bg-coffee-dark transform translate-y-full group-hover:translate-y-0 transition-transform duration-300 ease-in-out"></div>
+                                    <div class="absolute inset-0 bg-coffee-dark transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
                                 </a>
                             ))}
                         </div>
                     )}
 
                     {showSidebar && (
-                        <div class="lg:hidden mt-16 space-y-6">
-                             <p class="text-[10px] font-black text-center text-coffee-brown/40 uppercase tracking-[0.4em] mb-4">— Recommended Gear —</p>
-                             <div class="grid grid-cols-2 gap-4">
-                                <a href={ads.topPick.link} target="_blank" class="bg-white border border-coffee-brown/10 p-4 text-center shadow-sm">
-                                    <Image src={ads.topPick.img} alt={ads.topPick.title} width={150} height={150} class="w-16 h-16 mx-auto object-contain mb-3" />
-                                    <p class="text-[9px] font-black uppercase leading-tight line-clamp-2 mb-3">{ads.topPick.title}</p>
-                                    <span class="text-[8px] font-black bg-coffee-dark text-white px-3 py-1 uppercase tracking-widest">Shop</span>
+                        <div class="lg:hidden mt-20 space-y-10">
+                             <p class="text-[10px] font-black text-center text-coffee-brown/40 uppercase tracking-[0.4em]">— Recommended Gear —</p>
+                             <div class="space-y-8">
+                                <a href={ads.topPick.link} target="_blank" class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md block">
+                                    <p class="text-[9px] font-black text-accent-primary uppercase mb-4 tracking-[0.2em]">The Top Choice</p>
+                                    <div class="bg-[#F9F9F7] p-4 mb-4 border border-coffee-brown/5">
+                                        <Image src={ads.topPick.img} alt={ads.topPick.title} width={500} height={500} class="w-full h-auto object-contain max-h-[250px]" />
+                                    </div>
+                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-6 leading-snug">{ads.topPick.title}</h4>
+                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase shadow-lg">Check Price on Amazon</div>
                                 </a>
-                                <a href={ads.essential.link} target="_blank" class="bg-white border border-coffee-brown/10 p-4 text-center shadow-sm">
-                                    <Image src={ads.essential.img} alt={ads.essential.title} width={150} height={150} class="w-16 h-16 mx-auto object-contain mb-3" />
-                                    <p class="text-[9px] font-black uppercase leading-tight line-clamp-2 mb-3">{ads.essential.title}</p>
-                                    <span class="text-[8px] font-black bg-coffee-dark text-white px-3 py-1 uppercase tracking-widest">Shop</span>
+
+                                <a href={ads.essential.link} target="_blank" class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md block">
+                                    <p class="text-[9px] font-black text-accent-primary uppercase mb-4 tracking-[0.2em]">Essential Gear</p>
+                                    <div class="bg-[#F9F9F7] p-4 mb-4 border border-coffee-brown/5">
+                                        <Image src={ads.essential.img} alt={ads.essential.title} width={500} height={500} class="w-full h-auto object-contain max-h-[250px]" />
+                                    </div>
+                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-6 leading-snug">{ads.essential.title}</h4>
+                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase shadow-lg">Check Price on Amazon</div>
                                 </a>
                              </div>
                         </div>
@@ -190,7 +196,7 @@ const ads = {
                                         <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
                                     </div>
                                     <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
+                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check Price</div>
                                 </a>
                             </div>
 
@@ -201,13 +207,12 @@ const ads = {
                                         <Image src={ads.essential.img} alt={ads.essential.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
                                     </div>
                                     <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.essential.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check on Amazon</div>
+                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check Price</div>
                                 </a>
                             </div>
                         </div>
                     </aside>
                 )}
-
             </div>
         </div>
     </main>
