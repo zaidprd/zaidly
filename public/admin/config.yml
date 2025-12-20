@@ -9,7 +9,7 @@ backend:
   name: github
   repo: zaidprd/zaidly # Repository GitHub Anda
   branch: main
-  
+  base_url: https://api.decapcms.org
 
 publish_mode: editorial_workflow
 
