@@ -40,7 +40,7 @@ const { posts, categoryName } = Astro.props;
 
       <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
         {posts.map(post => (
-          <a href={`/blog/${post.slug}`} class="group bg-white p-3 border border-coffee-brown/10 shadow-sm">
+          <a href={`/${post.slug}`} class="group bg-white p-3 border border-coffee-brown/10 shadow-sm">
             {post.data.image && (
               <Image src={post.data.image} alt={post.data.title} width={500} height={300} class="w-full aspect-video object-cover mb-4" />
             )}
