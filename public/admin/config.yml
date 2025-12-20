@@ -10,8 +10,6 @@ backend:
   repo: zaidprd/zaidly # Repository GitHub Anda
   branch: main
   
-  # 💥 KUNCI: MENGGUNAKAN NETLIFY GIT GATEWAY SEBAGAI PROXY AUTENTIKASI
-  auth_proxy_url: https://shimmering-llama-ae3600.netlify.app/.netlify/git/github 
 
 publish_mode: editorial_workflow
 
