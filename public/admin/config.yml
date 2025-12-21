@@ -1,7 +1,24 @@
-fields:
+backend:
+  name: github
+  repo: zaidprd/zaidly
+  branch: main
+  base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
+  auth_endpoint: auth
+
+# Gambar khusus masuk ke folder blog agar rapi
+media_folder: "src/assets/images/blog"
+public_folder: "/src/assets/images/blog"
+
+collections:
+  - name: "blog"
+    label: "Blog"
+    folder: "src/content/blog"
+    create: true
+    slug: "{{slug}}"
+    fields:
       - { label: "Title", name: "title", widget: "string", required: true }
       - { label: "SEO Description", name: "description", widget: "string", required: true }
-      - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
+      - { label: "Publish Date", name: "pub_date", widget: "datetime", required: true }
       - { 
           label: "Category", 
           name: "category", 
