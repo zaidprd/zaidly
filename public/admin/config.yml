@@ -1,27 +1,21 @@
-backend:
-  name: github
-  repo: zaidprd/zaidly
-  branch: main
-  base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
-  auth_endpoint: auth
-
-publish_mode: simple
-
-media_folder: "public/images"
-public_folder: "/images"
-
-collections:
-  - name: "blog"
-    label: "Blog Posts"
-    folder: "src/content/blog"
-    create: true
-    slug: "{{slug}}"
-    fields:
-      - { label: "Title", name: "title", widget: "string" }
-      - { label: "Description", name: "description", widget: "string" }
-      - { label: "Publish Date", name: "pubDate", widget: "datetime" }
-      - { label: "Category", name: "category", widget: "select", options: ["Coffee", "Tech", "Lifestyle"], required: true }
-      - { label: "Author", name: "author", widget: "string" }
-      - { label: "Image", name: "image", widget: "image", required: false }
+fields:
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "SEO Description", name: "description", widget: "string", required: true }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
+      - { 
+          label: "Category", 
+          name: "category", 
+          widget: "select", 
+          options: [
+            "gear-lab", 
+            "bean-roastery", 
+            "brew-mastery", 
+            "barista-life", 
+            "buying-guides"
+          ], 
+          required: true 
+        }
+      - { label: "Author Name", name: "author", widget: "string", required: true }
+      - { label: "Feature Image URL", name: "image", widget: "image", required: false }
       - { label: "Tags", name: "tags", widget: "list", required: false }
-      - { label: "Body", name: "body", widget: "markdown" }
+      - { label: "Body", name: "body", widget: "markdown", required: true }
