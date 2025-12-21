@@ -1,49 +1,29 @@
-# =======================================================
-# public/admin/config.yml (KODE FINAL)
-# Setup: Astro + Decap CMS + GitHub + Cloudflare Pages
-# URL Autentikasi Netlify: https://shimmering-llama-ae3600.netlify.app
-# =======================================================
-
-# 1. Backend Configuration (GitHub + Auth Proxy)
 backend:
   name: github
-  repo: zaidprd/zaidly # Repository GitHub Anda
+  repo: zaidprd/zaidly
   branch: main
-<<<<<<< HEAD
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
-  
-=======
-  base_url: https://api.decapcms.org
 
->>>>>>> b7d307d2e83f4540543390460d336620a33262e2
 publish_mode: editorial_workflow
 
-# 2. Media & Asset Setup
-media_folder: "public/images" 
-public_folder: "/images" 
+media_folder: "public/images"
+public_folder: "/images"
 media_library:
-  name: uploadcare 
+  name: uploadcare
 
-# 3. Collection Structure
 collections:
   - name: "blog"
     label: "Blog Posts"
     folder: "src/content/blog"
     create: true
     slug: "{{slug}}"
-    
-    # KUNCI: Memberitahu CMS body field bukan bagian dari frontmatter
-    body_field: "body" 
-    
+    body_field: "body"
     fields:
-      # Field Wajib Astro/SEO
-      - { label: "Title", name: "title", widget: "string", required: true, hint: "Judul utama (H1)." }
-      - { label: "SEO Description", name: "description", widget: "string", required: true, hint: "Deskripsi singkat (Max 160 Karakter). Wajib diisi." }
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "SEO Description", name: "description", widget: "string", required: true }
       - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
-      - { label: "Author Name", name: "author", widget: "string", required: true, hint: "Nama penulis." }
-      - { label: "Feature Image URL", name: "image", widget: "image", required: false, hint: "Gambar utama artikel." } 
-      - { label: "Tags", name: "tags", widget: "list", required: false, hint: "Tag atau kategori artikel." } 
-      
-      # Field Konten Utama
-      - { label: "Body", name: "body", widget: "markdown", required: true, hint: "Gunakan Mode Raw (<>) untuk Tabel dan Pastikan Ada Baris Kosong Antar Paragraf." }
+      - { label: "Author Name", name: "author", widget: "string", required: true }
+      - { label: "Feature Image URL", name: "image", widget: "image", required: false }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+      - { label: "Body", name: "body", widget: "markdown", required: true }
