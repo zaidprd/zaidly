@@ -5,7 +5,13 @@ backend:
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
 
-# Baris wajib agar ada tombol Save (Draft)
+# Pengaturan slug global agar otomatis bersih dari karakter aneh
+slug:
+  encoding: "ascii"
+  clean_accents: true
+  sanitize_replacement: "-"
+
+# Baris wajib agar ada fitur Draft/Review
 publish_mode: editorial_workflow
 
 media_folder: "src/assets/images/blog"
@@ -16,10 +22,21 @@ collections:
     label: "Blog"
     folder: "src/content/blog"
     create: true
+    # Menggunakan template slug otomatis dari judul yang disanitasi
     slug: "{{slug}}"
     fields:
-      - { label: "Title", name: "title", widget: "string", required: true }
-      - { label: "SEO Description", name: "description", widget: "string", required: true }
+      - { label: "Title", name: "title", widget: "string", required: true, hint: "Judul lengkap yang menarik untuk pembaca." }
+      
+      # Field tambahan untuk kontrol manual kata kunci slug
+      - { 
+          label: "SEO Friendly Slug (Kata Kunci)", 
+          name: "slug_seo", 
+          widget: "string", 
+          required: false, 
+          hint: "Opsional. Isi hanya dengan kata kunci inti, misal: 'ultimate-bean-map'. Jika kosong, akan otomatis mengambil dari judul." 
+        }
+
+      - { label: "SEO Description", name: "description", widget: "string", required: true, hint: "Ringkasan 2 kalimat untuk meta description." }
       - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
       - { 
           label: "Category", 
@@ -28,7 +45,7 @@ collections:
           options: ["gear-lab", "bean-roastery", "brew-mastery", "barista-life", "buying-guides"], 
           required: true 
         }
-      - { label: "Author Name", name: "author", widget: "string", required: true }
+      - { label: "Author Name", name: "author", widget: "string", required: true, default: "admin" }
       - { label: "Feature Image URL", name: "image", widget: "image", required: false }
-      - { label: "Tags", name: "tags", widget: "list", required: false }
+      - { label: "Tags", name: "tags", widget: "list", required: false, default: ["bean roastery"] }
       - { label: "Body", name: "body", widget: "markdown", required: true }

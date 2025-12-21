@@ -31,10 +31,9 @@ const currentYear = new Date().getFullYear();
         </div>
 
         <nav aria-label="Footer Quick Links">
-          <h6 class="text-sm font-black uppercase tracking-[0.2em] mb-6 text-white">Quick Links</h6>
+          {/* PERBAIKAN: Ganti h6 menjadi h2 atau h3 agar urutan heading benar */}
+          <h2 class="text-sm font-black uppercase tracking-[0.2em] mb-6 text-white">Quick Links</h2>
           <ul class="space-y-4 text-sm font-medium">
-            {/* PERBAIKAN: Gunakan text-white atau text-cream-latte tanpa opacity (/100) 
-                agar kontras maksimal terhadap latar gelap */}
             <li><a href="/about" class="text-white hover:text-accent-primary transition-colors">About</a></li>
             <li><a href="https://www.instagram.com/bestcoffee.gear" class="text-white hover:text-accent-primary transition-colors">Contact Support</a></li>
             <li><a href="/privacy-policy" class="text-white hover:text-accent-primary transition-colors">Privacy Policy</a></li>
@@ -42,7 +41,8 @@ const currentYear = new Date().getFullYear();
         </nav>
 
         <nav aria-label="Footer Categories">
-          <h6 class="text-sm font-black uppercase tracking-[0.2em] mb-6 text-white">Categories</h6>
+          {/* PERBAIKAN: Ganti h6 menjadi h2 atau h3 */}
+          <h2 class="text-sm font-black uppercase tracking-[0.2em] mb-6 text-white">Categories</h2>
           <ul class="space-y-4 text-sm font-medium">
             <li><a href="/gear" class="text-white hover:text-accent-primary transition-colors">Gear Reviews</a></li>
             <li><a href="/beans" class="text-white hover:text-accent-primary transition-colors">Bean Guides</a></li>
@@ -59,13 +59,13 @@ const currentYear = new Date().getFullYear();
       <div class="bg-white/5 rounded-2xl p-6 mb-8 border border-white/10">
         <p class="text-[13px] text-cream-latte/85 leading-relaxed">
           <span class="text-white font-bold uppercase tracking-wider block mb-2 text-[11px]">Affiliate Disclosure</span>
-          Zaidly Blog is an independent publication supported by its readers. As an Amazon Associate, we earn from qualifying purchases at no extra cost to you, helping us keep the coffee brewing
+          Zaidly Blog is an independent publication supported by its readers. As an Amazon Associate, we earn from qualifying purchases at no extra cost to you, helping us keep the coffee brewing.
         </p>
       </div>
       
       <p class="text-cream-latte/80 text-xs font-medium uppercase tracking-widest">
-  &copy; {currentYear} Zaidly. All rights reserved.
-</p>
+        &copy; {currentYear} Zaidly. All rights reserved.
+      </p>
     </div>
   </div>
 </footer>
