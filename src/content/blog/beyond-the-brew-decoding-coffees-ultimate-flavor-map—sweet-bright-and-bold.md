@@ -3,7 +3,7 @@ title: "Beyond the Brew: Decoding Coffee's Ultimate Flavor Map—Sweet, Bright,
   and Bold"
 description: Discover the top 5 affordable manual coffee brewing gears for
   beginners to make quality coffee at home without breaking the bank.
-pub_date: 2025-12-21T16:16:00.000+07:00
+pubDate: 2025-12-21T16:16:00.000+07:00
 category: bean-roastery
 author: zaid
 image: /src/assets/images/blog/ultimate_bean_map_hero.webp
