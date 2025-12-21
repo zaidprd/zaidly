@@ -9,9 +9,14 @@ backend:
   name: github
   repo: zaidprd/zaidly # Repository GitHub Anda
   branch: main
+<<<<<<< HEAD
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
   
+=======
+  base_url: https://api.decapcms.org
+
+>>>>>>> b7d307d2e83f4540543390460d336620a33262e2
 publish_mode: editorial_workflow
 
 # 2. Media & Asset Setup
