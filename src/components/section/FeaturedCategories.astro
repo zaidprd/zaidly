@@ -14,35 +14,33 @@ import coffeeBeans from "../../assets/images/CoffeBeans.webp";
     </h2>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
-
-      <a href="/the-ultimate-guide" class="flex flex-col items-center justify-center p-6 rounded-lg hover:shadow-lg hover:shadow-accent-primary/20 transition-all border border-transparent hover:border-accent-primary text-center group">
-        <Image src={brewingGuides} alt="Brewing Guides" width={80} height={80} class="h-20 w-20 mb-3 mix-blend-multiply group-hover:scale-110 transition-transform" />
-        <p class="font-semibold text-lg text-coffee-dark group-hover:text-accent-primary">
-          Brewing Guides
-        </p>
-      </a>
-
-      <a href="/top-coffee-grinders-for-every-brew-method" class="flex flex-col items-center justify-center p-6 rounded-lg hover:shadow-lg hover:shadow-accent-primary/20 transition-all border border-transparent hover:border-accent-primary text-center group">
-        <Image src={gearReviews} alt="Gear Reviews" width={80} height={80} class="h-20 w-20 mb-3 mix-blend-multiply group-hover:scale-110 transition-transform" />
-        <p class="font-semibold text-lg text-coffee-dark group-hover:text-accent-primary">
-          Gear Reviews
-        </p>
-      </a>
-
-      <a href="/top-coffee-grinders-for-every-brew-method" class="flex flex-col items-center justify-center p-6 rounded-lg hover:shadow-lg hover:shadow-accent-primary/20 transition-all border border-transparent hover:border-accent-primary text-center group">
-        <Image src={espressoImg} alt="Espresso" width={80} height={80} class="h-20 w-20 mb-3 mix-blend-multiply group-hover:scale-110 transition-transform" />
-        <p class="font-semibold text-lg text-coffee-dark group-hover:text-accent-primary">
-          Espresso
-        </p>
-      </a>
-
-      <a href="/top-coffee-grinders-for-every-brew-method" class="flex flex-col items-center justify-center p-6 rounded-lg hover:shadow-lg hover:shadow-accent-primary/20 transition-all border border-transparent hover:border-accent-primary text-center group">
-        <Image src={coffeeBeans} alt="Coffee Beans" width={80} height={80} class="h-20 w-20 mb-3 mix-blend-multiply group-hover:scale-110 transition-transform" />
-        <p class="font-semibold text-lg text-coffee-dark group-hover:text-accent-primary">
-          Coffee Beans
-        </p>
-      </a>
-
+      {[
+        { src: brewingGuides, alt: "Brewing Guides", href: "/the-ultimate-guide" },
+        { src: gearReviews, alt: "Gear Reviews", href: "/top-coffee-grinders-for-every-brew-method" },
+        { src: espressoImg, alt: "Espresso", href: "/top-coffee-grinders-for-every-brew-method" },
+        { src: coffeeBeans, alt: "Coffee Beans", href: "/top-coffee-grinders-for-every-brew-method" }
+      ].map((item) => (
+        <a 
+          href={item.href} 
+          class="flex flex-col items-center justify-center p-6 rounded-lg hover:shadow-lg hover:shadow-accent-primary/20 transition-all border border-transparent hover:border-accent-primary text-center group"
+          aria-label={`Read more about ${item.alt}`}
+        >
+          {/* PERBAIKAN 1: Naikkan width & height ke 120 agar gambar tajam di semua layar (Retina/DPI) */}
+          <Image 
+            src={item.src} 
+            alt={item.alt} 
+            width={120} 
+            height={120} 
+            class="h-20 w-20 mb-3 mix-blend-multiply group-hover:scale-110 transition-transform" 
+          />
+          
+          {/* PERBAIKAN 2: Ubah hover color menjadi warna yang lebih gelap dari accent-primary 
+              untuk rasio kontras yang lebih baik terhadap latar cream */}
+          <p class="font-semibold text-lg text-coffee-dark group-hover:text-[#8b5e3c] transition-colors">
+            {item.alt}
+          </p>
+        </a>
+      ))}
     </div>
   </div>
 </section>

@@ -65,16 +65,16 @@ const beanFeaturedLinks = [
     </div>
 
     <h3 class="text-2xl font-bold text-coffee-dark mb-8 uppercase tracking-wider">
-      Essential Bean Knowledge:
-    </h3>
+  Essential Bean Knowledge:
+</h3>
 
     <div class="grid grid-cols-2 md:grid-cols-4 gap-6">
       {beanFeaturedLinks.map((link) => (
         <a
-          href={link.url}
-          class="group block bg-white/30 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 border border-coffee-brown/10 hover:bg-white/60"
-          aria-label={link.title}
-        >
+  href={link.url}
+  class="group block bg-white rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-2 border border-coffee-brown/10 hover:shadow-xl"
+  aria-label={link.title}
+>
           <div class="aspect-[4/3] overflow-hidden border-b border-coffee-brown/5">
             <Image
               src={link.image}
@@ -86,9 +86,9 @@ const beanFeaturedLinks = [
             />
           </div>
           <div class="p-5 text-center">
-            <p class="text-sm font-black text-coffee-dark group-hover:text-accent-primary transition-colors uppercase tracking-widest leading-tight">
-              {link.title}
-            </p>
+            <p class="text-sm font-black text-coffee-dark group-hover:text-[#8b5e3c] transition-colors uppercase tracking-widest leading-tight">
+    {link.title}
+  </p>
           </div>
         </a>
       ))}

@@ -5,13 +5,12 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 
 export interface Props {
-  title: string;
+  title?: string;
   description?: string;
   image?: string;
   canonical?: string;
 }
 
-// FIX: Pastikan URL Absolut benar
 const siteOrigin = "https://zaidly.com"; 
 const currentPath = Astro.url.pathname;
 const absoluteURL = new URL(currentPath, siteOrigin).href;
@@ -20,7 +19,6 @@ const {
   title = "Zaidly - Your Trusted Resource For All Things Coffee",
   description = "Zaidly is your leading coffee website online.",
   image = "/images/zaidly-logo-social.png",
-  // Gunakan absoluteURL agar skor SEO 100
   canonical = absoluteURL 
 } = Astro.props;
 
@@ -32,36 +30,44 @@ const siteName = "Zaidly";
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" />
+  
+  {/* PERBAIKAN PERFORMA 1: Tambahkan Preconnect untuk RemixIcon agar loading lebih cepat 
+      Ini mengatasi masalah 'Network dependency tree' di audit Anda */}
+  <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+  <link rel="dns-prefetch" href="https://cdn.jsdelivr.net" />
+  
+  {/* PERBAIKAN PERFORMA 2: Gunakan 'display=swap' atau muat CSS secara efisien untuk menghindari render-blocking */}
+  <link href="https://cdn.jsdelivr.net/npm/remixicon@4.5.0/fonts/remixicon.css" rel="stylesheet" media="print" onload="this.media='all'" />
+  
   <ViewTransitions />
-<meta name="google-site-verification" content="-_5rR5OonSa46ubUy5I2sHzN1esjGpcnd1em8We3a7c" />
+  <meta name="google-site-verification" content="-_5rR5OonSa46ubUy5I2sHzN1esjGpcnd1em8We3a7c" />
+  
   <title>{title}</title>
   <meta name="description" content={description} />
   
-  {/* Link Canonical Absolut */}
   <link rel="canonical" href={canonical} />
 
+  {/* Meta tags tetap sama */}
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonical} />
   <meta property="og:title" content={title} />
   <meta property="og:description" content={description} />
-  <meta property="og:image" content={image} />
+  <meta property="og:image" content={new URL(image, siteOrigin).href} />
   <meta property="og:site_name" content={siteName} />
 
   <meta name="twitter:card" content="summary_large_image" />
   <meta name="twitter:title" content={title} />
   <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={image} />
+  <meta name="twitter:image" content={new URL(image, siteOrigin).href} />
 
   <link rel="icon" href="/images/zaidly-favicon.png" />
 </head>
 
 <body class="flex flex-col min-h-screen antialiased bg-cream-latte">
   <Header />
-
   <main class="flex-grow pt-16">
-    <slot /> </main>
-
+    <slot />
+  </main>
   <Footer />
 </body>
 </html>

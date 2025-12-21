@@ -12,14 +12,15 @@
         </a>
 
         <nav class="hidden md:block">
-            <ul class="flex space-x-6 font-semibold" id="main-nav-links">
-                <li><a href="/guides" class="nav-link transition-colors duration-300 hover:text-accent-primary">Brewing Guides</a></li>
-                <li><a href="/gear" class="nav-link transition-colors duration-300 hover:text-accent-primary">Gear</a></li>
-                <li><a href="/beans" class="nav-link transition-colors duration-300 hover:text-accent-primary">Beans</a></li>
-                <li><a href="/about" class="nav-link transition-colors duration-300 hover:text-accent-primary">About</a></li>
-                <li><a href="/blog" class="nav-link transition-colors duration-300 hover:text-accent-primary">Blog</a></li>
-            </ul>
-        </nav>
+    <ul class="flex space-x-6 font-semibold" id="main-nav-links">
+        {/* PERBAIKAN: Gunakan text-coffee-dark sebagai default (bukan brown) agar kontras di atas bg-light */}
+        <li><a href="/guides" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Brewing Guides</a></li>
+        <li><a href="/gear" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Gear</a></li>
+        <li><a href="/beans" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Beans</a></li>
+        <li><a href="/about" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">About</a></li>
+        <li><a href="/blog" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Blog</a></li>
+    </ul>
+</nav>
 
         <button 
             id="mobile-menu-button" 
@@ -69,40 +70,40 @@
         };
 
         const updateHeader = () => {
-            const isScrolled = window.scrollY > 50;
+    const isScrolled = window.scrollY > 50;
 
-            if (isScrolled) {
-                header.classList.replace('bg-coffee-light', 'bg-coffee-dark/95');
-                header.classList.add('backdrop-blur-md');
-                logo.classList.replace('text-coffee-dark', 'text-white');
-                mobileMenuButton.classList.replace('text-coffee-dark', 'text-white');
-                mobileMenu.classList.replace('bg-coffee-light', 'bg-coffee-dark/95');
+    if (isScrolled) {
+        header.classList.replace('bg-coffee-light', 'bg-coffee-dark'); // Gunakan warna solid
+        header.classList.add('backdrop-blur-md');
+        logo.classList.replace('text-coffee-dark', 'text-white');
+        mobileMenuButton.classList.replace('text-coffee-dark', 'text-white');
+        mobileMenu.classList.replace('bg-coffee-light', 'bg-coffee-dark');
 
-                desktopLinks.forEach(link => {
-                    link.classList.add('text-white');
-                    link.classList.remove('text-coffee-brown');
-                });
-                mobileLinks.forEach(link => {
-                    link.classList.add('text-white/90');
-                    link.classList.remove('text-coffee-dark');
-                });
-            } else {
-                header.classList.replace('bg-coffee-dark/95', 'bg-coffee-light');
-                header.classList.remove('backdrop-blur-md');
-                logo.classList.replace('text-white', 'text-coffee-dark');
-                mobileMenuButton.classList.replace('text-white', 'text-coffee-dark');
-                mobileMenu.classList.replace('bg-coffee-dark/95', 'bg-coffee-light');
+        desktopLinks.forEach(link => {
+            link.classList.add('text-white'); // Putih solid untuk kontras maksimal
+            link.classList.remove('text-coffee-dark');
+        });
+        mobileLinks.forEach(link => {
+            link.classList.add('text-white');
+            link.classList.remove('text-coffee-dark');
+        });
+    } else {
+        header.classList.replace('bg-coffee-dark', 'bg-coffee-light');
+        header.classList.remove('backdrop-blur-md');
+        logo.classList.replace('text-white', 'text-coffee-dark');
+        mobileMenuButton.classList.replace('text-white', 'text-coffee-dark');
+        mobileMenu.classList.replace('bg-coffee-dark', 'bg-coffee-light');
 
-                desktopLinks.forEach(link => {
-                    link.classList.remove('text-white');
-                    link.classList.add('text-coffee-brown');
-                });
-                mobileLinks.forEach(link => {
-                    link.classList.remove('text-white/90');
-                    link.classList.add('text-coffee-dark');
-                });
-            }
-        };
+        desktopLinks.forEach(link => {
+            link.classList.remove('text-white');
+            link.classList.add('text-coffee-dark');
+        });
+        mobileLinks.forEach(link => {
+            link.classList.remove('text-white');
+            link.classList.add('text-coffee-dark');
+        });
+    }
+};
 
         window.addEventListener('scroll', updateHeader);
         updateHeader();
