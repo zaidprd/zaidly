@@ -5,7 +5,9 @@ backend:
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
 
-# Gambar khusus masuk ke folder blog agar rapi
+# Baris wajib agar ada tombol Save (Draft)
+publish_mode: editorial_workflow
+
 media_folder: "src/assets/images/blog"
 public_folder: "/src/assets/images/blog"
 
@@ -23,13 +25,7 @@ collections:
           label: "Category", 
           name: "category", 
           widget: "select", 
-          options: [
-            "gear-lab", 
-            "bean-roastery", 
-            "brew-mastery", 
-            "barista-life", 
-            "buying-guides"
-          ], 
+          options: ["gear-lab", "bean-roastery", "brew-mastery", "barista-life", "buying-guides"], 
           required: true 
         }
       - { label: "Author Name", name: "author", widget: "string", required: true }
