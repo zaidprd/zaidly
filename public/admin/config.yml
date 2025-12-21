@@ -5,12 +5,10 @@ backend:
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
 
-publish_mode: editorial_workflow
+publish_mode: simple
 
 media_folder: "public/images"
 public_folder: "/images"
-media_library:
-  name: uploadcare
 
 collections:
   - name: "blog"
@@ -18,12 +16,11 @@ collections:
     folder: "src/content/blog"
     create: true
     slug: "{{slug}}"
-    body_field: "body"
     fields:
-      - { label: "Title", name: "title", widget: "string", required: true }
-      - { label: "SEO Description", name: "description", widget: "string", required: true }
-      - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
-      - { label: "Author Name", name: "author", widget: "string", required: true }
-      - { label: "Feature Image URL", name: "image", widget: "image", required: false }
+      - { label: "Title", name: "title", widget: "string" }
+      - { label: "Description", name: "description", widget: "string" }
+      - { label: "Publish Date", name: "pubDate", widget: "datetime" }
+      - { label: "Author", name: "author", widget: "string" }
+      - { label: "Image", name: "image", widget: "image", required: false }
       - { label: "Tags", name: "tags", widget: "list", required: false }
-      - { label: "Body", name: "body", widget: "markdown", required: true }
+      - { label: "Body", name: "body", widget: "markdown" }
