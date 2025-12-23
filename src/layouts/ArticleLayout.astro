@@ -52,7 +52,7 @@ const ads = {
 ---
 
 <BaseLayout title={frontmatter.title}>
-    <main class="bg-cream-latte min-h-screen text-coffee-dark">
+    <main class="bg-cream-latte min-h-screen text-coffee-dark relative">
         
         <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10">
             <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -132,39 +132,27 @@ const ads = {
                         </div>
                     )}
 
-                    {showSidebar && (
-                        <div class="lg:hidden mt-20 space-y-10">
-                             <p class="text-[10px] font-black text-center text-coffee-brown/40 uppercase tracking-[0.4em]">— Recommended Gear —</p>
-                             <div class="space-y-8">
-                                <a href={ads.topPick.link} target="_blank" class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md block">
-                                    <p class="text-[9px] font-black text-accent-primary uppercase mb-4 tracking-[0.2em]">The Top Choice</p>
-                                    <div class="bg-[#F9F9F7] p-4 mb-4 border border-coffee-brown/5">
-                                        <Image src={ads.topPick.img} alt={ads.topPick.title} width={500} height={500} class="w-full h-auto object-contain max-h-[250px]" />
-                                    </div>
-                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-6 leading-snug">{ads.topPick.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase shadow-lg">Check Price on Amazon</div>
-                                </a>
-
-                                <a href={ads.essential.link} target="_blank" class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md block">
-                                    <p class="text-[9px] font-black text-accent-primary uppercase mb-4 tracking-[0.2em]">Essential Gear</p>
-                                    <div class="bg-[#F9F9F7] p-4 mb-4 border border-coffee-brown/5">
-                                        <Image src={ads.essential.img} alt={ads.essential.title} width={500} height={500} class="w-full h-auto object-contain max-h-[250px]" />
-                                    </div>
-                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-6 leading-snug">{ads.essential.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase shadow-lg">Check Price on Amazon</div>
-                                </a>
-                             </div>
-                        </div>
-                    )}
-
                     <div class="mt-20 border-t-4 border-coffee-dark pt-16">
-                        <div class="mb-20">
+                        <div class="mb-16">
                             <h3 class="text-[11px] font-black text-coffee-dark uppercase tracking-[0.3em] mb-8">Share this insight</h3>
                             <div class="flex flex-wrap gap-4">
                                 <a href={`https://www.facebook.com/sharer/sharer.php?u=${Astro.url}`} target="_blank" class="bg-white border-2 border-coffee-dark px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">Facebook</a>
                                 <a href={`https://twitter.com/intent/tweet?url=${Astro.url}&text=${frontmatter.title}`} target="_blank" class="bg-white border-2 border-coffee-dark px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">X (Twitter)</a>
                                 <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!')" class="bg-coffee-dark text-white px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-accent-primary transition-all">Copy Link</button>
                             </div>
+                        </div>
+
+                        <div class="bg-white border border-coffee-brown/20 p-8 md:p-12 shadow-sm mb-16 text-center">
+                            <div class="inline-flex items-center justify-center w-12 h-12 bg-[#29abe0] rounded-full text-white mb-6 shadow-md">
+                                <i class="ri-heart-fill text-xl"></i>
+                            </div>
+                            <h3 class="text-sm font-black text-coffee-dark uppercase tracking-[0.2em] mb-4 leading-tight">Did this guide help your morning brew?</h3>
+                            <p class="text-coffee-brown/80 text-sm mb-8 max-w-md mx-auto leading-relaxed">
+                                Your support encourages us to be more consistent in testing and reviewing coffee gear, ensuring you get the most reliable insights.
+                            </p>
+                            <a href="https://ko-fi.com/zaidly" target="_blank" rel="noopener noreferrer" class="inline-block bg-[#29abe0] text-white text-[10px] font-black py-4 px-10 tracking-[0.2em] uppercase hover:bg-[#2086b0] transition-colors shadow-lg">
+                                Support us on Ko-fi
+                            </a>
                         </div>
 
                         <div class="bg-white border border-coffee-brown/20 p-8 md:p-12 shadow-sm">
@@ -216,4 +204,17 @@ const ads = {
             </div>
         </div>
     </main>
+
+    <a 
+      href="https://ko-fi.com/zaidly" 
+      target="_blank" 
+      rel="noopener noreferrer"
+      class="fixed bottom-8 right-8 z-50 flex items-center justify-center w-14 h-14 bg-[#29abe0] rounded-full shadow-2xl hover:scale-110 transition-all active:scale-95 group border-2 border-white/20"
+      aria-label="Support Zaidly on Ko-fi"
+    >
+      <i class="ri-cup-fill text-2xl text-white"></i>
+      <span class="absolute right-16 bg-coffee-dark text-white text-[10px] font-black uppercase tracking-widest py-2 px-4 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none border border-coffee-brown/30 shadow-2xl">
+        Support Research ☕
+      </span>
+    </a>
 </BaseLayout>
