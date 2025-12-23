@@ -7,43 +7,48 @@
 >
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
         
-        <a href="/" id="header-logo" class="text-2xl font-bold text-coffee-dark tracking-wide transition-all duration-300 hover:text-accent-primary">
-            Zaidly
+        <a href="/" class="flex items-center gap-2 md:gap-3 group">
+            <img 
+                src="/logo.webp" 
+                alt="Zaidly Icon" 
+                class="h-12 md:h-14 w-auto object-contain transition-transform duration-300 group-hover:scale-105"
+            />
+            
+            <span 
+                id="header-text"
+                class="text-lg md:text-xl font-bold tracking-[0.15em] uppercase text-coffee-dark transition-colors duration-500"
+                style="font-family: system-ui, -apple-system, sans-serif;"
+            >
+                Zaidly
+            </span>
         </a>
 
         <nav class="hidden md:block">
-    <ul class="flex space-x-6 font-semibold" id="main-nav-links">
-        {/* PERBAIKAN: Gunakan text-coffee-dark sebagai default (bukan brown) agar kontras di atas bg-light */}
-        <li><a href="/" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Home</a></li>
-        <li><a href="/guides" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Brewing Guides</a></li>
-        <li><a href="/gear" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Gear</a></li>
-        <li><a href="/beans" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Beans</a></li>
-        <li><a href="/about" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">About</a></li>
-        <li><a href="/blog" class="nav-link text-coffee-dark transition-colors duration-300 hover:text-accent-primary">Blog</a></li>
-    </ul>
-</nav>
+            <ul class="flex space-x-8 text-sm font-medium tracking-wide uppercase" id="main-nav-links">
+                <li><a href="/" class="nav-link text-coffee-dark hover:text-accent-primary transition-colors duration-300">Home</a></li>
+                <li><a href="/guides" class="nav-link text-coffee-dark hover:text-accent-primary transition-colors duration-300">Guides</a></li>
+                <li><a href="/gear" class="nav-link text-coffee-dark hover:text-accent-primary transition-colors duration-300">Gear</a></li>
+                <li><a href="/beans" class="nav-link text-coffee-dark hover:text-accent-primary transition-colors duration-300">Beans</a></li>
+                <li><a href="/blog" class="nav-link text-coffee-dark hover:text-accent-primary transition-colors duration-300">Blog</a></li>
+            </ul>
+        </nav>
 
-        <button 
-            id="mobile-menu-button" 
-            aria-label="Toggle Navigation Menu" 
-            class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-300 hover:text-accent-primary"
-        >
-            <svg id="hamburger-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <button id="mobile-menu-button" class="md:hidden text-coffee-dark p-2 focus:outline-none">
+            <svg id="hamburger-icon" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
-            <svg id="close-icon" xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg id="close-icon" class="h-6 w-6 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
         </button>
     </div>
 
     <div id="mobile-menu" class="hidden md:hidden bg-coffee-light border-b border-coffee-brown/20 shadow-xl overflow-hidden transition-all duration-300">
-        <ul class="px-4 pt-2 pb-6 space-y-2">
-            <li><a href="/guides" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Brewing Guides</a></li>
-            <li><a href="/gear" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Gear</a></li>
-            <li><a href="/beans" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Beans</a></li>
-            <li><a href="/about" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">About</a></li>
-            <li><a href="/blog" class="mobile-link block py-3 px-4 font-semibold rounded-lg transition-all hover:bg-accent-primary/10 hover:text-accent-primary">Blog</a></li>
+        <ul class="px-6 py-8 space-y-4">
+            <li><a href="/guides" class="mobile-link block text-lg font-semibold text-coffee-dark">Brewing Guides</a></li>
+            <li><a href="/gear" class="mobile-link block text-lg font-semibold text-coffee-dark">Gear</a></li>
+            <li><a href="/beans" class="mobile-link block text-lg font-semibold text-coffee-dark">Beans</a></li>
+            <li><a href="/blog" class="mobile-link block text-lg font-semibold text-coffee-dark">Blog</a></li>
         </ul>
     </div>
 </header>
@@ -51,19 +56,15 @@
 <script>
     const initHeader = () => {
         const header = document.getElementById('main-header');
-        const logo = document.getElementById('header-logo');
-        const navLinksContainer = document.getElementById('main-nav-links');
+        const headerText = document.getElementById('header-text');
         const mobileMenuButton = document.getElementById('mobile-menu-button');
         const mobileMenu = document.getElementById('mobile-menu');
         const hamburgerIcon = document.getElementById('hamburger-icon');
         const closeIcon = document.getElementById('close-icon');
+        const navLinks = document.querySelectorAll('.nav-link, .mobile-link');
 
-        if (!header || !logo || !navLinksContainer || !mobileMenuButton || !mobileMenu || !hamburgerIcon || !closeIcon) return;
+        if (!header || !headerText || !mobileMenuButton || !mobileMenu || !hamburgerIcon || !closeIcon) return;
 
-        const mobileLinks = mobileMenu.querySelectorAll('.mobile-link');
-        const desktopLinks = navLinksContainer.querySelectorAll('.nav-link');
-
-        // Toggle Mobile Menu
         mobileMenuButton.onclick = () => {
             const isHidden = mobileMenu.classList.toggle('hidden');
             hamburgerIcon.classList.toggle('hidden', !isHidden);
@@ -71,45 +72,30 @@
         };
 
         const updateHeader = () => {
-    const isScrolled = window.scrollY > 50;
+            const isScrolled = window.scrollY > 50;
 
-    if (isScrolled) {
-        header.classList.replace('bg-coffee-light', 'bg-coffee-dark'); // Gunakan warna solid
-        header.classList.add('backdrop-blur-md');
-        logo.classList.replace('text-coffee-dark', 'text-white');
-        mobileMenuButton.classList.replace('text-coffee-dark', 'text-white');
-        mobileMenu.classList.replace('bg-coffee-light', 'bg-coffee-dark');
-
-        desktopLinks.forEach(link => {
-            link.classList.add('text-white'); // Putih solid untuk kontras maksimal
-            link.classList.remove('text-coffee-dark');
-        });
-        mobileLinks.forEach(link => {
-            link.classList.add('text-white');
-            link.classList.remove('text-coffee-dark');
-        });
-    } else {
-        header.classList.replace('bg-coffee-dark', 'bg-coffee-light');
-        header.classList.remove('backdrop-blur-md');
-        logo.classList.replace('text-white', 'text-coffee-dark');
-        mobileMenuButton.classList.replace('text-white', 'text-coffee-dark');
-        mobileMenu.classList.replace('bg-coffee-dark', 'bg-coffee-light');
-
-        desktopLinks.forEach(link => {
-            link.classList.remove('text-white');
-            link.classList.add('text-coffee-dark');
-        });
-        mobileLinks.forEach(link => {
-            link.classList.remove('text-white');
-            link.classList.add('text-coffee-dark');
-        });
-    }
-};
+            if (isScrolled) {
+                header.classList.replace('bg-coffee-light', 'bg-coffee-dark');
+                headerText.classList.replace('text-coffee-dark', 'text-white');
+                mobileMenuButton.classList.replace('text-coffee-dark', 'text-white');
+                navLinks.forEach(link => {
+                    link.classList.add('text-white');
+                    link.classList.remove('text-coffee-dark');
+                });
+            } else {
+                header.classList.replace('bg-coffee-dark', 'bg-coffee-light');
+                headerText.classList.replace('text-white', 'text-coffee-dark');
+                mobileMenuButton.classList.replace('text-white', 'text-coffee-dark');
+                navLinks.forEach(link => {
+                    link.classList.remove('text-white');
+                    link.classList.add('text-coffee-dark');
+                });
+            }
+        };
 
         window.addEventListener('scroll', updateHeader);
         updateHeader();
     };
 
-    // Pastikan jalan saat initial load dan saat navigasi ViewTransitions
     document.addEventListener('astro:page-load', initHeader);
 </script>
