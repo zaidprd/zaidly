@@ -3,7 +3,7 @@
 ---
 <header 
     id="main-header" 
-    class="fixed w-full top-0 z-50 bg-coffee-light h-20 transition-all duration-500 border-none shadow-none"
+    class="fixed w-full top-0 z-50 bg-coffee-light h-20 transition-all duration-300 border-none shadow-none"
 >
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 flex justify-between items-center h-full">
         
@@ -11,15 +11,17 @@
             <img 
                 src="/logo.webp" 
                 alt="Zaidly Icon" 
-                width="80"
-                height="80"
+                width="84" 
+                height="84" 
                 loading="eager"
+                decoding="async"
                 id="header-logo"
-                class="h-12 md:h-14 w-auto object-contain transition-all duration-500 group-hover:scale-105"
+                class="h-12 md:h-14 w-auto object-contain transition-all duration-300"
             />
+            
             <span 
                 id="header-text"
-                class="text-xl md:text-2xl font-bold tracking-[0.2em] uppercase text-coffee-dark transition-all duration-500"
+                class="text-xl md:text-2xl font-bold tracking-[0.2em] uppercase text-coffee-dark transition-all duration-300"
                 style="font-family: system-ui, -apple-system, sans-serif;"
             >
                 Zaidly
@@ -36,7 +38,7 @@
             </ul>
         </nav>
 
-        <button id="mobile-menu-button" class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-500">
+        <button id="mobile-menu-button" class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-300">
             <svg id="hamburger-icon" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -46,12 +48,12 @@
         </button>
     </div>
 
-    <div id="mobile-menu" class="hidden md:hidden bg-coffee-light border-t border-coffee-brown/10 shadow-2xl overflow-hidden transition-all duration-300">
+    <div id="mobile-menu" class="hidden md:hidden bg-coffee-light border-t border-coffee-brown/10 shadow-2xl overflow-hidden">
         <ul class="px-6 py-8 space-y-2">
-            <li><a href="/guides" class="mobile-link block py-3 px-4 text-xl font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Brewing Guides</a></li>
-            <li><a href="/gear" class="mobile-link block py-3 px-4 text-xl font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Gear</a></li>
-            <li><a href="/beans" class="mobile-link block py-3 px-4 text-xl font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Beans</a></li>
-            <li><a href="/blog" class="mobile-link block py-3 px-4 text-xl font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Blog</a></li>
+            <li><a href="/guides" class="mobile-link block py-3 px-4 text-lg font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Brewing Guides</a></li>
+            <li><a href="/gear" class="mobile-link block py-3 px-4 text-lg font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Gear</a></li>
+            <li><a href="/beans" class="mobile-link block py-3 px-4 text-lg font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Beans</a></li>
+            <li><a href="/blog" class="mobile-link block py-3 px-4 text-lg font-black text-coffee-dark hover:bg-coffee-dark hover:text-white rounded-lg transition-all">Blog</a></li>
         </ul>
     </div>
 </header>
@@ -69,23 +71,26 @@
 
         if (!header || !mobileMenuButton) return;
 
+        // Toggle Mobile Menu
         mobileMenuButton.onclick = () => {
             const isHidden = mobileMenu.classList.toggle('hidden');
             hamburgerIcon.classList.toggle('hidden', !isHidden);
             closeIcon.classList.toggle('hidden', isHidden);
         };
 
+        // Optimized Scroll Handler (requestAnimationFrame)
+        let ticking = false;
         const updateHeader = () => {
-            const isScrolled = window.scrollY > 50;
+            const isScrolled = window.scrollY > 20;
 
             if (isScrolled) {
                 header.classList.replace('h-20', 'h-16');
                 header.classList.replace('bg-coffee-light', 'bg-coffee-dark');
-                
                 if(headerLogo) headerLogo.classList.replace('h-12', 'h-10');
-                headerText.classList.replace('text-coffee-dark', 'text-white');
-                headerText.classList.replace('text-xl', 'text-lg');
-
+                if(headerText) {
+                    headerText.classList.replace('text-coffee-dark', 'text-white');
+                    headerText.classList.replace('text-xl', 'text-lg');
+                }
                 mobileMenuButton.classList.replace('text-coffee-dark', 'text-white');
                 navLinks.forEach(link => {
                     link.classList.add('text-white');
@@ -94,20 +99,27 @@
             } else {
                 header.classList.replace('h-16', 'h-20');
                 header.classList.replace('bg-coffee-dark', 'bg-coffee-light');
-                
                 if(headerLogo) headerLogo.classList.replace('h-10', 'h-12');
-                headerText.classList.replace('text-white', 'text-coffee-dark');
-                headerText.classList.replace('text-lg', 'text-xl');
-
+                if(headerText) {
+                    headerText.classList.replace('text-white', 'text-coffee-dark');
+                    headerText.classList.replace('text-lg', 'text-xl');
+                }
                 mobileMenuButton.classList.replace('text-white', 'text-coffee-dark');
                 navLinks.forEach(link => {
                     link.classList.remove('text-white');
                     link.classList.add('text-coffee-dark');
                 });
             }
+            ticking = false;
         };
 
-        window.addEventListener('scroll', updateHeader);
+        window.addEventListener('scroll', () => {
+            if (!ticking) {
+                window.requestAnimationFrame(updateHeader);
+                ticking = true;
+            }
+        }, { passive: true });
+
         updateHeader();
     };
 
@@ -115,5 +127,10 @@
 </script>
 
 <style>
-    #main-header { border-bottom: none !important; box-shadow: none !important; }
+    /* Prevent layout shift & remove line */
+    #main-header {
+        border-bottom: none !important;
+        box-shadow: none !important;
+        will-change: height, background-color;
+    }
 </style>
