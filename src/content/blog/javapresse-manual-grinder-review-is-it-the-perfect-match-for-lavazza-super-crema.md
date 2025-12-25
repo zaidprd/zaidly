@@ -25,15 +25,12 @@ At **Zaidly**, we believe every great bean deserves a perfect grind. That’s wh
 
 ## Watch the JavaPresse in Action
 
-<div style="aspect-ratio: 16/9; width: 100%; margin-bottom: 2rem;">
-  <iframe 
-    src="https://www.youtube.com/embed/h5SQ9i6grzY" 
-    style="width: 100%; height: 100%; border-radius: 8px;" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-    allowfullscreen>
-  </iframe>
-</div>
+<iframe 
+  src="https://www.youtube-nocookie.com/embed/h5SQ9i6grzY" 
+  style="width: 100%; height: 100%; border-radius: 8px;" 
+  frameborder="0" 
+  allowfullscreen>
+</iframe>
 
 *In this video, we demonstrate how the JavaPresse handles medium-light roasts and how to adjust the click settings for the perfect brew.*
 
