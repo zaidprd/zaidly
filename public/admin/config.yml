@@ -4,7 +4,8 @@ backend:
   branch: main
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
-local_backend: true
+# local_backend: true <--- Hapus baris ini atau ganti jadi false
+local_backend: false
 
 slug:
   encoding: "ascii"
@@ -43,5 +44,5 @@ collections:
           name: "body", 
           widget: "markdown", 
           required: true,
-          default: "import AffiliateLink from '../../components/AffiliateLink.astro';\n\n"
+          default: "import { Image } from 'astro:assets';\nimport AffiliateLink from '../../components/AffiliateLink.astro';\n\nAs an Amazon and AliExpress Associate, I earn from qualifying purchases at no extra cost to you.\n\n"
         }
