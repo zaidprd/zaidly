@@ -4,16 +4,14 @@ backend:
   branch: main
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
+local_backend: true
 
-# Pengaturan slug global agar otomatis bersih dari karakter aneh
 slug:
   encoding: "ascii"
   clean_accents: true
   sanitize_replacement: "-"
 
-# Baris wajib agar ada fitur Draft/Review
 publish_mode: editorial_workflow
-
 media_folder: "src/assets/images/blog"
 public_folder: "/src/assets/images/blog"
 
@@ -22,21 +20,13 @@ collections:
     label: "Blog"
     folder: "src/content/blog"
     create: true
-    # Menggunakan template slug otomatis dari judul yang disanitasi
     slug: "{{slug}}"
+    extension: "mdx" # Ubah ke mdx agar support tombol
+    format: "frontmatter"
     fields:
-      - { label: "Title", name: "title", widget: "string", required: true, hint: "Judul lengkap yang menarik untuk pembaca." }
-      
-      # Field tambahan untuk kontrol manual kata kunci slug
-      - { 
-          label: "SEO Friendly Slug (Kata Kunci)", 
-          name: "slug_seo", 
-          widget: "string", 
-          required: false, 
-          hint: "Opsional. Isi hanya dengan kata kunci inti, misal: 'ultimate-bean-map'. Jika kosong, akan otomatis mengambil dari judul." 
-        }
-
-      - { label: "SEO Description", name: "description", widget: "string", required: true, hint: "Ringkasan 2 kalimat untuk meta description." }
+      - { label: "Title", name: "title", widget: "string", required: true }
+      - { label: "SEO Friendly Slug", name: "slug_seo", widget: "string", required: false }
+      - { label: "SEO Description", name: "description", widget: "string", required: true }
       - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
       - { 
           label: "Category", 
@@ -48,4 +38,10 @@ collections:
       - { label: "Author Name", name: "author", widget: "string", required: true, default: "admin" }
       - { label: "Feature Image URL", name: "image", widget: "image", required: false }
       - { label: "Tags", name: "tags", widget: "list", required: false, default: ["bean roastery"] }
-      - { label: "Body", name: "body", widget: "markdown", required: true }
+      - { 
+          label: "Body", 
+          name: "body", 
+          widget: "markdown", 
+          required: true,
+          default: "import AffiliateLink from '../../components/AffiliateLink.astro';\n\n"
+        }

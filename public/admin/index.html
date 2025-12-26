@@ -5,10 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Admin CMS</title>
   <base href="/admin/">
-
   <script src="https://identity.netlify.com/v1/netlify-identity-widget.js"></script>
 </head>
 <body>
   <script src="https://unpkg.com/decap-cms@^3.0.0/dist/decap-cms.js"></script>
+  <script>
+    // Tambahan tombol Affiliate tanpa merusak struktur asli Anda
+    CMS.registerEditorComponent({
+      id: "affiliate_group",
+      label: "Affiliate Buttons (Pair)",
+      fields: [
+        { name: 'amazon_url', label: 'Amazon Link', widget: 'string' },
+        { name: 'ali_url', label: 'AliExpress Link', widget: 'string' }
+      ],
+      pattern: /^<div class="flex flex-wrap gap-3 my-4">[\s\S]*?href="(.*?)" merchant="Amazon"[\s\S]*?href="(.*?)" merchant="AliExpress"[\s\S]*?<\/div>$/,
+      fromBlock: function(match) { return { amazon_url: match[1], ali_url: match[2] }; },
+      toBlock: function(obj) {
+        return `<div class="flex flex-wrap gap-3 my-4">
+  <AffiliateLink href="${obj.amazon_url}" merchant="Amazon" />
+  <AffiliateLink href="${obj.ali_url}" merchant="AliExpress" />
+</div>`;
+      },
+      toPreview: function(obj) { return `<strong>Affiliate Pair: Amazon & Ali</strong>`; }
+    });
+  </script>
 </body>
 </html>

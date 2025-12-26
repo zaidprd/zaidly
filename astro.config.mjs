@@ -3,7 +3,7 @@
 import { defineConfig } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
 import sitemap from '@astrojs/sitemap'; // <-- Import Sitemap
-
+import mdx from '@astrojs/mdx';
 // https://astro.build/config
 export default defineConfig({
   // WAJIB: Tentukan domain utama situs Anda untuk Sitemap
@@ -12,5 +12,6 @@ export default defineConfig({
   integrations: [
     tailwind(),
     sitemap(), // <-- Tambahkan Sitemap
+    mdx(),
   ],
 });
