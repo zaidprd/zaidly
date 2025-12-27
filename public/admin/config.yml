@@ -4,17 +4,17 @@ backend:
   branch: main
   base_url: https://zaidly-auth.ahmadzaid-tamiang.workers.dev
   auth_endpoint: auth
-# local_backend: true <--- Hapus baris ini atau ganti jadi false
-local_backend: false
+
+publish_mode: editorial_workflow
+
+# Pengaturan folder media agar sinkron dengan Astro
+media_folder: "src/assets/images/blog"
+public_folder: "/src/assets/images/blog"
 
 slug:
   encoding: "ascii"
   clean_accents: true
   sanitize_replacement: "-"
-
-publish_mode: editorial_workflow
-media_folder: "src/assets/images/blog"
-public_folder: "/src/assets/images/blog"
 
 collections:
   - name: "blog"
@@ -22,27 +22,34 @@ collections:
     folder: "src/content/blog"
     create: true
     slug: "{{slug}}"
-    extension: "mdx" # Ubah ke mdx agar support tombol
+    extension: "mdx"
     format: "frontmatter"
+
     fields:
       - { label: "Title", name: "title", widget: "string", required: true }
-      - { label: "SEO Friendly Slug", name: "slug_seo", widget: "string", required: false }
       - { label: "SEO Description", name: "description", widget: "string", required: true }
-      - { label: "Publish Date", name: "pubDate", widget: "datetime", required: true }
-      - { 
-          label: "Category", 
-          name: "category", 
-          widget: "select", 
-          options: ["gear-lab", "bean-roastery", "brew-mastery", "barista-life", "buying-guides"], 
-          required: true 
+      - { label: "Publish Date", name: "pubDate", widget: "datetime" }
+      - {
+          label: "Category",
+          name: "category",
+          widget: "select",
+          options:
+            - gear-lab
+            - bean-roastery
+            - brew-mastery
+            - barista-life
+            - buying-guides
         }
-      - { label: "Author Name", name: "author", widget: "string", required: true, default: "admin" }
-      - { label: "Feature Image URL", name: "image", widget: "image", required: false }
-      - { label: "Tags", name: "tags", widget: "list", required: false, default: ["bean roastery"] }
-      - { 
-          label: "Body", 
-          name: "body", 
-          widget: "markdown", 
-          required: true,
-          default: "import { Image } from 'astro:assets';\nimport AffiliateLink from '../../components/AffiliateLink.astro';\n\nAs an Amazon and AliExpress Associate, I earn from qualifying purchases at no extra cost to you.\n\n"
-        }
+      - { label: "Author", name: "author", widget: "string", default: "admin" }
+      - { label: "Tags", name: "tags", widget: "list", required: false }
+
+      - label: "Body"
+        name: "body"
+        widget: "markdown"
+        required: true
+        # Menggunakan format '|-' agar import berada di baris baru paling kiri
+        default: |-
+          import { Image } from 'astro:assets';
+          import AffiliateLink from '../../components/AffiliateLink.astro';
+
+          As an Amazon and AliExpress Associate, I earn from qualifying purchases at no extra cost to you.
