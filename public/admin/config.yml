@@ -6,7 +6,9 @@ backend:
   auth_endpoint: auth
 
 publish_mode: editorial_workflow
-local_backend: false # TAMBAHKAN INI UNTUK TES LOKAL
+local_backend: false # Ubah ke true kalau mau tes di laptop lagi
+
+# Pengaturan Folder Gambar (Public Mode)
 media_folder: "public/images/blog"
 public_folder: "/images/blog"
 
@@ -38,6 +40,11 @@ collections:
           - "barista-life"
           - "buying-guides"
       - { label: "Author", name: "author", widget: "string", default: "admin" }
+      
+      # --- BARIS INI YANG HARUS ADA SUPAYA GAMBAR MUNCUL DI CMS ---
+      - { label: "Featured Image", name: "image", widget: "image", required: true }
+      # -----------------------------------------------------------
+
       - { label: "Tags", name: "tags", widget: "list", required: false }
 
       - label: "Body"

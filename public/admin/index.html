@@ -13,42 +13,33 @@
 
   <script>
     /* ===========================
-       1. ASTRO IMAGE (MDX FIX)
-       Edit: Ditambahkan fix agar preview gambar muncul di CMS
+       1. GAMBAR MODE PUBLIC (MDX SAFE)
+       Sesuai dengan: media_folder: "public/images/blog"
     =========================== */
     CMS.registerEditorComponent({
       id: "astro_image",
-      label: "Astro Image (MDX)",
+      label: "Astro Image (Public)",
       fields: [
         { name: "src", label: "Pilih Gambar", widget: "image" },
         { name: "alt", label: "Alt Text (SEO)", widget: "string" }
       ],
-      // Deteksi pola import MDX
-      pattern: /^<Image src=\{import\("(.*?)"\)\} alt="(.*?)" \/>$/,
+      // Deteksi tag img standar yang dihasilkan
+      pattern: /^<img src="(.*?)" alt="(.*?)" \/>$/,
       fromBlock: function(match) {
-        // Membersihkan path relatif saat masuk kembali ke editor
-        let cleanSrc = match[1].replace('../../assets/images/blog/', '/src/assets/images/blog/');
-        return { src: cleanSrc, alt: match[2] };
+        return { src: match[1], alt: match[2] };
       },
       toBlock: function(obj) {
-        let path = obj.src;
-        // Ubah path absolut /src/ menjadi relatif ../../ untuk Astro
-        if (path.startsWith('/src/')) {
-          path = `../../${path.replace('/src/', '')}`;
-        }
-        // JANGAN DIUBAH: Ini format wajib MDX Astro
-        return `<Image src={import("${path}")} alt="${obj.alt}" />`;
+        // Karena file di public, path-nya langsung /images/blog/nama-file.jpg
+        return `<img src="${obj.src}" alt="${obj.alt}" />`;
       },
       toPreview: function(obj) {
-        // FIX: Agar gambar muncul di kotak preview sebelah kanan CMS
-        // Kita gunakan path asli yang dipilih oleh widget image
-        return `<img src="${obj.src}" alt="${obj.alt}" style="width:100%; height:auto; border-radius:12px; border: 2px solid #eee; margin-top: 10px;" />`;
+        return `<img src="${obj.src}" alt="${obj.alt}" style="width:100%; height:auto; border-radius:12px; border: 2px solid #eee;" />`;
       }
     });
 
     /* ===========================
        2. AFFILIATE BUTTONS
-       =========================== */
+    =========================== */
     CMS.registerEditorComponent({
       id: "affiliate_group",
       label: "Affiliate Buttons (Pair)",
@@ -56,12 +47,11 @@
         { name: "amazon_url", label: "Amazon Link", widget: "string" },
         { name: "ali_url", label: "AliExpress Link", widget: "string" }
       ],
-      pattern: /^<div class="flex flex-wrap gap-3 my-4">[\s\S]*?href="(.*?)" merchant="Amazon"[\s\S]*?href="(.*?)" merchant="AliExpress"[\s\S]*?<\/div>$/,
+      pattern: /^<div class="flex flex-wrap gap-3 my-4"><AffiliateLink href="(.*?)" merchant="Amazon" \/><AffiliateLink href="(.*?)" merchant="AliExpress" \/><\/div>$/,
       fromBlock: function(match) {
         return { amazon_url: match[1], ali_url: match[2] };
       },
       toBlock: function(obj) {
-        // Format satu baris agar MDX tidak bingung dengan spasi kosong
         return `<div class="flex flex-wrap gap-3 my-4"><AffiliateLink href="${obj.amazon_url || '#'}" merchant="Amazon" /><AffiliateLink href="${obj.ali_url || '#'}" merchant="AliExpress" /></div>`;
       },
       toPreview: function(obj) {
