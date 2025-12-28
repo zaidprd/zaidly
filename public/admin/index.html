@@ -14,7 +14,7 @@
   <script>
     /* ===========================
        1. ASTRO IMAGE (MDX FIX)
-       Solusi agar gambar muncul & tidak error build
+       Edit: Ditambahkan fix agar preview gambar muncul di CMS
     =========================== */
     CMS.registerEditorComponent({
       id: "astro_image",
@@ -23,29 +23,32 @@
         { name: "src", label: "Pilih Gambar", widget: "image" },
         { name: "alt", label: "Alt Text (SEO)", widget: "string" }
       ],
-      // Regex untuk mendeteksi kembali komponen saat edit artikel
+      // Deteksi pola import MDX
       pattern: /^<Image src=\{import\("(.*?)"\)\} alt="(.*?)" \/>$/,
       fromBlock: function(match) {
-        return { src: match[1], alt: match[2] };
+        // Membersihkan path relatif saat masuk kembali ke editor
+        let cleanSrc = match[1].replace('../../assets/images/blog/', '/src/assets/images/blog/');
+        return { src: cleanSrc, alt: match[2] };
       },
       toBlock: function(obj) {
-        // Otomatis ubah path /src/assets/ ke ../../assets/ agar dibaca Astro
-        let cleanPath = obj.src;
-        if (cleanPath.startsWith('/src/')) {
-          cleanPath = `../../${cleanPath.replace('/src/', '')}`;
+        let path = obj.src;
+        // Ubah path absolut /src/ menjadi relatif ../../ untuk Astro
+        if (path.startsWith('/src/')) {
+          path = `../../${path.replace('/src/', '')}`;
         }
-        // Wajib satu baris lurus agar Cloudflare build tidak error
-        return `<Image src={import("${cleanPath}")} alt="${obj.alt}" />`;
+        // JANGAN DIUBAH: Ini format wajib MDX Astro
+        return `<Image src={import("${path}")} alt="${obj.alt}" />`;
       },
       toPreview: function(obj) {
-        return `<img src="${obj.src}" alt="${obj.alt}" style="max-width:100%; height:auto; border-radius:8px;" />`;
+        // FIX: Agar gambar muncul di kotak preview sebelah kanan CMS
+        // Kita gunakan path asli yang dipilih oleh widget image
+        return `<img src="${obj.src}" alt="${obj.alt}" style="width:100%; height:auto; border-radius:12px; border: 2px solid #eee; margin-top: 10px;" />`;
       }
     });
 
     /* ===========================
        2. AFFILIATE BUTTONS
-       Sesuai spesifikasi Zaidly.com
-    =========================== */
+       =========================== */
     CMS.registerEditorComponent({
       id: "affiliate_group",
       label: "Affiliate Buttons (Pair)",
@@ -53,22 +56,21 @@
         { name: "amazon_url", label: "Amazon Link", widget: "string" },
         { name: "ali_url", label: "AliExpress Link", widget: "string" }
       ],
-      // Deteksi pola div affiliate
       pattern: /^<div class="flex flex-wrap gap-3 my-4">[\s\S]*?href="(.*?)" merchant="Amazon"[\s\S]*?href="(.*?)" merchant="AliExpress"[\s\S]*?<\/div>$/,
       fromBlock: function(match) {
         return { amazon_url: match[1], ali_url: match[2] };
       },
       toBlock: function(obj) {
-        return `<div class="flex flex-wrap gap-3 my-4">
-  <AffiliateLink href="${obj.amazon_url || '#'}" merchant="Amazon" />
-  <AffiliateLink href="${obj.ali_url || '#'}" merchant="AliExpress" />
-</div>`;
+        // Format satu baris agar MDX tidak bingung dengan spasi kosong
+        return `<div class="flex flex-wrap gap-3 my-4"><AffiliateLink href="${obj.amazon_url || '#'}" merchant="Amazon" /><AffiliateLink href="${obj.ali_url || '#'}" merchant="AliExpress" /></div>`;
       },
       toPreview: function(obj) {
-        return `<div style="padding:10px; background:#f9f9f9; border:1px dashed #ccc; text-align:center; border-radius:5px;">
-          <strong>Affiliate Buttons:</strong><br/>
-          <small>Amazon: ${obj.amazon_url} | AliExpress: ${obj.ali_url}</small>
-        </div>`;
+        return `
+          <div style="padding:15px; background:#f4f1ea; border:1px solid #d4cdc1; text-align:center; border-radius:8px; margin: 10px 0;">
+            <p style="margin:0 0 10px 0; font-weight:bold; color:#4a3728;">🛒 Affiliate Buttons Preview</p>
+            <span style="background:#232f3e; color:white; padding:5px 10px; border-radius:4px; font-size:10px; margin-right:5px;">Amazon</span>
+            <span style="background:#ff4747; color:white; padding:5px 10px; border-radius:4px; font-size:10px;">AliExpress</span>
+          </div>`;
       }
     });
   </script>

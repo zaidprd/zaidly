@@ -6,10 +6,9 @@ backend:
   auth_endpoint: auth
 
 publish_mode: editorial_workflow
-
-# Pengaturan folder media agar sinkron dengan Astro
-media_folder: "src/assets/images/blog"
-public_folder: "/src/assets/images/blog"
+local_backend: false # TAMBAHKAN INI UNTUK TES LOKAL
+media_folder: "public/images/blog"
+public_folder: "/images/blog"
 
 slug:
   encoding: "ascii"
@@ -29,17 +28,15 @@ collections:
       - { label: "Title", name: "title", widget: "string", required: true }
       - { label: "SEO Description", name: "description", widget: "string", required: true }
       - { label: "Publish Date", name: "pubDate", widget: "datetime" }
-      - {
-          label: "Category",
-          name: "category",
-          widget: "select",
-          options:
-            - gear-lab
-            - bean-roastery
-            - brew-mastery
-            - barista-life
-            - buying-guides
-        }
+      - label: "Category"
+        name: "category"
+        widget: "select"
+        options:
+          - "gear-lab"
+          - "bean-roastery"
+          - "brew-mastery"
+          - "barista-life"
+          - "buying-guides"
       - { label: "Author", name: "author", widget: "string", default: "admin" }
       - { label: "Tags", name: "tags", widget: "list", required: false }
 
@@ -47,7 +44,6 @@ collections:
         name: "body"
         widget: "markdown"
         required: true
-        # Menggunakan format '|-' agar import berada di baris baru paling kiri
         default: |-
           import { Image } from 'astro:assets';
           import AffiliateLink from '../../components/AffiliateLink.astro';
