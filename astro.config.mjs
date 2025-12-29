@@ -19,7 +19,20 @@ export default defineConfig({
     sitemap(),
     mdx(),
     react(),
-    markdoc(),
+    // Konfigurasi Markdoc agar mengenali komponen tombol dari dashboard
+    markdoc({
+      tags: {
+        AffiliateButton: {
+          // FIX: render harus merujuk ke nama file AffiliateLink.astro lu
+          render: 'AffiliateLink', 
+          attributes: {
+            // Mendaftarkan url dan label agar build Cloudflare sukses
+            url: { type: String, required: true },
+            label: { type: String },
+          },
+        },
+      },
+    }),
     keystatic(),
   ],
 });

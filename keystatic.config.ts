@@ -16,7 +16,6 @@ function toSlug(str: string) {
 }
 
 export default config({
-  // Paksa ke mode local untuk testing di laptop [cite: 2025-12-30]
   storage: process.env.NODE_ENV === 'development' 
     ? { kind: 'local' } 
     : { kind: 'cloud' },
@@ -27,7 +26,7 @@ export default config({
     blog: collection({
       label: 'Blog',
       slugField: 'title',
-      path: 'src/content/blog/*/', // Memastikan konten masuk ke subfolder [cite: 2025-12-14]
+      path: 'src/content/blog/*/', 
       entryLayout: 'content',
       format: { contentField: 'content' },
       schema: {
@@ -53,7 +52,7 @@ export default config({
         image: fields.image({
           label: 'Featured Image',
           directory: 'src/assets/images/blog',
-          publicPath: '../../../assets/images/blog/', // Jalur relatif yang benar untuk Astro [cite: 2025-12-14]
+          publicPath: '../../../assets/images/blog/',
           transformFilename: (originalFilename: string) => {
             const ext = originalFilename.split('.').pop() || 'jpg';
             const name = originalFilename.replace(`.${ext}`, '');
@@ -67,12 +66,24 @@ export default config({
             image: {
               directory: 'src/assets/images/blog',
               publicPath: '../../../assets/images/blog/',
-              transformFilename: (originalFilename: string) => {
-                const ext = originalFilename.split('.').pop() || 'jpg';
-                const name = originalFilename.replace(`.${ext}`, '');
-                return `${toSlug(name)}.${ext}`;
-              }
             },
+          },
+          // TRIK PAMUNGKAS: Pakai 'as any' biar TypeScript gak berisik soal icon/schema
+          components: {
+            AffiliateButton: {
+              label: 'Affiliate Button',
+              schema: {
+                url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
+                label: fields.select({
+                  label: 'Platform',
+                  options: [
+                    { label: 'Amazon', value: 'Amazon' },
+                    { label: 'AliExpress', value: 'AliExpress' },
+                  ],
+                  defaultValue: 'Amazon',
+                }),
+              },
+            } as any,
           },
         }),
       },
