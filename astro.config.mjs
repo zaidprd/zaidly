@@ -1,17 +1,25 @@
-// astro.config.mjs
-
 import { defineConfig } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
-import sitemap from '@astrojs/sitemap'; // <-- Import Sitemap
+import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
-// https://astro.build/config
+import react from '@astrojs/react';
+import markdoc from '@astrojs/markdoc';
+import keystatic from '@keystatic/astro';
+import cloudflare from '@astrojs/cloudflare';
+
 export default defineConfig({
-  // WAJIB: Tentukan domain utama situs Anda untuk Sitemap
-  site: 'https://www.zaidly.com', 
+  site: 'https://zaidly.com',
   
+  // WAJIB: Aktifkan mode server untuk Keystatic Cloud
+  output: 'server',
+  adapter: cloudflare(),
+
   integrations: [
     tailwind(),
-    sitemap(), // <-- Tambahkan Sitemap
+    sitemap(),
     mdx(),
+    react(),
+    markdoc(),
+    keystatic(),
   ],
 });

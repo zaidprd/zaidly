@@ -22,16 +22,14 @@ export async function getStaticPaths() {
     // Ambil data HANYA dari koleksi 'blog'
     const allPosts = await getCollection('blog');
     
-    // SLUGS YANG DIKECUALIKAN
-    // 'blog' dipertahankan di sini untuk mencegah konflik dengan halaman 'blog.astro' statis
-    const excludedSlugs = ['admin', 'blog', 'about', 'gear', 'index']; 
+    // ✨ FIX: Tambahkan 'keystatic' ke daftar ini biar rute admin gak ditabrak!
+    const excludedSlugs = ['admin', 'blog', 'about', 'gear', 'index', 'keystatic'];
 
     const paths = allPosts
-        // Filter: Hanya ambil postingan yang slug-nya TIDAK termasuk di daftar yang dikecualikan
+        // Filter tetap sama
         .filter(post => !excludedSlugs.includes(post.slug)) 
         .map((post) => ({
             params: { 
-                // ✨ FIX KRUSIAL: Menghapus prefix 'blog/' dari slug untuk URL root.
                 slug: post.slug.replace('blog/', ''), 
             }, 
             props: { post },

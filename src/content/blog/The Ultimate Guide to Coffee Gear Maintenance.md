@@ -1,7 +1,7 @@
 ---
 title: "Don't Ruin Your Brew: The Ultimate Guide to Coffee Gear Maintenance"
 description: "Learn how to clean and maintain your espresso machine and coffee grinder. Prevent bitter flavors and extend the life of your equipment with these essential tools."
-pubDate: 2025-12-24
+pubDate: 2025-12-27
 author: "admin"
 image: "../../assets/images/MaintenanceTool.webp"
 category: "barista-life"

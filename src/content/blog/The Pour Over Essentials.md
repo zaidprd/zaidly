@@ -1,7 +1,7 @@
 ---
 title: "The Pour Over Essentials 2026: Mastering the Art of Precision Brewing"
 description: "Everything you need to start your pour-over coffee journey. From gooseneck kettles to precision scales, we break down the must-have tools for 2026."
-pubDate: 2025-12-24
+pubDate: 2025-12-26
 author: "Zaidly Team"
 image: "../../assets/images/PourOverEssentials.webp"
 category: "brew-mastery"
