@@ -10,8 +10,8 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://zaidly.com',
   
-  // WAJIB: Aktifkan mode server untuk Keystatic Cloud
-  output: 'server',
+  // WAJIB: Balik ke static agar daftar blog tidak 404
+  output: 'static', 
   adapter: cloudflare(),
 
   integrations: [
@@ -19,14 +19,13 @@ export default defineConfig({
     sitemap(),
     mdx(),
     react(),
-    // Konfigurasi Markdoc agar mengenali komponen tombol dari dashboard
+    // ✨ INI BAGIAN YANG HARUS LU PERHATIKAN
     markdoc({
       tags: {
         AffiliateButton: {
-          // FIX: render harus merujuk ke nama file AffiliateLink.astro lu
           render: 'AffiliateLink', 
           attributes: {
-            // Mendaftarkan url dan label agar build Cloudflare sukses
+            // Mendaftarkan url dan label agar build sukses
             url: { type: String, required: true },
             label: { type: String },
           },

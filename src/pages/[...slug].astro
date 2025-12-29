@@ -1,10 +1,12 @@
 ---
 // ===============================================
-// FILE: src/pages/[...slug].astro (FINAL VERSION)
-// FIX: Menghilangkan prefix 'blog/' dari URL dan mengelola slug yang dikecualikan
+// FILE: src/pages/[...slug].astro (REVISED FINAL)
+// FIX: Menghilangkan error 404, mengaktifkan tombol affiliate, dan fix BeanHub integration
 // ===============================================
 
-// 1. IMPOR WAJIB DARI ASTRO CONTENT COLLECTIONS
+// 1. WAJIB: Tambahkan ini agar halaman statis kembali muncul (Fix 404)
+export const prerender = true; 
+
 import { getCollection } from "astro:content"; 
 import type { CollectionEntry } from 'astro:content'; 
 
@@ -12,21 +14,17 @@ import type { CollectionEntry } from 'astro:content';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleLayout from '../layouts/ArticleLayout.astro'; 
 import Error404 from '../components/Error404.astro'; 
+// Impor file tombol affiliate lu
+import AffiliateLink from '../components/AffiliateLink.astro'; 
 
-// Definisi Tipe HANYA untuk blog
 type BlogPost = CollectionEntry<'blog'>;
 
 // --- Bagian 1: getStaticPaths (Menangani Routing) ---
-
 export async function getStaticPaths() {
-    // Ambil data HANYA dari koleksi 'blog'
     const allPosts = await getCollection('blog');
-    
-    // ✨ FIX: Tambahkan 'keystatic' ke daftar ini biar rute admin gak ditabrak!
     const excludedSlugs = ['admin', 'blog', 'about', 'gear', 'index', 'keystatic'];
 
     const paths = allPosts
-        // Filter tetap sama
         .filter(post => !excludedSlugs.includes(post.slug)) 
         .map((post) => ({
             params: { 
@@ -38,31 +36,31 @@ export async function getStaticPaths() {
     return paths;
 }
 
-// --- Bagian 2: PROPS & DATA Halaman Dinamis ---
-
+// --- Bagian 2: PROPS & DATA ---
 const { post } = Astro.props as { post: BlogPost }; 
 
-// Deklarasi variabel dengan tipe aman (untuk menghindari error 'Content is not a valid component')
 let Content: any = () => null; 
 let headings: any[] = [];
 let postData: any = {};
 
-// Hanya render dan ambil data jika 'post' ada
 if (post) { 
-    // Mengambil Content dan Headings dengan aman
     const rendered = await post.render();
     Content = rendered.Content; 
     headings = rendered.headings;
     postData = post.data;
 }
 
-// --- END OF FRONTMATTER ---
+// ✨ MAPPING KOMPONEN: Hubungkan tag dashboard ke file .astro lu
+const components = {
+  AffiliateButton: AffiliateLink,
+};
 ---
 
 {/* Tampilan Artikel atau 404 */}
 {post ? (
     <ArticleLayout frontmatter={postData} headings={headings}> 
-        <Content />
+        {/* Sisipkan components di sini agar tombol Amazon muncul */}
+        <Content components={components} />
     </ArticleLayout>
 ) : (
     <BaseLayout title="404 Not Found">
