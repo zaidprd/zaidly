@@ -82,7 +82,7 @@ export default config({
           },
           components: {
             // Komponen Tombol Affiliate lu
-            AffiliateButton: block({
+            affiliatelink: block({
               label: 'Affiliate Button',
               schema: {
                 url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
