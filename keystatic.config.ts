@@ -81,22 +81,21 @@ export default config({
             },
           },
           components: {
-            // Komponen Tombol Affiliate lu
-            affiliatelink: block({
-              label: 'Affiliate Button',
-              schema: {
-                url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
-                label: fields.select({
-                  label: 'Platform',
-                  options: [
-                    { label: 'Amazon', value: 'Amazon' },
-                    { label: 'AliExpress', value: 'AliExpress' },
-                  ],
-                  defaultValue: 'Amazon',
-                }),
-              },
-            }),
-          },
+  CtaButton: block({ // Ganti ID jadi CtaButton
+    label: 'Affiliate Button',
+    schema: {
+      url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
+      label: fields.select({
+        label: 'Platform',
+        options: [
+          { label: 'Amazon', value: 'Amazon' },
+          { label: 'AliExpress', value: 'AliExpress' },
+        ],
+        defaultValue: 'Amazon',
+      }),
+    },
+  }),
+},
         }),
       },
     }),

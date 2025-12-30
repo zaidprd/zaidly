@@ -1,44 +1,33 @@
 ---
 // ===============================================
-// FILE: src/pages/[...slug].astro (REVISED FINAL)
-// FIX: Menghilangkan error 404, mengaktifkan tombol affiliate, dan fix BeanHub integration
+// FILE: src/pages/[...slug].astro (FINAL COMPATIBLE)
 // ===============================================
 
-// 1. WAJIB: Tambahkan ini agar halaman statis kembali muncul (Fix 404)
 export const prerender = true; 
 
 import { getCollection } from "astro:content"; 
 import type { CollectionEntry } from 'astro:content'; 
-
-// 2. IMPOR KOMPONEN DAN LAYOUT
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleLayout from '../layouts/ArticleLayout.astro'; 
 import Error404 from '../components/Error404.astro'; 
-// Impor file tombol affiliate lu
-import AffiliateLink from '../components/AffiliateLink.astro'; 
 
 type BlogPost = CollectionEntry<'blog'>;
 
-// --- Bagian 1: getStaticPaths (Menangani Routing) ---
 export async function getStaticPaths() {
     const allPosts = await getCollection('blog');
     const excludedSlugs = ['admin', 'blog', 'about', 'gear', 'index', 'keystatic'];
 
-    const paths = allPosts
+    return allPosts
         .filter(post => !excludedSlugs.includes(post.slug)) 
         .map((post) => ({
-            params: { 
-                slug: post.slug.replace('blog/', ''), 
-            }, 
+            params: { slug: post.slug.replace('blog/', '') }, 
             props: { post },
         }));
-
-    return paths;
 }
 
-// --- Bagian 2: PROPS & DATA ---
 const { post } = Astro.props as { post: BlogPost }; 
 
+// 1. LOGIKA RENDER DATA
 let Content: any = () => null; 
 let headings: any[] = [];
 let postData: any = {};
@@ -50,17 +39,14 @@ if (post) {
     postData = post.data;
 }
 
-// ✨ MAPPING KOMPONEN: Hubungkan tag dashboard ke file .astro lu
-const components = {
-  affiliatelink: AffiliateLink,
-};
+// 2. DEBUG LOG (Cek terminal VS Code lu)
+console.log("DEBUG - Rendering Slug:", post?.slug);
 ---
 
-{/* Tampilan Artikel atau 404 */}
 {post ? (
     <ArticleLayout frontmatter={postData} headings={headings}> 
-        {/* Sisipkan components di sini agar tombol Amazon muncul */}
-        <Content components={components} />
+        {/* Saat menggunakan component() di config, Content tidak butuh props components lagi */}
+        <Content /> 
     </ArticleLayout>
 ) : (
     <BaseLayout title="404 Not Found">
