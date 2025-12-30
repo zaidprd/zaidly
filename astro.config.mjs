@@ -9,8 +9,6 @@ import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   site: 'https://zaidly.com',
-  
-  // WAJIB: Balik ke static agar daftar blog tidak 404
   output: 'static', 
   adapter: cloudflare(),
 
@@ -19,19 +17,9 @@ export default defineConfig({
     sitemap(),
     mdx(),
     react(),
-    // ✨ INI BAGIAN YANG HARUS LU PERHATIKAN
-    markdoc({
-      tags: {
-        AffiliateButton: {
-          render: 'AffiliateLink', 
-          attributes: {
-            // Mendaftarkan url dan label agar build sukses
-            url: { type: String, required: true },
-            label: { type: String },
-          },
-        },
-      },
-    }),
+    // ✨ CUKUP PANGGIL markdoc() KOSONG
+    // Astro otomatis akan membaca file markdoc.config.mjs tadi
+    markdoc(), 
     keystatic(),
   ],
 });
