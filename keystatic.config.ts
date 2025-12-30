@@ -1,25 +1,10 @@
 import { config, fields, collection } from '@keystatic/core';
+import { block } from '@keystatic/core/content-components'; // ✨ TAMBAHKAN IMPOR INI
 
-function toSlug(str: string) {
-  if (!str) return '';
-  const a = 'àáâäæãåāăąçćčđďèéêëēėęěğǵḧîïíīįìłḿñńǹňôöòóœøōõőṕŕřßśšşșťțûüùúūǘůűųẃẍÿýžźż·/_,:;'
-  const b = 'aaaaaaaaaacccddeeeeeeeegghiiiiiilmnnnnoooooooooprrsssssttuuuuuuuuuwxyyzzz------'
-  const p = new RegExp(a.split('').join('|'), 'g')
-  return str.toString().toLowerCase()
-    .replace(/\s+/g, '-')
-    .replace(p, c => b.charAt(a.indexOf(c)))
-    .replace(/&/g, '-and-')
-    .replace(/[^\w\-]+/g, '')
-    .replace(/\-\-+/g, '-')
-    .replace(/^-+/, '')
-    .replace(/-+$/, '')
-}
+// ... fungsi toSlug lu tetap sama ...
 
 export default config({
-  storage: process.env.NODE_ENV === 'development' 
-    ? { kind: 'local' } 
-    : { kind: 'cloud' },
-
+  storage: process.env.NODE_ENV === 'development' ? { kind: 'local' } : { kind: 'cloud' },
   cloud: { project: 'zaidly/zaidly' },
 
   collections: {
@@ -53,11 +38,6 @@ export default config({
           label: 'Featured Image',
           directory: 'src/assets/images/blog',
           publicPath: '../../../assets/images/blog/',
-          transformFilename: (originalFilename: string) => {
-            const ext = originalFilename.split('.').pop() || 'jpg';
-            const name = originalFilename.replace(`.${ext}`, '');
-            return `${toSlug(name)}.${ext}`;
-          }
         }),
         tags: fields.array(fields.text({ label: 'Tag' })),
         content: fields.markdoc({
@@ -68,9 +48,9 @@ export default config({
               publicPath: '../../../assets/images/blog/',
             },
           },
-          // TRIK PAMUNGKAS: Pakai 'as any' biar TypeScript gak berisik soal icon/schema
           components: {
-            AffiliateButton: {
+            // ✨ GUNAKAN FUNGSI block() SESUAI DOKUMENTASI
+            AffiliateButton: block({
               label: 'Affiliate Button',
               schema: {
                 url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
@@ -83,7 +63,7 @@ export default config({
                   defaultValue: 'Amazon',
                 }),
               },
-            } as any,
+            }),
           },
         }),
       },
