@@ -1,10 +1,10 @@
-// markdoc.config.mjs
-import { defineMarkdocConfig } from '@astrojs/markdoc/config';
+import { defineMarkdocConfig, component } from '@astrojs/markdoc/config';
 
 export default defineMarkdocConfig({
   tags: {
-    affiliatelink: {
-      render: 'AffiliateLink',
+    // Gunakan nama CtaButton agar sinkron dengan Keystatic
+    CtaButton: {
+      render: component('./src/components/AffiliateLink.astro'), 
       attributes: {
         url: { type: String, required: true },
         label: { type: String },
