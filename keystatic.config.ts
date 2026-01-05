@@ -18,10 +18,8 @@ export default config({
         }),
         description: fields.text({ label: 'Description', multiline: true }),
         
-        // 1. MENDUKUNG JADWAL JAM (3 Artikel Sehari)
-        // Menggunakan datetime agar Anda bisa mengatur jam publish (pagi, siang, malam)
         pubDate: fields.datetime({ 
-         defaultValue: { kind: 'now' },
+          defaultValue: { kind: 'now' },
           label: 'Publish Date & Time', 
           validation: { isRequired: true } 
         }),
@@ -55,7 +53,6 @@ export default config({
           validation: { isRequired: true }, 
           directory: 'src/assets/images/blog',
           publicPath: '../../../assets/images/blog/',
-          // AUTO-FIX: Mencegah error "Could not resolve image" akibat spasi
           transformFilename: (originalFilename) => {
             return originalFilename
               .toLowerCase()
@@ -79,10 +76,15 @@ export default config({
         content: fields.markdoc({
           label: 'Content',
           options: {
+            // FITUR AGAR PASTE OTOMATIS JADI RICH TEXT
+            formatting: true,
+            links: true,
+            tables: true,   // Agar tabel Markdown langsung jadi tabel visual
+            dividers: true,
+            headings: [2, 3, 4, 5, 6],
             image: {
               directory: 'src/assets/images/blog',
               publicPath: '../../../assets/images/blog/',
-              // PENTING: Tambahkan ini agar gambar di dalam artikel juga otomatis ganti spasi jadi strip
               transformFilename: (originalFilename) => {
                 return originalFilename
                   .toLowerCase()
@@ -96,13 +98,10 @@ export default config({
               label: 'Affiliate Button',
               schema: {
                 url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
-                label: fields.select({
-                  label: 'Platform',
-                  options: [
-                    { label: 'Amazon', value: 'Amazon' },
-                    { label: 'AliExpress', value: 'AliExpress' },
-                  ],
-                  defaultValue: 'Amazon',
+                // UBAH KE TEXT: Agar AI bisa mengisi "Check Price on Amazon" secara otomatis
+                label: fields.text({ 
+                  label: 'Button Label', 
+                  defaultValue: 'Check Price on Amazon' 
                 }),
               },
             }),
