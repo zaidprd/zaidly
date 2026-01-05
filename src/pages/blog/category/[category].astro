@@ -1,5 +1,5 @@
 ---
-// Lokasi file: src/pages/category/[category].astro
+// Lokasi file: src/pages/blog/category/[category].astro
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
@@ -7,7 +7,10 @@ import { Image } from 'astro:assets';
 export async function getStaticPaths() {
   const allPosts = await getCollection('blog');
   
-  // Mengambil kategori langsung dari config kamu
+  // Ambil waktu sekarang untuk filter jadwal jam
+  const now = new Date();
+  
+  // Daftar kategori sesuai config Keystatic kamu
   const categories = [
     'gear-lab',
     'bean-roastery',
@@ -17,7 +20,12 @@ export async function getStaticPaths() {
   ];
 
   return categories.map((cat) => {
-    const filteredPosts = allPosts.filter((post) => post.data.category === cat);
+    // FILTER: Hanya post yang kategorinya sama DAN bukan draft DAN sudah waktunya publish
+    const filteredPosts = allPosts
+      .filter((post) => post.data.category === cat)
+      .filter((post) => !post.data.draft && post.data.pubDate <= now)
+      .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
     return {
       params: { category: cat },
       props: { posts: filteredPosts, categoryName: cat },
@@ -25,7 +33,6 @@ export async function getStaticPaths() {
   });
 }
 
-const { category } = Astro.params;
 const { posts, categoryName } = Astro.props;
 ---
 
@@ -36,20 +43,42 @@ const { posts, categoryName } = Astro.props;
         <h1 class="text-5xl font-black uppercase italic text-coffee-dark">
           {categoryName.replace('-', ' ')}
         </h1>
+        <p class="text-coffee-brown mt-2 text-sm uppercase tracking-widest font-bold">
+          {posts.length} Articles Published
+        </p>
       </header>
 
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-        {posts.map(post => (
-          <a href={`/${post.slug}`} class="group bg-white p-3 border border-coffee-brown/10 shadow-sm">
-            {post.data.image && (
-              <Image src={post.data.image} alt={post.data.title} width={500} height={300} class="w-full aspect-video object-cover mb-4" />
-            )}
-            <h2 class="font-black text-xl uppercase leading-tight group-hover:text-accent-primary transition-colors">
-              {post.data.title}
-            </h2>
-          </a>
-        ))}
-      </div>
+      {posts.length > 0 ? (
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+          {posts.map(post => (
+            <a href={`/${post.slug}`} class="group bg-white p-3 border border-coffee-brown/10 shadow-sm hover:shadow-xl transition-all duration-300">
+              {post.data.image && (
+                <div class="overflow-hidden mb-4">
+                  <Image 
+                    src={post.data.image} 
+                    alt={post.data.title} 
+                    width={500} 
+                    height={300} 
+                    class="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500" 
+                  />
+                </div>
+              )}
+              <div class="px-2 pb-2">
+                <h2 class="font-black text-xl uppercase leading-tight group-hover:text-accent-primary transition-colors">
+                  {post.data.title}
+                </h2>
+                <p class="text-[10px] text-coffee-brown/60 mt-2 font-bold uppercase tracking-tighter">
+                  {post.data.pubDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
+                </p>
+              </div>
+            </a>
+          ))}
+        </div>
+      ) : (
+        <div class="text-center py-20 bg-white/50 border-2 border-dashed border-coffee-brown/20">
+          <p class="text-coffee-brown italic">New articles for this category are being brewed. Check back soon!</p>
+        </div>
+      )}
     </div>
   </main>
 </BaseLayout>

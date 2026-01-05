@@ -12,8 +12,15 @@ type CombinedPost = CollectionEntry<'blog'>;
 export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
     const blogPosts = await getCollection("blog");
     
-    // Sort by Date (Terbaru di atas)
-    const allPosts = blogPosts.sort((a, b) => 
+    // 1. FILTER: Hanya tampilkan yang BUKAN draft & jam tayangnya sudah lewat/saat ini
+    const filteredPosts = blogPosts.filter((post) => {
+        const isNotDraft = !post.data.draft;
+        const isPastPublishDate = post.data.pubDate <= new Date();
+        return isNotDraft && isPastPublishDate;
+    });
+
+    // 2. SORT: Urutkan berdasarkan tanggal terbaru di atas
+    const allPosts = filteredPosts.sort((a, b) => 
         (b.data.pubDate?.getTime() ?? 0) - (a.data.pubDate?.getTime() ?? 0)
     );
 
@@ -22,9 +29,10 @@ export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
 
 const { page } = Astro.props as { page: Page<CombinedPost> }; 
 
-// Ambil kategori unik & bersihkan dari undefined/null
+// Filter kategori hanya dari post yang sudah dipublikasikan (Bukan Draft & Sudah Waktunya)
 const allPostsForFilter = await getCollection("blog");
-const categories = ['all', ...new Set(allPostsForFilter.map((post) => post.data.category).filter(Boolean))];
+const publishedPosts = allPostsForFilter.filter(p => !p.data.draft && p.data.pubDate <= new Date());
+const categories = ['all', ...new Set(publishedPosts.map((post) => post.data.category).filter(Boolean))];
 
 const pageNum = page.currentPage;
 const posts = page.data;
@@ -54,9 +62,15 @@ const posts = page.data;
 
             {/* 2. GRID ARTIKEL */}
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                {posts.map((post) => (
-                    <PostCard post={post} /> 
-                ))}
+                {posts.length > 0 ? (
+                    posts.map((post) => (
+                        <PostCard post={post} /> 
+                    ))
+                ) : (
+                    <div class="col-span-full text-center py-20">
+                        <p class="text-coffee-brown italic">No posts found yet. Stay tuned!</p>
+                    </div>
+                )}
             </section>
 
             {/* 3. PAGINATION */}

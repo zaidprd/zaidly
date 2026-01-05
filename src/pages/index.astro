@@ -14,22 +14,35 @@ import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
 // 2. Data Fetching
 import { getCollection } from 'astro:content';
 
-const allPosts = await getCollection('blog') || []; 
+// Ambil semua post dan pastikan tidak null
+const allPostsRaw = await getCollection('blog') || []; 
 
-// 3. Logic: Sorting & Filtering
-// Menggunakan as Date untuk memastikan TypeScript senang
-const sortedPosts = allPosts.sort((a, b) => 
+// 3. Logic: Filter & Sorting
+const now = new Date();
+
+// FILTER UTAMA: Hanya post yang BUKAN draft DAN sudah masuk waktu tayangnya
+const publishedPosts = allPostsRaw.filter((post) => {
+    const isNotDraft = !post.data.draft;
+    const isPastPublishDate = new Date(post.data.pubDate) <= now;
+    return isNotDraft && isPastPublishDate;
+});
+
+// SORTING: Urutkan berdasarkan tanggal terbaru
+const sortedPosts = publishedPosts.sort((a, b) => 
     new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
 );
 
+// DATA UNTUK SECTION:
+// a. Latest Articles (3 Post terbaru)
 const latestPosts = sortedPosts.slice(0, 3);
 
-// SINKRONISASI KATEGORI: Sesuaikan dengan schema di config.ts
-const gearPosts = allPosts.filter(post => 
+// b. Gear Hub (Filter kategori gear-lab/buying-guides)
+const gearPosts = sortedPosts.filter(post => 
     post.data.category === 'gear-lab' || post.data.category === 'buying-guides'
 ).slice(0, 4);
 
-const beanPosts = allPosts.filter(post => 
+// c. Bean Guides (Filter kategori bean-roastery)
+const beanPosts = sortedPosts.filter(post => 
     post.data.category === 'bean-roastery'
 ).slice(0, 4);
 
@@ -63,9 +76,11 @@ const featuredCategories = [
         linkUrl="/about" 
     />
     
-    <CoffeeGearHub posts={gearPosts} />
-    <CoffeeBeanGuides posts={beanPosts} />
+    {/* Hanya tampilkan section jika ada post yang sudah dipublikasi */}
+    {gearPosts.length > 0 && <CoffeeGearHub posts={gearPosts} />}
     
-    <LatestPosts posts={latestPosts} />
+    {beanPosts.length > 0 && <CoffeeBeanGuides posts={beanPosts} />}
+    
+    {latestPosts.length > 0 && <LatestPosts posts={latestPosts} />}
 
 </MainLayout>
