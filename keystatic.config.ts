@@ -13,14 +13,19 @@ export default config({
       entryLayout: 'content',
       format: { contentField: 'content' },
       schema: {
-        // Judul dengan tanda bintang wajib isi
         title: fields.slug({ 
           name: { label: 'Title', validation: { isRequired: true, length: { min: 4 } } } 
         }),
         description: fields.text({ label: 'Description', multiline: true }),
-        pubDate: fields.date({ label: 'Publish Date', validation: { isRequired: true } }),
         
-        // 1. FITUR DRAFT: Default centang (True) agar tidak langsung publish
+        // 1. MENDUKUNG JADWAL JAM (3 Artikel Sehari)
+        // Menggunakan datetime agar Anda bisa mengatur jam publish (pagi, siang, malam)
+        pubDate: fields.datetime({ 
+         defaultValue: { kind: 'now' },
+          label: 'Publish Date & Time', 
+          validation: { isRequired: true } 
+        }),
+        
         draft: fields.checkbox({ 
           label: 'Save as Draft', 
           description: 'Jika dicentang, artikel tidak akan muncul di website.',
@@ -45,21 +50,20 @@ export default config({
           defaultValue: 'admin',
         }),
 
-        // 2. FEATURED IMAGE: Wajib Isi + Auto-Fix Spasi jadi Strip (-)
         image: fields.image({
           label: 'Featured Image',
           validation: { isRequired: true }, 
           directory: 'src/assets/images/blog',
           publicPath: '../../../assets/images/blog/',
+          // AUTO-FIX: Mencegah error "Could not resolve image" akibat spasi
           transformFilename: (originalFilename) => {
             return originalFilename
               .toLowerCase()
-              .replace(/\s+/g, '-')      // Ganti spasi jadi strip
-              .replace(/[^\w\-.]+/g, ''); // Hapus karakter aneh
+              .replace(/\s+/g, '-')
+              .replace(/[^\w\-.]+/g, '');
           },
         }),
 
-        // 3. TAGS OTOMATIS: Pilih dari daftar kategori
         tags: fields.multiselect({
           label: 'Hashtags / Tags',
           options: [
@@ -78,24 +82,31 @@ export default config({
             image: {
               directory: 'src/assets/images/blog',
               publicPath: '../../../assets/images/blog/',
+              // PENTING: Tambahkan ini agar gambar di dalam artikel juga otomatis ganti spasi jadi strip
+              transformFilename: (originalFilename) => {
+                return originalFilename
+                  .toLowerCase()
+                  .replace(/\s+/g, '-')
+                  .replace(/[^\w\-.]+/g, '');
+              },
             },
           },
           components: {
-  CtaButton: block({ // Ganti ID jadi CtaButton
-    label: 'Affiliate Button',
-    schema: {
-      url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
-      label: fields.select({
-        label: 'Platform',
-        options: [
-          { label: 'Amazon', value: 'Amazon' },
-          { label: 'AliExpress', value: 'AliExpress' },
-        ],
-        defaultValue: 'Amazon',
-      }),
-    },
-  }),
-},
+            CtaButton: block({ 
+              label: 'Affiliate Button',
+              schema: {
+                url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
+                label: fields.select({
+                  label: 'Platform',
+                  options: [
+                    { label: 'Amazon', value: 'Amazon' },
+                    { label: 'AliExpress', value: 'AliExpress' },
+                  ],
+                  defaultValue: 'Amazon',
+                }),
+              },
+            }),
+          },
         }),
       },
     }),
