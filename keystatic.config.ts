@@ -27,7 +27,8 @@ export default config({
         draft: fields.checkbox({ 
           label: 'Save as Draft', 
           description: 'Jika dicentang, artikel tidak akan muncul di website.',
-          defaultValue: true 
+          // Diubah ke false agar OFF secara default
+          defaultValue: false 
         }),
 
         category: fields.select({
@@ -76,12 +77,11 @@ export default config({
         content: fields.markdoc({
           label: 'Content',
           options: {
-            // FITUR AGAR PASTE OTOMATIS JADI RICH TEXT
-            formatting: true,
-            links: true,
-            tables: true,   // Agar tabel Markdown langsung jadi tabel visual
-            dividers: true,
-            headings: [2, 3, 4, 5, 6],
+            // Baris 'formatting' dihapus karena menyebabkan Error 2353
+            link: true,      // Diganti ke bentuk tunggal agar tidak error
+            table: true,     // Diganti ke bentuk tunggal agar tidak error
+            divider: true,   // Diganti ke bentuk tunggal agar tidak error
+            heading: [2, 3, 4, 5, 6], // Diganti ke bentuk tunggal agar tidak error
             image: {
               directory: 'src/assets/images/blog',
               publicPath: '../../../assets/images/blog/',
@@ -98,7 +98,6 @@ export default config({
               label: 'Affiliate Button',
               schema: {
                 url: fields.url({ label: 'Product Link', validation: { isRequired: true } }),
-                // UBAH KE TEXT: Agar AI bisa mengisi "Check Price on Amazon" secara otomatis
                 label: fields.text({ 
                   label: 'Button Label', 
                   defaultValue: 'Check Price on Amazon' 
