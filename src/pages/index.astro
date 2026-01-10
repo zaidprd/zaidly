@@ -9,10 +9,10 @@ import LatestPosts from '../components/section/LatestArticles.astro';
 import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
 import { getCollection } from 'astro:content';
 
-// 1. KONFIGURASI URL RENDER [cite: 2026-01-10]
+// 1. KONFIGURASI URL RENDER US
 const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
-// 2. AMBIL DATA LOKAL (.md) [cite: 2026-01-10]
+// 2. AMBIL DATA LOKAL (.md)
 const allLocalPosts = await getCollection('blog') || []; 
 const now = new Date().getTime();
 
@@ -23,7 +23,6 @@ const publishedLocal = allLocalPosts.filter((post) => {
 }).map(post => ({
     ...post,
     isPayload: false,
-    // Samakan struktur dengan Payload agar komponen tidak bingung [cite: 2026-01-10]
     title: post.data.title,
     pubDate: post.data.pubDate,
     category: post.data.category,
@@ -31,11 +30,13 @@ const publishedLocal = allLocalPosts.filter((post) => {
     image: post.data.image
 }));
 
-// 3. AMBIL DATA PAYLOAD CMS [cite: 2026-01-10]
+// 3. AMBIL DATA PAYLOAD CMS (FIXED QUERY) [cite: 2026-01-10]
 let payloadPosts = [];
 try {
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&sort=-pubDate&where[status][equals]=published`);
+    // PERBAIKAN UTAMA: Ganti [status] menjadi [_status] agar error 400 hilang [cite: 2026-01-10]
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&sort=-pubDate&where[_status][equals]=published`);
     const data = await res.json();
+    
     payloadPosts = (data?.docs || []).map((post: any) => ({
         ...post,
         isPayload: true,
@@ -43,30 +44,22 @@ try {
         pubDate: post.pubDate,
         category: post.category,
         description: post.description,
-        // Gunakan URL absolut untuk Cloudflare R2 [cite: 2026-01-10]
+        // Pastikan memanggil .url untuk gambar dari Cloudflare R2 [cite: 2026-01-10]
         image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : null
     }));
 } catch (e) {
     console.error("Gagal ambil data Payload di Index:", e);
 }
 
-// 4. GABUNGKAN DAN URUTKAN BERDASARKAN TANGGAL TERBARU [cite: 2026-01-10]
+// 4. GABUNGKAN DAN URUTKAN
 const allCombinedPosts = [...publishedLocal, ...payloadPosts].sort((a, b) => {
     return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
 });
 
-// 5. SLICING UNTUK SECTION (Latest Articles ambil 3 teratas) [cite: 2026-01-10]
+// 5. SLICING UNTUK SECTION
 const latestPosts = allCombinedPosts.slice(0, 3);
-
-// Filter Gear (Pastikan slug kategori di Payload sama dengan lokal) [cite: 2026-01-10]
-const gearPosts = allCombinedPosts.filter(post => 
-    post.category === 'gear-lab' || post.category === 'buying-guides'
-).slice(0, 4);
-
-// Filter Beans [cite: 2026-01-10]
-const beanPosts = allCombinedPosts.filter(post => 
-    post.category === 'bean-roastery'
-).slice(0, 4);
+const gearPosts = allCombinedPosts.filter(p => p.category === 'gear-lab' || p.category === 'buying-guides').slice(0, 4);
+const beanPosts = allCombinedPosts.filter(p => p.category === 'bean-roastery').slice(0, 4);
 
 const featuredCategories = [
     { title: "Gear Guides", description: "In-depth reviews.", url: "/gear", icon: "ri:tools-line" },
@@ -98,7 +91,6 @@ const featuredCategories = [
     {gearPosts.length > 0 && <CoffeeGearHub posts={gearPosts} />}
     {beanPosts.length > 0 && <CoffeeBeanGuides posts={beanPosts} />}
     
-    {/* INI ADALAH SECTION UNTUK ARTIKEL TERBARU (Payload & Lokal) [cite: 2026-01-10] */}
+    {/* ARTIKEL PAYLOAD & LOKAL MUNCUL DI SINI [cite: 2026-01-10] */}
     {latestPosts.length > 0 && <LatestPosts posts={latestPosts} />}
-
 </MainLayout>

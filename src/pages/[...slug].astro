@@ -30,7 +30,8 @@ if (localPost) {
 } else {
   // JIKA LOKAL TIDAK ADA, CARI DI PAYLOAD CMS [cite: 2026-01-10]
   try {
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}`);
+    // FIX: Tambahkan &draft=false karena CMS abang pakai fitur Versions/Drafts [cite: 2026-01-10]
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}&draft=false`);
     const data = await res.json();
     post = data?.docs?.[0] || null;
 
@@ -68,7 +69,7 @@ const payloadFrontmatter = post ? {
   description: post.description || "",
   pubDate: post.pubDate ? new Date(post.pubDate) : new Date(),
   author: "admin",
-  // Fix URL Gambar R2/Render [cite: 2026-01-10]
+  // URL Gambar dari Cloudflare R2 via Render [cite: 2026-01-10]
   image: post.featuredImage?.url 
     ? (post.featuredImage.url.startsWith('http') 
         ? post.featuredImage.url 
@@ -89,7 +90,6 @@ const payloadFrontmatter = post ? {
       {payloadFrontmatter.image && (
         <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
           {payloadFrontmatter.isPayload ? (
-            /* Gambar dari Render/R2 [cite: 2026-01-10] */
             <img 
               src={payloadFrontmatter.image} 
               alt={payloadFrontmatter.title} 
@@ -98,7 +98,6 @@ const payloadFrontmatter = post ? {
               onerror="this.style.display='none'"
             />
           ) : (
-            /* Gambar Lokal (.md) [cite: 2026-01-10] */
             <Image 
               src={payloadFrontmatter.image as any} 
               alt={payloadFrontmatter.title} 
@@ -110,7 +109,7 @@ const payloadFrontmatter = post ? {
         </div>
       )}
       
-      {/* 5. KONTEN (RICH TEXT ATAU MD) [cite: 2026-01-10] */}
+      {/* 5. KONTEN [cite: 2026-01-10] */}
       {payloadFrontmatter.isPayload ? (
         <RichText content={post.content} />
       ) : (
