@@ -5,24 +5,21 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
 
-// FIXED: Menggunakan URL Render, bukan localhost [cite: 2026-01-10]
 const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 const { category } = Astro.params;
 const now = new Date().getTime();
 
-// 1. AMBIL SEMUA ARTIKEL UNTUK GENERATE TABS [cite: 2026-01-10]
+// 1. AMBIL SEMUA ARTIKEL UNTUK GENERATE TABS
 const allLocalForTabs = await getCollection('blog');
 const localPostData = allLocalForTabs.map(p => ({ category: p.data.category }));
 
 let payloadPostData = [];
 try {
-    // FIX QUERY: Ganti status ke _status dan localhost ke PAYLOAD_URL [cite: 2026-01-10]
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100&draft=false`);
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100`);
     const data = await res.json();
     payloadPostData = (data.docs || []).map((p: any) => ({ category: p.category }));
 } catch (e) { console.error("Error Tab Categories:", e); }
 
-// Gabungkan semua kategori untuk TABS
 const allCategories = ['all', ...new Set([...localPostData, ...payloadPostData].map(p => p.category).filter(Boolean))];
 
 // 2. FILTER ARTIKEL LOKAL
@@ -42,22 +39,29 @@ const filteredLocal = allLocalForTabs
         isPayload: false
     }));
 
-// 3. FILTER ARTIKEL PAYLOAD (FIXED) [cite: 2026-01-10]
+// 3. FILTER ARTIKEL PAYLOAD (FIXED URL LOGIC) [cite: 2026-01-10]
 let filteredPayload = [];
 try {
-    // FIX: Pastikan memanggil kategori yang benar & status yang benar [cite: 2026-01-10]
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[category][equals]=${category}&where[_status][equals]=published&draft=false`);
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[category][equals]=${category}&where[_status][equals]=published`);
     const data = await res.json();
-    filteredPayload = (data.docs || []).map((post: any) => ({
-        title: post.title,
-        description: post.description,
-        pubDate: new Date(post.pubDate),
-        category: post.category,
-        slug: post.slug,
-        // Gunakan URL absolut Render untuk gambar R2 [cite: 2026-01-10]
-        image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : undefined,
-        isPayload: true
-    }));
+    filteredPayload = (data.docs || []).map((post: any) => {
+        const rawImageUrl = post.featuredImage?.url || null;
+        
+        // FIX: Jika URL dari R2 (http), jangan tempel PAYLOAD_URL [cite: 2026-01-10]
+        const finalImage = rawImageUrl 
+            ? (rawImageUrl.startsWith('http') ? rawImageUrl : `${PAYLOAD_URL}${rawImageUrl}`) 
+            : undefined;
+
+        return {
+            title: post.title,
+            description: post.description,
+            pubDate: new Date(post.pubDate),
+            category: post.category,
+            slug: post.slug,
+            image: finalImage,
+            isPayload: true
+        };
+    });
 } catch (e) { console.error("Error Filtered Payload:", e); }
 
 const allPosts = [...filteredLocal, ...filteredPayload].sort((a, b) => 

@@ -1,17 +1,11 @@
 ---
-// src/components/RichText.astro [cite: 2026-01-10]
 import { parseLexicalToMarkdown } from '../utils/richTextParser';
 import MarkdownRenderer from './MarkdownRenderer.jsx';
 
 const { content } = Astro.props;
-
-// Convert Lexical JSON → Markdown [cite: 2026-01-10]
 const markdown = parseLexicalToMarkdown(content?.root ?? content);
 ---
 
-{/* HAPUS div bg-white di sini karena sudah ada di [...slug].astro. 
-   Kita cuma butuh pembungkus prose agar tulisan rapi. [cite: 2026-01-10]
-*/}
 <div class="prose prose-coffee max-w-none prose-img:rounded-2xl prose-headings:text-coffee-dark">
   <MarkdownRenderer client:load content={markdown} />
 </div>

@@ -30,23 +30,30 @@ const publishedLocal = allLocalPosts.filter((post) => {
     image: post.data.image
 }));
 
-// 3. AMBIL DATA PAYLOAD CMS (FIXED QUERY) [cite: 2026-01-10]
+// 3. AMBIL DATA PAYLOAD CMS (FIXED URL LOGIC) [cite: 2026-01-10]
 let payloadPosts = [];
 try {
-    // PERBAIKAN UTAMA: Ganti [status] menjadi [_status] agar error 400 hilang [cite: 2026-01-10]
     const res = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&sort=-pubDate&where[_status][equals]=published`);
     const data = await res.json();
     
-    payloadPosts = (data?.docs || []).map((post: any) => ({
-        ...post,
-        isPayload: true,
-        title: post.title,
-        pubDate: post.pubDate,
-        category: post.category,
-        description: post.description,
-        // Pastikan memanggil .url untuk gambar dari Cloudflare R2 [cite: 2026-01-10]
-        image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : null
-    }));
+    payloadPosts = (data?.docs || []).map((post: any) => {
+        const rawImageUrl = post.featuredImage?.url || null;
+        
+        // FIX: Jika URL sudah diawali http (R2), jangan tambah PAYLOAD_URL lagi! [cite: 2026-01-10]
+        const finalImage = rawImageUrl 
+            ? (rawImageUrl.startsWith('http') ? rawImageUrl : `${PAYLOAD_URL}${rawImageUrl}`) 
+            : null;
+
+        return {
+            ...post,
+            isPayload: true,
+            title: post.title,
+            pubDate: post.pubDate,
+            category: post.category,
+            description: post.description,
+            image: finalImage
+        };
+    });
 } catch (e) {
     console.error("Gagal ambil data Payload di Index:", e);
 }

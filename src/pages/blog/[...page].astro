@@ -5,14 +5,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import HeroBlog from '../../components/HeroBlog.astro';
 
-// 1. KONFIGURASI URL RENDER [cite: 2026-01-10]
+// 1. KONFIGURASI URL RENDER
 const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
 const { page: pageParam } = Astro.params;
 const currentPage = pageParam ? parseInt(pageParam) : 1;
 const pageSize = 9;
 
-// 2. AMBIL ARTIKEL LOKAL [cite: 2026-01-10]
+// 2. AMBIL ARTIKEL LOKAL
 const blogPosts = await getCollection("blog");
 const localPosts = blogPosts.map(post => ({
     title: post.data.title,
@@ -24,28 +24,36 @@ const localPosts = blogPosts.map(post => ({
     isPayload: false
 }));
 
-// 3. AMBIL ARTIKEL PAYLOAD (FIXED QUERY & STATUS) [cite: 2026-01-10]
+// 3. AMBIL ARTIKEL PAYLOAD (FIXED URL & QUERY) [cite: 2026-01-10]
 let payloadPosts = [];
 try {
-    // FIX: Gunakan _status (pakai garis bawah) dan draft=false sesuai log Render abang [cite: 2026-01-10]
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100&sort=-pubDate&draft=false`);
+    // FIX: Hapus draft=false, cukup _status=published [cite: 2026-01-10]
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100&sort=-pubDate`);
     const data = await res.json();
     
-    payloadPosts = (data.docs || []).map((post: any) => ({
-        title: post.title,
-        category: post.category,
-        pubDate: new Date(post.pubDate),
-        description: post.description,
-        slug: post.slug,
-        // Pastikan URL gambar absolut agar muncul di Cloudflare [cite: 2026-01-10]
-        image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : undefined,
-        isPayload: true
-    }));
+    payloadPosts = (data.docs || []).map((post: any) => {
+        const rawImageUrl = post.featuredImage?.url || null;
+        
+        // FIX: Proteksi URL ganda (R2 vs Render) [cite: 2026-01-10]
+        const finalImage = rawImageUrl 
+            ? (rawImageUrl.startsWith('http') ? rawImageUrl : `${PAYLOAD_URL}${rawImageUrl}`) 
+            : undefined;
+
+        return {
+            title: post.title,
+            category: post.category,
+            pubDate: new Date(post.pubDate),
+            description: post.description,
+            slug: post.slug,
+            image: finalImage,
+            isPayload: true
+        };
+    });
 } catch (e) { 
     console.error("Gagal ambil data Payload di Blog:", e); 
 }
 
-// 4. GABUNGKAN DAN URUTKAN BERDASARKAN TANGGAL [cite: 2026-01-10]
+// 4. GABUNGKAN DAN URUTKAN
 const allCombinedPosts = [...localPosts, ...payloadPosts].sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
 );
@@ -77,9 +85,6 @@ const allCategories = ['all', ...new Set(allCombinedPosts.map((post) => post.cat
 
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
                 {posts.map((post) => (
-                    /* PENTING: Pastikan komponen PostCard abang menerima data 
-                       isPayload agar dia bisa buat link yang benar (tanpa /blog/)
-                    */
                     <PostCard post={post} />
                 ))}
             </section>
