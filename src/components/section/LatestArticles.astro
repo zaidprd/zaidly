@@ -1,11 +1,8 @@
 ---
+// src/components/section/LatestArticles.astro
 import { Image } from "astro:assets";
 
-// Komponen ini menerima data gabungan dari index.astro sebagai props [cite: 2026-01-10]
 const { posts } = Astro.props;
-
-// DEFINISI URL RENDER AGAR GAMBAR MUNCUL DI CLOUDFLARE [cite: 2026-01-10]
-const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 ---
 <section class="pt-32 pb-20 bg-cream-latte"> 
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -14,26 +11,25 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
         </h2>
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {posts.map((post: any) => {
-                const isPayload = !!post.isPayload;
-                const title = isPayload ? post.title : post.data.title;
-                const slug = isPayload ? post.slug : post.slug;
-                const category = isPayload ? post.category : post.data.category;
-                const description = isPayload ? post.description : post.data.description;
+            {posts && posts.map((post: any) => {
+                // LOGIKA PROTEKSI: Cek apakah data dibungkus dalam .data (Lokal) atau langsung (Turso)
+                const isExternal = !!post.isExternal;
                 
-                // FIXED: Ambil gambar dari properti 'image' yang sudah di-mapping di index.astro [cite: 2026-01-10]
-                const imageSrc = post.image;
+                // Ambil data dengan fallback agar tidak crash
+                const title = isExternal ? post.title : (post.data?.title || "Untitled");
+                const slug = isExternal ? post.slug : (post.slug || post.id);
+                const category = isExternal ? post.category : (post.data?.category || "Coffee");
+                const description = isExternal ? post.description : (post.data?.description || "");
+                const imageSrc = isExternal ? post.image : (post.data?.image || post.image);
 
-                // FIXED LINK: Jika slug berasal dari Payload, link langsung ke /slug [cite: 2026-01-10]
-                const articleUrl = isPayload ? `/${slug}` : `/blog/${slug}`;
+                const articleUrl = `/${slug}`;
 
                 return (
                     <article class="bg-coffee-light rounded-lg overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-accent-primary/20 transition duration-300 flex flex-col h-full">
                         
                         <div class="w-full h-56 overflow-hidden bg-slate-100">
                             {imageSrc ? (
-                                isPayload ? (
-                                    /* Payload: Menggunakan URL absolut Render/R2 [cite: 2026-01-10] */
+                                isExternal ? (
                                     <img 
                                         src={imageSrc} 
                                         alt={title} 
@@ -42,7 +38,6 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
                                         onerror="this.src='/placeholder-coffee.jpg'"
                                     />
                                 ) : (
-                                    /* Lokal */
                                     <Image 
                                         src={imageSrc} 
                                         alt={title} 
@@ -60,7 +55,7 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
                         <div class="p-6 flex flex-col flex-grow">
                             <span class="inline-block bg-accent-primary/10 text-[#5d4037] text-[10px] font-bold uppercase mb-3 px-2 py-1 rounded w-fit">
-                                {category || 'Guide'}
+                                {category.replace('-', ' ')}
                             </span>
 
                             <h3 class="text-xl font-semibold text-coffee-dark mb-2 line-clamp-2">
@@ -70,7 +65,7 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
                             </h3>
                             
                             <p class="text-sm text-coffee-brown/95 line-clamp-3 mb-4"> 
-                                {description?.substring(0, 120) || 'Read the full article for detailed information and expert tips.'}
+                                {description}
                             </p>
                             
                             <div class="mt-auto">
@@ -83,12 +78,10 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
                 );
             })}
         </div>
-
+        
+        {/* Tombol View All */}
         <div class="text-center mt-12">
-            <a 
-                href="/blog" 
-                class="inline-block border border-coffee-dark text-coffee-dark font-semibold px-10 py-3 rounded-lg hover:bg-coffee-dark hover:text-white transition duration-300"
-            >
+            <a href="/blog" class="inline-block border border-coffee-dark text-coffee-dark font-semibold px-10 py-3 rounded-lg hover:bg-coffee-dark hover:text-white transition duration-300">
                 View All Articles
             </a>
         </div>

@@ -1,11 +1,11 @@
 ---
-// src/components/PostCard.astro [cite: 2026-01-10]
+// src/components/PostCard.astro
 import { Image } from 'astro:assets';
 
 const { post, postType = "Blog" } = Astro.props;
 
-// Data sudah diseragamkan di halaman pemanggil
-const { title, description, category, slug, image, pubDate, isPayload } = post;
+// Sekarang kita hanya punya dua kondisi: Lokal (md) atau External (Turso)
+const { title, description, category, slug, image, pubDate, isExternal } = post;
 
 const formattedDate = pubDate instanceof Date 
     ? pubDate.toLocaleDateString('en-US', { 
@@ -13,9 +13,12 @@ const formattedDate = pubDate instanceof Date
         month: 'short', 
         day: 'numeric' 
       })
-    : 'Recent';
+    : (pubDate ? new Date(pubDate).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      }) : 'Recent');
 
-// SEMUA KE ROOT SESUAI REQUEST [cite: 2026-01-10]
 const postUrl = `/${slug}`; 
 ---
 
@@ -24,7 +27,8 @@ const postUrl = `/${slug}`;
     <div class="bg-white border border-coffee-brown/10 group-hover:border-accent-primary transition-all duration-500 shadow-sm group-hover:shadow-xl h-full flex flex-col">
         <div class="relative h-64 w-full bg-coffee-light overflow-hidden">
             {image ? (
-                isPayload ? (
+                /* Jika dari Turso, pakai <img> biasa untuk R2. Jika lokal, pakai <Image /> Astro */
+                isExternal ? (
                     <img 
                       src={image} 
                       alt={title} 
@@ -32,7 +36,13 @@ const postUrl = `/${slug}`;
                       loading="lazy"
                     />
                 ) : (
-                    <Image src={image} alt={title} width={800} height={450} class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s]" />
+                    <Image 
+                      src={image} 
+                      alt={title} 
+                      width={800} 
+                      height={450} 
+                      class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s]" 
+                    />
                 )
             ) : (
                 <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 bg-coffee-light/50 font-black uppercase tracking-widest text-[10px]">Image coming soon</div>

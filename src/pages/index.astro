@@ -1,4 +1,5 @@
 ---
+// src/pages/index.astro
 import MainLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro'; 
 import WhoIsZaidly from '../components/section/WhoIsZaidly.astro'; 
@@ -9,8 +10,8 @@ import LatestPosts from '../components/section/LatestArticles.astro';
 import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
 import { getCollection } from 'astro:content';
 
-// 1. KONFIGURASI URL RENDER US
-const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
+// 1. IMPORT FUNGSI TURSO [cite: 2026-01-11]
+import { getTursoPosts } from '../lib/turso';
 
 // 2. AMBIL DATA LOKAL (.md)
 const allLocalPosts = await getCollection('blog') || []; 
@@ -22,48 +23,30 @@ const publishedLocal = allLocalPosts.filter((post) => {
     return isNotDraft && postTime <= now;
 }).map(post => ({
     ...post,
-    isPayload: false,
+    isExternal: false, // Flag baru
     title: post.data.title,
     pubDate: post.data.pubDate,
     category: post.data.category,
     description: post.data.description,
-    image: post.data.image
+    image: post.data.image,
+    slug: post.id || post.slug
 }));
 
-// 3. AMBIL DATA PAYLOAD CMS (FIXED URL LOGIC) [cite: 2026-01-10]
-let payloadPosts = [];
+// 3. AMBIL DATA TURSO (SANITY SYNC) [cite: 2026-01-11]
+let tursoPosts = [];
 try {
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&sort=-pubDate&where[_status][equals]=published`);
-    const data = await res.json();
-    
-    payloadPosts = (data?.docs || []).map((post: any) => {
-        const rawImageUrl = post.featuredImage?.url || null;
-        
-        // FIX: Jika URL sudah diawali http (R2), jangan tambah PAYLOAD_URL lagi! [cite: 2026-01-10]
-        const finalImage = rawImageUrl 
-            ? (rawImageUrl.startsWith('http') ? rawImageUrl : `${PAYLOAD_URL}${rawImageUrl}`) 
-            : null;
-
-        return {
-            ...post,
-            isPayload: true,
-            title: post.title,
-            pubDate: post.pubDate,
-            category: post.category,
-            description: post.description,
-            image: finalImage
-        };
-    });
+    tursoPosts = await getTursoPosts();
 } catch (e) {
-    console.error("Gagal ambil data Payload di Index:", e);
+    console.error("Gagal ambil data Turso di Index:", e);
 }
 
-// 4. GABUNGKAN DAN URUTKAN
-const allCombinedPosts = [...publishedLocal, ...payloadPosts].sort((a, b) => {
+// 4. GABUNGKAN DAN URUTKAN (Lokal + Turso)
+const allCombinedPosts = [...publishedLocal, ...tursoPosts].sort((a, b) => {
     return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
 });
 
-// 5. SLICING UNTUK SECTION
+// 5. SLICING UNTUK SETIAP SECTION
+// Slicing otomatis akan mengambil campuran Lokal & Turso yang terbaru
 const latestPosts = allCombinedPosts.slice(0, 3);
 const gearPosts = allCombinedPosts.filter(p => p.category === 'gear-lab' || p.category === 'buying-guides').slice(0, 4);
 const beanPosts = allCombinedPosts.filter(p => p.category === 'bean-roastery').slice(0, 4);
@@ -95,9 +78,12 @@ const featuredCategories = [
         linkUrl="/about" 
     />
     
+    {/* SEKSI GEAR (Gabungan Lokal & Turso) */}
     {gearPosts.length > 0 && <CoffeeGearHub posts={gearPosts} />}
+    
+    {/* SEKSI BIJI KOPI (Gabungan Lokal & Turso) */}
     {beanPosts.length > 0 && <CoffeeBeanGuides posts={beanPosts} />}
     
-    {/* ARTIKEL PAYLOAD & LOKAL MUNCUL DI SINI [cite: 2026-01-10] */}
+    {/* SEKSI TERBARU (Gabungan Lokal & Turso) */}
     {latestPosts.length > 0 && <LatestPosts posts={latestPosts} />}
 </MainLayout>

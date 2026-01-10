@@ -8,7 +8,7 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://zaidly.com',
   
-  // Output static agar performa kencang di US [cite: 2026-01-10]
+  // Ganti ke hybrid agar API Sync bisa jalan [cite: 2026-01-11]
   output: 'static', 
   
   adapter: cloudflare({
@@ -16,7 +16,6 @@ export default defineConfig({
     runtime: { mode: 'complete' } 
   }),
 
-  // Tambahkan ini untuk memperbaiki warning Sharp di log abang tadi [cite: 2026-01-10]
   image: {
     service: {
       entrypoint: 'astro/assets/services/sharp'

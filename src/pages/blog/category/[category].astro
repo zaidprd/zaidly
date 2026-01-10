@@ -4,67 +4,57 @@ export const prerender = false;
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
+// 1. IMPORT KONEKSI TURSO
+import { turso, getTursoPosts } from '../../../lib/turso';
 
-const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 const { category } = Astro.params;
 const now = new Date().getTime();
 
-// 1. AMBIL SEMUA ARTIKEL UNTUK GENERATE TABS
+// 2. AMBIL SEMUA DATA (Lokal & Turso) UNTUK GENERATE TABS KATEGORI
 const allLocalForTabs = await getCollection('blog');
-const localPostData = allLocalForTabs.map(p => ({ category: p.data.category }));
+const tursoPostsAll = await getTursoPosts();
 
-let payloadPostData = [];
-try {
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100`);
-    const data = await res.json();
-    payloadPostData = (data.docs || []).map((p: any) => ({ category: p.category }));
-} catch (e) { console.error("Error Tab Categories:", e); }
+const allCategories = ['all', ...new Set([
+    ...allLocalForTabs.map(p => p.data.category), 
+    ...tursoPostsAll.map(p => p.category)
+].filter(Boolean))];
 
-const allCategories = ['all', ...new Set([...localPostData, ...payloadPostData].map(p => p.category).filter(Boolean))];
-
-// 2. FILTER ARTIKEL LOKAL
+// 3. FILTER ARTIKEL LOKAL BERDASARKAN KATEGORI
 const filteredLocal = allLocalForTabs
     .filter((post) => post.data.category === category)
-    .filter((post) => {
-        const isNotDraft = (post.data as any).draft !== true;
-        return isNotDraft && new Date(post.data.pubDate).getTime() <= now;
-    })
     .map(post => ({
         title: post.data.title,
         description: post.data.description,
         pubDate: post.data.pubDate,
         category: post.data.category,
-        slug: post.slug,
+        slug: post.slug || post.id,
         image: post.data.image,
-        isPayload: false
+        isExternal: false
     }));
 
-// 3. FILTER ARTIKEL PAYLOAD (FIXED URL LOGIC) [cite: 2026-01-10]
-let filteredPayload = [];
+// 4. FILTER ARTIKEL TURSO BERDASARKAN KATEGORI (Query SQL Langsung)
+let filteredTurso = [];
 try {
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[category][equals]=${category}&where[_status][equals]=published`);
-    const data = await res.json();
-    filteredPayload = (data.docs || []).map((post: any) => {
-        const rawImageUrl = post.featuredImage?.url || null;
-        
-        // FIX: Jika URL dari R2 (http), jangan tempel PAYLOAD_URL [cite: 2026-01-10]
-        const finalImage = rawImageUrl 
-            ? (rawImageUrl.startsWith('http') ? rawImageUrl : `${PAYLOAD_URL}${rawImageUrl}`) 
-            : undefined;
-
-        return {
-            title: post.title,
-            description: post.description,
-            pubDate: new Date(post.pubDate),
-            category: post.category,
-            slug: post.slug,
-            image: finalImage,
-            isPayload: true
-        };
+    const result = await turso.execute({
+      sql: "SELECT * FROM posts WHERE category = ? ORDER BY published_at DESC",
+      args: [category]
     });
-} catch (e) { console.error("Error Filtered Payload:", e); }
+    
+    filteredTurso = result.rows.map(post => ({
+      title: post.title,
+      description: post.description,
+      pubDate: post.published_at,
+      category: post.category,
+      slug: post.slug,
+      image: post.r2_image_url,
+      isExternal: true
+    }));
+} catch (e) { 
+    console.error("Error Filtered Turso:", e); 
+}
 
-const allPosts = [...filteredLocal, ...filteredPayload].sort((a, b) => 
+// 5. GABUNGKAN DAN URUTKAN
+const allPosts = [...filteredLocal, ...filteredTurso].sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
 );
 
@@ -84,7 +74,7 @@ const categoryName = category ? category.replace('-', ' ') : 'Category';
                     cat === category ? "border-coffee-dark text-coffee-dark bg-slate-50" : "border-coffee-dark/10 text-coffee-brown hover:border-accent-primary hover:text-accent-primary"
                 ]}
             >
-                {cat.replace('-', ' ')}
+                {String(cat).replace('-', ' ')}
             </a>
         ))}
       </nav>

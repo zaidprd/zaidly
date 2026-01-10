@@ -5,56 +5,36 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import HeroBlog from '../../components/HeroBlog.astro';
 
-// 1. KONFIGURASI URL RENDER
-const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
+// 1. IMPORT FUNGSI TURSO
+import { getTursoPosts } from '../../lib/turso';
 
 const { page: pageParam } = Astro.params;
 const currentPage = pageParam ? parseInt(pageParam) : 1;
 const pageSize = 9;
 
-// 2. AMBIL ARTIKEL LOKAL
+// 2. AMBIL ARTIKEL LOKAL (.md)
 const blogPosts = await getCollection("blog");
 const localPosts = blogPosts.map(post => ({
     title: post.data.title,
     category: post.data.category,
     pubDate: post.data.pubDate,
     description: post.data.description,
-    slug: post.slug,
+    slug: post.slug || post.id,
     image: post.data.image,
-    isPayload: false
+    isExternal: false // Pengganti isPayload
 }));
 
-// 3. AMBIL ARTIKEL PAYLOAD (FIXED URL & QUERY) [cite: 2026-01-10]
-let payloadPosts = [];
+// 3. AMBIL ARTIKEL TURSO (SANITY SYNC)
+let tursoPosts = [];
 try {
-    // FIX: Hapus draft=false, cukup _status=published [cite: 2026-01-10]
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100&sort=-pubDate`);
-    const data = await res.json();
-    
-    payloadPosts = (data.docs || []).map((post: any) => {
-        const rawImageUrl = post.featuredImage?.url || null;
-        
-        // FIX: Proteksi URL ganda (R2 vs Render) [cite: 2026-01-10]
-        const finalImage = rawImageUrl 
-            ? (rawImageUrl.startsWith('http') ? rawImageUrl : `${PAYLOAD_URL}${rawImageUrl}`) 
-            : undefined;
-
-        return {
-            title: post.title,
-            category: post.category,
-            pubDate: new Date(post.pubDate),
-            description: post.description,
-            slug: post.slug,
-            image: finalImage,
-            isPayload: true
-        };
-    });
+    tursoPosts = await getTursoPosts();
 } catch (e) { 
-    console.error("Gagal ambil data Payload di Blog:", e); 
+    console.error("Gagal ambil data Turso di Blog:", e); 
 }
 
 // 4. GABUNGKAN DAN URUTKAN
-const allCombinedPosts = [...localPosts, ...payloadPosts].sort((a, b) => 
+// Kita urutkan berdasarkan pubDate (Terbaru di atas)
+const allCombinedPosts = [...localPosts, ...tursoPosts].sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
 );
 
