@@ -1,96 +1,78 @@
 ---
-// src/pages/blog/[...page].astro
+export const prerender = false;
 import { getCollection } from "astro:content";
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import HeroBlog from '../../components/HeroBlog.astro';
-import type { GetStaticPaths, Page } from 'astro';
-import type { CollectionEntry } from 'astro:content';
 
-type CombinedPost = CollectionEntry<'blog'>;
+// PAKSA URL RENDER AGAR TABS MENU MUNCUL [cite: 2026-01-10]
+const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
-export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
-    const blogPosts = await getCollection("blog");
-    
-    // 1. FILTER: Hanya tampilkan yang BUKAN draft & jam tayangnya sudah lewat/saat ini
-    const filteredPosts = blogPosts.filter((post) => {
-        const isNotDraft = !post.data.draft;
-        const isPastPublishDate = post.data.pubDate <= new Date();
-        return isNotDraft && isPastPublishDate;
-    });
+const { page: pageParam } = Astro.params;
+const currentPage = pageParam ? parseInt(pageParam) : 1;
+const pageSize = 9;
+const now = new Date().getTime();
 
-    // 2. SORT: Urutkan berdasarkan tanggal terbaru di atas
-    const allPosts = filteredPosts.sort((a, b) => 
-        (b.data.pubDate?.getTime() ?? 0) - (a.data.pubDate?.getTime() ?? 0)
-    );
+// AMBIL ARTIKEL LOKAL [cite: 2026-01-10]
+const blogPosts = await getCollection("blog");
+const localPosts = blogPosts.map(post => ({
+    title: post.data.title,
+    category: post.data.category,
+    pubDate: post.data.pubDate,
+    description: post.data.description,
+    slug: post.slug,
+    image: post.data.image,
+    isPayload: false
+}));
 
-    return paginate(allPosts, { pageSize: 9 });
-};
+// AMBIL ARTIKEL PAYLOAD DARI RENDER US [cite: 2026-01-10]
+let payloadPosts = [];
+try {
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[status][equals]=published&limit=100&sort=-pubDate`);
+    const data = await res.json();
+    payloadPosts = (data.docs || []).map((post: any) => ({
+        title: post.title,
+        category: post.category,
+        pubDate: new Date(post.pubDate),
+        description: post.description,
+        slug: post.slug,
+        image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : undefined,
+        isPayload: true
+    }));
+} catch (e) { 
+    console.error("Gagal ambil data Payload di Blog:", e); 
+}
 
-const { page } = Astro.props as { page: Page<CombinedPost> }; 
+const allCombinedPosts = [...localPosts, ...payloadPosts].sort((a, b) => 
+    new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+);
 
-// Filter kategori hanya dari post yang sudah dipublikasikan (Bukan Draft & Sudah Waktunya)
-const allPostsForFilter = await getCollection("blog");
-const publishedPosts = allPostsForFilter.filter(p => !p.data.draft && p.data.pubDate <= new Date());
-const categories = ['all', ...new Set(publishedPosts.map((post) => post.data.category).filter(Boolean))];
+// GENERATE DAFTAR KATEGORI UNTUK TABS MENU [cite: 2026-01-10]
+const allCategories = ['all', ...new Set(allCombinedPosts.map((post) => post.category).filter(Boolean))];
 
-const pageNum = page.currentPage;
-const posts = page.data;
+const posts = allCombinedPosts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 ---
 
-<BaseLayout title={pageNum === 1 ? 'Blog' : `Blog - Page ${pageNum}`}> 
+<BaseLayout title="Blog"> 
+    {currentPage === 1 && <HeroBlog />}
     
-    {pageNum === 1 && <HeroBlog />}
-
     <main class="bg-cream-latte/30 min-h-screen">
-        <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
+        <div class="container mx-auto max-w-6xl px-4 py-12">
             
-            {/* 1. KATEGORI FILTER */}
-            <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12" aria-label="Blog categories">
-                {categories.map((cat) => (
+            <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12">
+                {allCategories.map((cat) => (
                     <a 
                         href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
-                        class:list={[
-                            "text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border transition-all duration-300 bg-white shadow-sm hover:shadow-md",
-                            cat === 'all' ? "border-coffee-dark text-coffee-dark" : "border-coffee-dark/10 text-coffee-brown hover:border-accent-primary hover:text-accent-primary"
-                        ]}
+                        class="text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border border-coffee-dark/10 bg-white text-coffee-brown hover:border-accent-primary hover:text-accent-primary transition-all shadow-sm"
                     >
                         {cat.replace('-', ' ')}
                     </a>
                 ))}
             </nav>
 
-            {/* 2. GRID ARTIKEL */}
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                {posts.length > 0 ? (
-                    posts.map((post) => (
-                        <PostCard post={post} /> 
-                    ))
-                ) : (
-                    <div class="col-span-full text-center py-20">
-                        <p class="text-coffee-brown italic">No posts found yet. Stay tuned!</p>
-                    </div>
-                )}
+                {posts.map((post) => <PostCard post={post} />)}
             </section>
-
-            {/* 3. PAGINATION */}
-            <div class="mt-24 border-t border-coffee-brown/10 pt-16 flex flex-col items-center">
-                {page.url.next ? (
-                    <a
-                        href={page.url.next}
-                        class="group flex flex-col items-center gap-4"
-                    >
-                        <span class="text-[11px] font-black uppercase tracking-[0.4em] text-coffee-brown group-hover:text-accent-primary transition-colors">
-                            Next Page
-                        </span>
-                        <div class="w-12 h-[1px] bg-coffee-dark group-hover:w-24 group-hover:bg-accent-primary transition-all duration-500"></div>
-                    </a>
-                ) : (
-                    <span class="text-[10px] font-bold uppercase tracking-[0.2em] text-coffee-brown/40 italic">
-                        End of Blog
-                    </span>
-                )}
-            </div>
         </div>
     </main>
 </BaseLayout>

@@ -1,77 +1,97 @@
 ---
-// Lokasi file: src/pages/blog/category/[category].astro
+export const prerender = false;
+
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
-import { Image } from 'astro:assets';
+import PostCard from '../../../components/PostCard.astro';
 
-export async function getStaticPaths() {
-  const allPosts = await getCollection('blog');
-  
-  // Ambil waktu sekarang untuk filter jadwal jam
-  const now = new Date();
-  
-  // Daftar kategori sesuai config Keystatic kamu
-  const categories = [
-    'gear-lab',
-    'bean-roastery',
-    'brew-mastery',
-    'barista-life',
-    'buying-guides'
-  ];
+const { category } = Astro.params;
+const now = new Date().getTime();
 
-  return categories.map((cat) => {
-    // FILTER: Hanya post yang kategorinya sama DAN bukan draft DAN sudah waktunya publish
-    const filteredPosts = allPosts
-      .filter((post) => post.data.category === cat)
-      .filter((post) => !post.data.draft && post.data.pubDate <= now)
-      .sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+// 1. AMBIL SEMUA ARTIKEL UNTUK GENERATE TABS [cite: 2026-01-09, 2026-01-10]
+const allLocalForTabs = await getCollection('blog');
+const localPostData = allLocalForTabs.map(p => ({ category: p.data.category }));
 
-    return {
-      params: { category: cat },
-      props: { posts: filteredPosts, categoryName: cat },
-    };
-  });
-}
+let payloadPostData = [];
+try {
+    const res = await fetch(`http://127.0.0.1:3000/api/posts?where[status][equals]=published&limit=100`);
+    const data = await res.json();
+    payloadPostData = (data.docs || []).map((p: any) => ({ category: p.category }));
+} catch (e) { console.error(e); }
 
-const { posts, categoryName } = Astro.props;
+// Gabungkan semua kategori yang ada untuk dijadikan TABS [cite: 2026-01-10]
+const allCategories = ['all', ...new Set([...localPostData, ...payloadPostData].map(p => p.category).filter(Boolean))];
+
+// 2. FILTER ARTIKEL KHUSUS KATEGORI INI [cite: 2026-01-09]
+const filteredLocal = allLocalForTabs
+    .filter((post) => post.data.category === category)
+    .filter((post) => {
+        const isNotDraft = (post.data as any).draft !== true;
+        return isNotDraft && new Date(post.data.pubDate).getTime() <= now;
+    })
+    .map(post => ({
+        title: post.data.title,
+        description: post.data.description,
+        pubDate: post.data.pubDate,
+        category: post.data.category,
+        slug: post.slug,
+        image: post.data.image,
+        isPayload: false
+    }));
+
+let filteredPayload = [];
+try {
+    const res = await fetch(`http://127.0.0.1:3000/api/posts?where[category][equals]=${category}&where[status][equals]=published`);
+    const data = await res.json();
+    filteredPayload = (data.docs || []).map((post: any) => ({
+        title: post.title,
+        description: post.description,
+        pubDate: new Date(post.pubDate),
+        category: post.category,
+        slug: post.slug,
+        image: post.featuredImage?.url ? `http://127.0.0.1:3000${post.featuredImage.url}` : undefined,
+        isPayload: true
+    }));
+} catch (e) { console.error(e); }
+
+const allPosts = [...filteredLocal, ...filteredPayload].sort((a, b) => 
+    new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+);
+
+const categoryName = category ? category.replace('-', ' ') : 'Category';
 ---
 
-<BaseLayout title={`${categoryName.replace('-', ' ')} - Zaidly Blog`}>
-  <main class="bg-cream-latte min-h-screen pt-32 pb-20">
+<BaseLayout title={`${categoryName} - Zaidly Blog`}>
+  <main class="bg-cream-latte/30 min-h-screen pt-32 pb-20">
     <div class="container mx-auto max-w-6xl px-4">
+      
+      <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12" aria-label="Blog categories">
+        {allCategories.map((cat) => (
+            <a 
+                href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
+                class:list={[
+                    "text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border transition-all duration-300 bg-white shadow-sm hover:shadow-md",
+                    cat === category ? "border-coffee-dark text-coffee-dark bg-slate-50" : "border-coffee-dark/10 text-coffee-brown hover:border-accent-primary hover:text-accent-primary"
+                ]}
+            >
+                {cat.replace('-', ' ')}
+            </a>
+        ))}
+      </nav>
+
       <header class="mb-12 border-b-2 border-coffee-dark pb-6">
         <h1 class="text-5xl font-black uppercase italic text-coffee-dark">
-          {categoryName.replace('-', ' ')}
+          {categoryName}
         </h1>
         <p class="text-coffee-brown mt-2 text-sm uppercase tracking-widest font-bold">
-          {posts.length} Articles Published
+          {allPosts.length} Articles Found
         </p>
       </header>
 
-      {posts.length > 0 ? (
+      {allPosts.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
-          {posts.map(post => (
-            <a href={`/${post.slug}`} class="group bg-white p-3 border border-coffee-brown/10 shadow-sm hover:shadow-xl transition-all duration-300">
-              {post.data.image && (
-                <div class="overflow-hidden mb-4">
-                  <Image 
-                    src={post.data.image} 
-                    alt={post.data.title} 
-                    width={500} 
-                    height={300} 
-                    class="w-full aspect-video object-cover group-hover:scale-105 transition-transform duration-500" 
-                  />
-                </div>
-              )}
-              <div class="px-2 pb-2">
-                <h2 class="font-black text-xl uppercase leading-tight group-hover:text-accent-primary transition-colors">
-                  {post.data.title}
-                </h2>
-                <p class="text-[10px] text-coffee-brown/60 mt-2 font-bold uppercase tracking-tighter">
-                  {post.data.pubDate.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' })}
-                </p>
-              </div>
-            </a>
+          {allPosts.map(post => (
+            <PostCard post={post} />
           ))}
         </div>
       ) : (

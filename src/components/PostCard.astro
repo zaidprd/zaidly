@@ -1,89 +1,54 @@
 ---
-// src/components/PostCard.astro - FIXED LINK & IMAGE
-import type { CollectionEntry } from 'astro:content';
+// src/components/PostCard.astro [cite: 2026-01-10]
 import { Image } from 'astro:assets';
-
-type CombinedPost = CollectionEntry<'blog'>; 
-
-interface Props {
-    post: CombinedPost;
-    postType?: string; 
-}
 
 const { post, postType = "Blog" } = Astro.props;
 
-const imagePath = post.data.image; 
+// Data sudah diseragamkan di [...page].astro, tinggal panggil langsung [cite: 2026-01-10]
+const { title, description, category, slug, image, pubDate, isPayload } = post;
 
-const formattedDate = post.data.pubDate 
-    ? post.data.pubDate.toLocaleDateString('en-US', { 
+const formattedDate = pubDate instanceof Date 
+    ? pubDate.toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'short', 
         day: 'numeric' 
       })
-    : 'Blog';
+    : 'Recent';
 
-// FIX: Karena Anda punya [...slug].astro di root, 
-// pastikan link mengarah ke rute yang benar sesuai struktur folder pages Anda.
-const postUrl = `/${post.slug}`; 
+const postUrl = `/${slug}`; 
 ---
 
 <div class="relative group">
-    {/* Trik Overlay Link: Membuat seluruh kartu bisa diklik tanpa merusak struktur HTML */}
-    <a href={postUrl} class="absolute inset-0 z-20" aria-label={post.data.title}></a>
-
+    <a href={postUrl} class="absolute inset-0 z-20" aria-label={title}></a>
     <div class="bg-white border border-coffee-brown/10 group-hover:border-accent-primary transition-all duration-500 shadow-sm group-hover:shadow-xl">
-        
-        {/* Image Container */}
         <div class="relative h-64 w-full bg-coffee-light overflow-hidden">
-            {imagePath ? (
-                <Image 
-                    src={imagePath} 
-                    alt={post.data.title}
-                    width={800}
-                    height={450}
-                    class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s] ease-out"
-                />
+            {image ? (
+                /* Jika dari Payload pakai img biasa, jika lokal pakai Image Astro [cite: 2026-01-09, 2026-01-10] */
+                isPayload ? (
+                    <img src={image} alt={title} class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s]" />
+                ) : (
+                    <Image src={image} alt={title} width={800} height={450} class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s]" />
+                )
             ) : (
-                <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 font-bold uppercase tracking-[0.3em] text-[10px] bg-coffee-light/50">
-                    Image coming soon
-                </div>
+                <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 bg-coffee-light/50 font-black uppercase tracking-widest text-[10px]">Image coming soon</div>
             )}
-            
             <div class="absolute top-0 left-0 z-10">
-                 <span class="bg-coffee-dark text-white text-[9px] font-black px-4 py-2 tracking-[0.3em] uppercase inline-block">
-                    {postType} 
-                </span>
+                 <span class="bg-coffee-dark text-white text-[9px] font-black px-4 py-2 tracking-[0.3em] uppercase inline-block">{postType}</span>
             </div>
         </div>
 
         <div class="p-8">
-            {post.data.category && (
-                <span class="text-accent-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2 block relative z-30">
-                    {post.data.category.replace('-', ' ')}
-                </span>
+            {category && (
+                <span class="text-accent-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2 block relative z-30">{category.replace('-', ' ')}</span>
             )}
-
-            <h3 class="text-xl font-black text-coffee-dark mb-4 leading-tight uppercase tracking-tight group-hover:text-accent-primary transition duration-300">
-                {post.data.title}
-            </h3>
-            
-            <p class="text-coffee-brown text-base mb-8 line-clamp-3 leading-relaxed opacity-80 italic">
-                {post.data.description}
-            </p>
-
+            <h3 class="text-xl font-black text-coffee-dark mb-4 leading-tight uppercase group-hover:text-accent-primary transition duration-300">{title}</h3>
+            <p class="text-coffee-brown text-base mb-8 line-clamp-3 italic opacity-80">{description}</p>
             <div class="flex items-center justify-between pt-6 border-t border-coffee-brown/10">
                 <div class="flex flex-col">
-                    <span class="text-[9px] font-bold text-coffee-brown/40 uppercase tracking-[0.2em]">
-                        Published
-                    </span>
-                    <span class="text-[10px] font-black text-coffee-dark uppercase tracking-widest">
-                        {formattedDate}
-                    </span>
+                    <span class="text-[9px] font-bold text-coffee-brown/40 uppercase tracking-widest">Published</span>
+                    <span class="text-[10px] font-black text-coffee-dark uppercase">{formattedDate}</span>
                 </div>
-                
-                <span class="text-coffee-dark font-black text-[10px] uppercase tracking-[0.2em] group-hover:text-accent-primary transition-colors flex items-center gap-2">
-                    View Blog <span class="group-hover:translate-x-2 transition-transform duration-300">→</span>
-                </span>
+                <span class="text-coffee-dark font-black text-[10px] uppercase group-hover:text-accent-primary flex items-center gap-2">View Blog <span>→</span></span>
             </div>
         </div>
     </div>

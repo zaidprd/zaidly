@@ -20,6 +20,7 @@ interface CustomFrontmatter {
     author: string; 
     image?: any; 
     tags?: string[];
+    isPayload?: boolean;
 }
 
 interface Props {
@@ -30,13 +31,12 @@ interface Props {
 const { frontmatter, headings } = Astro.props; 
 
 // Logika Tampilkan Sidebar jika ada konten heading
-const showSidebar = headings.filter((h: Heading) => h.depth > 1 && h.depth < 4).length > 0;
+const showSidebar = headings && headings.filter((h: Heading) => h.depth > 1 && h.depth < 4).length > 0;
 
 const formattedDate = frontmatter.pubDate 
     ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
     : 'Date not available';
 
-// DATA IKLAN
 const ads = {
     topPick: {
         title: "Brew Conical Burr Coffee Grinder",
@@ -55,7 +55,7 @@ const ads = {
     <main class="bg-cream-latte min-h-screen text-coffee-dark relative">
         
         <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10">
-            <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
+            <div class="container mx-auto max-w-6xl px-4">
                 <div class="max-w-4xl">
                     <div class="flex items-center space-x-3 mb-8">
                         <span class="bg-accent-primary text-white text-[10px] font-black px-3 py-1 tracking-[0.2em] uppercase">Expert Guide</span>
@@ -71,133 +71,100 @@ const ads = {
             </div>
         </header>
 
-        <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 py-12">
+        <div class="container mx-auto max-w-6xl px-4 py-12">
             <div class="flex flex-col lg:flex-row gap-16">
                 
                 <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
                     
                     {frontmatter.image && (
                         <div class="mb-12 border border-coffee-brown/15 bg-white p-2 shadow-sm"> 
-                            <Image 
-                                src={frontmatter.image} 
-                                alt={frontmatter.title} 
-                                width={1200} 
-                                height={675} 
-                                loading="eager"
-                                class="w-full aspect-video object-cover" 
-                            />
+                            {typeof frontmatter.image === 'string' ? (
+                                <img 
+                                    src={frontmatter.image} 
+                                    alt={frontmatter.title} 
+                                    class="w-full aspect-video object-cover" 
+                                    loading="eager"
+                                />
+                            ) : (
+                                <Image 
+                                    src={frontmatter.image} 
+                                    alt={frontmatter.title} 
+                                    width={1200} 
+                                    height={675} 
+                                    class="w-full aspect-video object-cover" 
+                                    loading="eager"
+                                />
+                            )}
                         </div>
                     )}
 
                     {showSidebar && (
-                        <div class="lg:hidden mb-12 bg-white border-l-4 border-accent-primary p-6 shadow-sm">
-                            <div class="flex items-center space-x-3 mb-4">
-                                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-accent-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                    <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line>
-                                    <line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
-                                </svg>
-                                <p class="text-[11px] font-black uppercase tracking-[0.3em] text-coffee-dark italic">Table of Contents</p>
-                            </div>
-                            <TableOfContents headings={headings} />
+                        <div class="lg:hidden mb-12">
+                            <details class="group bg-white border-l-4 border-accent-primary shadow-sm">
+                                <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                                    <div class="flex items-center space-x-3">
+                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-accent-primary group-open:rotate-90 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                                            <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line>
+                                        </svg>
+                                        <p class="text-[11px] font-black uppercase tracking-[0.3em] text-coffee-dark italic">Table of Contents</p>
+                                    </div>
+                                    <span class="text-accent-primary group-open:rotate-180 transition-transform">↓</span>
+                                </summary>
+                                <div class="px-6 pb-2 border-t border-coffee-brown/5">
+                                    <TableOfContents headings={headings} />
+                                </div>
+                            </details>
                         </div>
                     )}
                     
                     <div class="prose prose-coffee max-w-none 
                         prose-p:text-[19px] md:prose-p:text-[21px] 
-                        prose-p:leading-[1.85] 
-                        prose-p:mb-10
-                        prose-p:text-coffee-dark/95 
-                        prose-headings:font-black 
-                        prose-headings:uppercase 
-                        prose-headings:tracking-tight 
-                        prose-headings:text-coffee-dark
-                        prose-headings:mt-16
-                        prose-headings:mb-8
-                        prose-strong:text-coffee-dark
-                        prose-strong:font-black
-                        prose-a:text-accent-primary prose-a:font-bold prose-a:no-underline hover:prose-a:underline">
+                        prose-headings:font-black prose-headings:uppercase 
+                        prose-a:text-accent-primary prose-a:font-bold hover:prose-a:underline">
                         <slot /> 
                     </div>
 
-                    {frontmatter.tags && (
-                        <div class="mt-12 flex flex-wrap gap-3">
-                            {frontmatter.tags.slice(0, 4).map((tag: string) => (
-                                <a href="/" class="relative group overflow-hidden bg-white border-2 border-coffee-dark px-5 py-2 transition-all">
-                                    <span class="relative z-10 text-[10px] font-black uppercase tracking-[0.2em] text-coffee-dark group-hover:text-white italic">
+                    {frontmatter.tags && frontmatter.tags.length > 0 && (
+                        <div class="mt-16 pt-8 border-t border-coffee-brown/10">
+                            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-coffee-brown/50 mb-6 italic">Tagged in</p>
+                            <div class="flex flex-wrap gap-3">
+                                {frontmatter.tags.map((tag: string) => (
+                                    <a 
+                                        href="/" 
+                                        class="bg-white border border-coffee-brown/10 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-coffee-dark hover:bg-accent-primary hover:text-white hover:border-accent-primary transition-all shadow-sm"
+                                    >
                                         # {tag.replace('-', ' ')}
-                                    </span>
-                                    <div class="absolute inset-0 bg-coffee-dark transform translate-y-full group-hover:translate-y-0 transition-transform duration-300"></div>
-                                </a>
-                            ))}
+                                    </a>
+                                ))}
+                            </div>
                         </div>
                     )}
-
-                    <div class="mt-20 border-t-4 border-coffee-dark pt-16">
-                        <div class="mb-16">
-                            <h3 class="text-[11px] font-black text-coffee-dark uppercase tracking-[0.3em] mb-8">Share this insight</h3>
-                            <div class="flex flex-wrap gap-4">
-                                <a href={`https://www.facebook.com/sharer/sharer.php?u=${Astro.url}`} target="_blank" class="bg-white border-2 border-coffee-dark px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">Facebook</a>
-                                <a href={`https://twitter.com/intent/tweet?url=${Astro.url}&text=${frontmatter.title}`} target="_blank" class="bg-white border-2 border-coffee-dark px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-black hover:text-white transition-all">X (Twitter)</a>
-                                <button onclick="navigator.clipboard.writeText(window.location.href); alert('Link copied!')" class="bg-coffee-dark text-white px-8 py-4 text-[11px] font-black uppercase tracking-widest hover:bg-accent-primary transition-all">Copy Link</button>
-                            </div>
-                        </div>
-
-                        <div class="bg-white border border-coffee-brown/20 p-8 md:p-12 shadow-sm mb-16 text-center">
-                            <div class="inline-flex items-center justify-center w-12 h-12 bg-[#29abe0] rounded-full text-white mb-6 shadow-md">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-6 h-6 mx-auto">
-  <path d="M12.001 4.52853C14.35 2.42 17.98 2.49 20.2426 4.75736C22.5053 7.02472 22.583 10.637 20.4786 12.993L11.9999 21.485L3.52138 12.993C1.41705 10.637 1.49471 7.01959 3.75736 4.75736C6.02001 2.49513 9.6455 2.41539 12.001 4.52853Z"></path>
-</svg>
-                            </div>
-                            <h3 class="text-sm font-black text-coffee-dark uppercase tracking-[0.2em] mb-4 leading-tight">Did this guide help your morning brew?</h3>
-                            <p class="text-coffee-brown/80 text-sm mb-8 max-w-md mx-auto leading-relaxed">
-                                Your support encourages us to be more consistent in testing and reviewing coffee gear, ensuring you get the most reliable insights.
-                            </p>
-                            <a href="https://ko-fi.com/zaidly" target="_blank" rel="noopener noreferrer" class="inline-block bg-[#29abe0] text-white text-[10px] font-black py-4 px-10 tracking-[0.2em] uppercase hover:bg-[#2086b0] transition-colors shadow-lg">
-                                Support us on Ko-fi
-                            </a>
-                        </div>
-
-                        <div class="bg-white border border-coffee-brown/20 p-8 md:p-12 shadow-sm">
-                            <h3 class="text-sm font-black text-coffee-dark uppercase tracking-[0.2em] mb-12 border-b border-coffee-brown/10 pb-6">Community Discussion</h3>
-                            <div id="cusdis_thread" data-host="https://cusdis.com" data-app-id="b93c1941-4385-44af-91c7-347e55b2fbc8" data-page-id={frontmatter.title} data-page-url={Astro.url} data-page-title={frontmatter.title} data-theme="light"></div>
-                            <script async defer src="https://cusdis.com/js/cusdis.es.js"></script>
-                        </div>
-                    </div>
                 </article>
 
+                {/* SIDEBAR DESKTOP */}
                 {showSidebar && (
                     <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit">
                         <div class="space-y-12">
-                            <div class="bg-white border-l-4 border-accent-primary p-6 shadow-sm">
-                                <div class="flex items-center space-x-3 mb-6">
-                                    <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4 text-accent-primary" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
-                                        <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line>
-                                        <line x1="3" y1="6" x2="3.01" y2="6"></line><line x1="3" y1="12" x2="3.01" y2="12"></line><line x1="3" y1="18" x2="3.01" y2="18"></line>
-                                    </svg>
-                                    <p class="text-[10px] font-black uppercase tracking-[0.3em] text-coffee-dark italic">Navigation</p>
+                            <details class="group bg-white border-l-4 border-accent-primary shadow-sm">
+                                <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
+                                    <div class="flex items-center space-x-3">
+                                        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-coffee-dark italic">Navigation</p>
+                                    </div>
+                                    <span class="text-accent-primary group-open:rotate-180 transition-transform">↓</span>
+                                </summary>
+                                <div class="px-6 pb-2 border-t border-coffee-brown/5">
+                                    <TableOfContents headings={headings} />
                                 </div>
-                                <TableOfContents headings={headings} />
-                            </div>
+                            </details>
 
                             <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
                                 <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">The Top Choice</h3>
                                 <a href={ads.topPick.link} target="_blank" rel="nofollow sponsored" class="group block">
-                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
+                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4 border border-coffee-brown/5">
                                         <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
                                     </div>
-                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check Price</div>
-                                </a>
-                            </div>
-
-                            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
-                                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Essential Gear</h3>
-                                <a href={ads.essential.link} target="_blank" rel="nofollow sponsored" class="group block">
-                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 border border-coffee-brown/5 p-4">
-                                        <Image src={ads.essential.img} alt={ads.essential.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
-                                    </div>
-                                    <h4 class="text-sm font-black text-coffee-dark uppercase tracking-tight mb-5 group-hover:text-accent-primary leading-snug">{ads.essential.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 tracking-widest uppercase hover:bg-accent-primary transition-colors shadow-lg">Check Price</div>
+                                    <h4 class="text-sm font-black text-coffee-dark uppercase group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
+                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 mt-4 tracking-widest uppercase hover:bg-accent-primary transition-colors">Check Price</div>
                                 </a>
                             </div>
                         </div>
@@ -206,19 +173,4 @@ const ads = {
             </div>
         </div>
     </main>
-
-    <a 
-      href="https://ko-fi.com/zaidly" 
-      target="_blank" 
-      rel="noopener noreferrer"
-      class="fixed bottom-8 right-8 z-50 flex items-center justify-center w-14 h-14 bg-[#29abe0] rounded-full shadow-2xl hover:scale-110 transition-all active:scale-95 group border-2 border-white/20"
-      aria-label="Support Zaidly on Ko-fi"
-    >
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-7 h-7 text-white">
-  <path d="M5 3H19C19.5523 3 20 3.44772 20 4V12C20 15.3137 17.3137 18 14 18H10C6.68629 18 4 15.3137 4 12V4C4 3.44772 4.44772 3 5 3ZM6 5V12C6 14.2091 7.79086 16 10 16H14C16.2091 16 18 14.2091 18 12V5H6ZM21 8H23V12C23 13.1046 22.1046 14 21 14V8Z"></path>
-</svg>
-      <span class="absolute right-16 bg-coffee-dark text-white text-[10px] font-black uppercase tracking-widest py-2 px-4 rounded-lg opacity-0 group-hover:opacity-100 transition-opacity duration-300 whitespace-nowrap pointer-events-none border border-coffee-brown/30 shadow-2xl">
-        Support Research ☕
-      </span>
-    </a>
 </BaseLayout>

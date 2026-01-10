@@ -31,11 +31,6 @@ const siteName = "Zaidly";
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="p:domain_verify" content="75ef94da23de9e533c737720247ff3f9"/>
-  {/* PERBAIKAN PERFORMA 1: Tambahkan Preconnect untuk RemixIcon agar loading lebih cepat 
-      Ini mengatasi masalah 'Network dependency tree' di audit Anda */}
-  
-  
-  
   
   <ViewTransitions />
   <meta name="google-site-verification" content="-_5rR5OonSa46ubUy5I2sHzN1esjGpcnd1em8We3a7c" />
@@ -45,7 +40,6 @@ const siteName = "Zaidly";
   
   <link rel="canonical" href={canonical} />
 
-  {/* Meta tags tetap sama */}
   <meta property="og:type" content="website" />
   <meta property="og:url" content={canonical} />
   <meta property="og:title" content={title} />
@@ -60,6 +54,26 @@ const siteName = "Zaidly";
 
   <link rel="icon" type="image/webp" href="/favicon.webp" />
   <link rel="shortcut icon" href="/favicon.webp" />
+
+  {/* CSS UNTUK SMOOTH SCROLL & OFFSET [cite: 2026-01-10] */}
+  <style is:global>
+    html {
+      /* Efek meluncur halus saat klik link internal [cite: 2026-01-10] */
+      scroll-behavior: smooth;
+    }
+
+    /* Berikan jarak agar judul tidak tertutup Header Sticky saat melompat [cite: 2026-01-10] */
+    /* Kita menargetkan elemen yang memiliki ID (tujuan scroll) [cite: 2026-01-10] */
+    [id] {
+      scroll-margin-top: 100px; /* Sesuaikan dengan tinggi header kamu [cite: 2026-01-10] */
+    }
+
+    @media (min-width: 768px) {
+      [id] {
+        scroll-margin-top: 120px;
+      }
+    }
+  </style>
 </head>
 
 <body class="flex flex-col min-h-screen antialiased bg-cream-latte">

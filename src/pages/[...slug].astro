@@ -1,55 +1,128 @@
 ---
-// ===============================================
-// FILE: src/pages/[...slug].astro (FINAL COMPATIBLE)
-// ===============================================
+// 1. SSR MODE [cite: 2026-01-10]
+export const prerender = false;
 
-export const prerender = true; 
-
-import { getCollection } from "astro:content"; 
-import type { CollectionEntry } from 'astro:content'; 
+import { getCollection } from 'astro:content';
+import { Image } from 'astro:assets'; 
 import BaseLayout from '../layouts/BaseLayout.astro';
-import ArticleLayout from '../layouts/ArticleLayout.astro'; 
-import Error404 from '../components/Error404.astro'; 
+import ArticleLayout from '../layouts/ArticleLayout.astro';
+import Error404 from '../components/Error404.astro';
+import RichText from '../components/RichText.astro';
 
-type BlogPost = CollectionEntry<'blog'>;
+// DEFINISI URL RENDER [cite: 2026-01-10]
+const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
-export async function getStaticPaths() {
-    const allPosts = await getCollection('blog');
-    const excludedSlugs = ['admin', 'blog', 'about', 'gear', 'index', 'keystatic'];
+const { slug } = Astro.params;
 
-    return allPosts
-        .filter(post => !excludedSlugs.includes(post.slug)) 
-        .map((post) => ({
-            params: { slug: post.slug.replace('blog/', '') }, 
-            props: { post },
-        }));
+// 2. AMBIL DATA LOKAL & PAYLOAD [cite: 2026-01-10]
+const allLocalPosts = await getCollection('blog'); 
+const localPost = allLocalPosts.find((p) => p.slug === slug);
+
+let post = null;
+let DynamicContent: any = null; 
+let allHeadings: any[] = []; 
+
+if (localPost) {
+  const rendered = await localPost.render();
+  DynamicContent = rendered.Content; 
+  allHeadings = rendered.headings; 
+} else {
+  try {
+    // Menembak server Render US [cite: 2026-01-10]
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}`);
+    const data = await res.json();
+    post = data?.docs?.[0] || null;
+
+    if (post?.content?.root?.children) {
+      allHeadings = post.content.root.children
+        .map((node: any) => {
+          const getInnerText = (n: any): string => {
+            if (n.text) return n.text;
+            if (n.children) return n.children.map(getInnerText).join("");
+            return "";
+          };
+          const fullText = getInnerText(node).trim();
+          const isHeading = node.type === 'heading';
+          const isMarkdown = fullText.startsWith('#');
+
+          if (isHeading || isMarkdown) {
+            let depth = 2;
+            if (isHeading) {
+                depth = parseInt(node.tag.replace('h', ''));
+            } else {
+                const match = fullText.match(/^#+/);
+                depth = match ? match[0].length : 2;
+            }
+            const cleanText = fullText.replace(/^#+\s*/, '');
+            return {
+              depth,
+              slug: cleanText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/[\s_-]+/g, '-').trim(),
+              text: cleanText
+            };
+          }
+          return null;
+        })
+        .filter((h: any) => h !== null);
+    }
+  } catch (e) {
+    console.error("Payload Error:", e);
+  }
 }
 
-const { post } = Astro.props as { post: BlogPost }; 
-
-// 1. LOGIKA RENDER DATA
-let Content: any = () => null; 
-let headings: any[] = [];
-let postData: any = {};
-
-if (post) { 
-    const rendered = await post.render();
-    Content = rendered.Content; 
-    headings = rendered.headings;
-    postData = post.data;
-}
-
-// 2. DEBUG LOG (Cek terminal VS Code lu)
-console.log("DEBUG - Rendering Slug:", post?.slug);
+// 3. MAPPING FRONTMATTER [cite: 2026-01-10]
+const payloadFrontmatter = post ? {
+  title: post.title || "Untitled",
+  description: post.description || "",
+  pubDate: post.pubDate ? new Date(post.pubDate) : new Date(),
+  author: "admin",
+  // Gunakan PAYLOAD_URL agar gambar muncul dari Render [cite: 2026-01-10]
+  image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : null,
+  isPayload: true
+} : localPost ? {
+  ...localPost.data,
+  isPayload: false
+} : null;
 ---
 
-{post ? (
-    <ArticleLayout frontmatter={postData} headings={headings}> 
-        {/* Saat menggunakan component() di config, Content tidak butuh props components lagi */}
-        <Content /> 
-    </ArticleLayout>
+{payloadFrontmatter ? (
+  <ArticleLayout frontmatter={payloadFrontmatter as any} headings={allHeadings}>
+    <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
+      
+      {/* 4. LOGIKA GAMBAR [cite: 2026-01-10] */}
+      {payloadFrontmatter.image && (
+        <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
+          {payloadFrontmatter.isPayload ? (
+            /* Gambar dari Render/Cloudflare R2 */
+            <img 
+              src={payloadFrontmatter.image as string} 
+              alt={payloadFrontmatter.title} 
+              class="w-full h-auto object-cover max-h-[600px]" 
+            />
+          ) : (
+            /* Gambar Lokal */
+            <Image 
+              src={payloadFrontmatter.image as any} 
+              alt={payloadFrontmatter.title} 
+              width={1200} 
+              height={675}
+              class="w-full h-auto object-cover max-h-[600px]" 
+            />
+          )}
+        </div>
+      )}
+      
+      {/* 5. CONTENT [cite: 2026-01-10] */}
+      {payloadFrontmatter.isPayload ? (
+        <RichText content={post.content} />
+      ) : (
+        <div class="prose prose-coffee max-w-none">
+          {DynamicContent && <DynamicContent />}
+        </div>
+      )}
+    </div>
+  </ArticleLayout>
 ) : (
-    <BaseLayout title="404 Not Found">
-        <Error404 /> 
-    </BaseLayout>
+  <BaseLayout title="404 Not Found">
+    <Error404 />
+  </BaseLayout>
 )}

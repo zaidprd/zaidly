@@ -2,16 +2,12 @@
   "name": "zaidly",
   "type": "module",
   "version": "0.0.1",
-
- 
-
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
     "astro": "astro"
   },
-
   "dependencies": {
     "@astrojs/cloudflare": "^12.6.12",
     "@astrojs/markdoc": "^0.15.10",
@@ -23,10 +19,12 @@
     "@tailwindcss/vite": "^4.1.17",
     "astro": "^5.16.4",
     "lucide-astro": "^0.556.0",
+    "marked": "^17.0.1",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-markdown": "^10.1.0",
+    "remark-gfm": "^4.0.1"
   },
-
   "devDependencies": {
     "@astrojs/tailwind": "^6.0.2",
     "@tailwindcss/typography": "^0.5.19",

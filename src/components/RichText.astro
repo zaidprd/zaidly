@@ -1,0 +1,13 @@
+---
+import { parseLexicalToMarkdown } from '../utils/richTextParser';
+import MarkdownRenderer from './MarkdownRenderer.jsx';
+
+const { content } = Astro.props;
+
+// Convert Lexical JSON → Markdown
+const markdown = parseLexicalToMarkdown(content?.root ?? content);
+---
+
+<div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 my-8">
+  <MarkdownRenderer client:load content={markdown} />
+</div>

@@ -1,7 +1,6 @@
 ---
-// src/pages/index.astro
+// src/pages/index.astro - FULL VERSION (LOCAL + PAYLOAD GABUNG) [cite: 2026-01-10]
 
-// 1. Layout & Components
 import MainLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro'; 
 import WhoIsZaidly from '../components/section/WhoIsZaidly.astro'; 
@@ -10,43 +9,62 @@ import TopPicks from '../components/section/TopPicks.astro';
 import CoffeeGearHub from '../components/section/CoffeeGearHub.astro'; 
 import LatestPosts from '../components/section/LatestArticles.astro'; 
 import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
-
-// 2. Data Fetching
 import { getCollection } from 'astro:content';
 
-// Ambil semua post dan pastikan tidak null
-const allPostsRaw = await getCollection('blog') || []; 
+// 1. KONFIGURASI URL (MENGARAH KE RENDER US) [cite: 2026-01-10]
+const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
-// 3. Logic: Filter & Sorting
-const now = new Date();
+// 2. AMBIL DATA LOKAL (.md) [cite: 2026-01-10]
+const allLocalPosts = await getCollection('blog') || []; 
+const now = new Date().getTime();
 
-// FILTER UTAMA: Hanya post yang BUKAN draft DAN sudah masuk waktu tayangnya
-const publishedPosts = allPostsRaw.filter((post) => {
-    const isNotDraft = !post.data.draft;
-    const isPastPublishDate = new Date(post.data.pubDate) <= now;
-    return isNotDraft && isPastPublishDate;
+const publishedLocal = allLocalPosts.filter((post) => {
+    const isNotDraft = (post.data as any).draft !== true;
+    const postTime = new Date(post.data.pubDate).getTime();
+    return isNotDraft && postTime <= now;
+}).map(post => ({ ...post, isPayload: false }));
+
+// 3. AMBIL DATA PAYLOAD CMS [cite: 2026-01-10]
+let payloadPosts = [];
+try {
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?limit=100&sort=-pubDate&where[status][equals]=published`);
+    const data = await res.json();
+    payloadPosts = (data?.docs || []).map((post: any) => ({
+        ...post,
+        isPayload: true,
+        data: { 
+            title: post.title,
+            pubDate: post.pubDate,
+            category: post.category,
+            description: post.description,
+            // URL Gambar sudah mengarah ke Render [cite: 2026-01-10]
+            image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : null
+        }
+    }));
+} catch (e) {
+    console.error("Gagal ambil data Payload di Index:", e);
+}
+
+// 4. GABUNGKAN DAN URUTKAN [cite: 2026-01-10]
+const allCombinedPosts = [...publishedLocal, ...payloadPosts].sort((a, b) => {
+    const dateA = a.isPayload ? new Date(a.pubDate).getTime() : new Date(a.data.pubDate).getTime();
+    const dateB = b.isPayload ? new Date(b.pubDate).getTime() : new Date(b.data.pubDate).getTime();
+    return dateB - dateA;
 });
 
-// SORTING: Urutkan berdasarkan tanggal terbaru
-const sortedPosts = publishedPosts.sort((a, b) => 
-    new Date(b.data.pubDate).getTime() - new Date(a.data.pubDate).getTime()
-);
+// 5. SLICING UNTUK SECTION [cite: 2026-01-10]
+const latestPosts = allCombinedPosts.slice(0, 3);
 
-// DATA UNTUK SECTION:
-// a. Latest Articles (3 Post terbaru)
-const latestPosts = sortedPosts.slice(0, 3);
+const gearPosts = allCombinedPosts.filter(post => {
+    const cat = post.isPayload ? post.category : post.data.category;
+    return cat === 'gear-lab' || cat === 'buying-guides';
+}).slice(0, 4);
 
-// b. Gear Hub (Filter kategori gear-lab/buying-guides)
-const gearPosts = sortedPosts.filter(post => 
-    post.data.category === 'gear-lab' || post.data.category === 'buying-guides'
-).slice(0, 4);
+const beanPosts = allCombinedPosts.filter(post => {
+    const cat = post.isPayload ? post.category : post.data.category;
+    return cat === 'bean-roastery';
+}).slice(0, 4);
 
-// c. Bean Guides (Filter kategori bean-roastery)
-const beanPosts = sortedPosts.filter(post => 
-    post.data.category === 'bean-roastery'
-).slice(0, 4);
-
-// 4. Category Data
 const featuredCategories = [
     { title: "Gear Guides", description: "In-depth reviews of the latest brewing tools.", url: "/gear", icon: "ri:tools-line" },
     { title: "Bean Types", description: "Discover origins, roasts, and flavor profiles.", url: "/beans", icon: "ri:seedling-line" },
@@ -56,27 +74,24 @@ const featuredCategories = [
 ---
 
 <MainLayout title="Best Coffee Gear Reviews & Brewing Guides | Zaidly">
-    
     <Hero 
         title="Premium Coffee Gear for Home Brewing" 
         subtitle="Elevate your daily ritual with expert-reviewed espresso machines, precision grinders, and professional brewing techniques."
         linkText="Explore Gear Reviews"
         linkUrl="/gear" 
-        imageAlt="Collection of premium coffee brewing tools, grinders, and espresso machines - Zaidly Coffee Gear Reviews"
+        imageAlt="Collection of premium coffee brewing tools - Zaidly"
     />
 
     <FeaturedCategories categories={featuredCategories} />
-
     <TopPicks />
 
     <WhoIsZaidly 
         title="Independent Coffee Authority" 
-        subtitle="Zaidly is a dedicated coffee gear guide for home brewers. We research, test, and review equipment—from espresso machines to precision grinders—so you can invest in the right tools with total confidence."
+        subtitle="Zaidly is a dedicated coffee gear guide for home brewers. We research, test, and review equipment."
         linkText="Our Review Process →"
         linkUrl="/about" 
     />
     
-    {/* Hanya tampilkan section jika ada post yang sudah dipublikasi */}
     {gearPosts.length > 0 && <CoffeeGearHub posts={gearPosts} />}
     
     {beanPosts.length > 0 && <CoffeeBeanGuides posts={beanPosts} />}
