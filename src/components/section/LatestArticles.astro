@@ -3,6 +3,9 @@ import { Image } from "astro:assets";
 
 // Komponen ini menerima data gabungan dari index.astro sebagai props [cite: 2026-01-10]
 const { posts } = Astro.props;
+
+// DEFINISI URL RENDER AGAR GAMBAR MUNCUL DI CLOUDFLARE [cite: 2026-01-10]
+const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 ---
 <section class="pt-32 pb-20 bg-cream-latte"> 
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
@@ -19,9 +22,9 @@ const { posts } = Astro.props;
                 const category = isPayload ? post.category : post.data.category;
                 const description = isPayload ? post.description : post.data.description;
                 
-                // Ambil gambar berdasarkan sumbernya [cite: 2026-01-10]
+                // Ambil gambar berdasarkan sumbernya (GANTI KE PAYLOAD_URL RENDER) [cite: 2026-01-10]
                 const imageSrc = isPayload 
-                    ? (post.featuredImage?.url ? `http://127.0.0.1:3000${post.featuredImage.url}` : null)
+                    ? (post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : null)
                     : post.data.image;
 
                 return (
@@ -60,7 +63,7 @@ const { posts } = Astro.props;
                             </span>
 
                             <h3 class="text-xl font-semibold text-coffee-dark mb-2 line-clamp-2">
-                                <a href={`/${slug}`} class="hover:text-[#8b5e3c] transition">
+                                <a href={`/blog/${slug}`} class="hover:text-[#8b5e3c] transition">
                                     {title}
                                 </a>
                             </h3>
@@ -70,7 +73,7 @@ const { posts } = Astro.props;
                             </p>
                             
                             <div class="mt-auto">
-                                <a href={`/${slug}`} class="text-xs font-black uppercase tracking-widest text-accent-primary hover:underline">
+                                <a href={`/blog/${slug}`} class="text-xs font-black uppercase tracking-widest text-accent-primary hover:underline">
                                     Read More →
                                 </a>
                             </div>

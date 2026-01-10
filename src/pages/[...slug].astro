@@ -28,7 +28,6 @@ if (localPost) {
   allHeadings = rendered.headings; 
 } else {
   try {
-    // Menembak server Render US [cite: 2026-01-10]
     const res = await fetch(`${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}`);
     const data = await res.json();
     post = data?.docs?.[0] || null;
@@ -75,8 +74,12 @@ const payloadFrontmatter = post ? {
   description: post.description || "",
   pubDate: post.pubDate ? new Date(post.pubDate) : new Date(),
   author: "admin",
-  // Gunakan PAYLOAD_URL agar gambar muncul dari Render [cite: 2026-01-10]
-  image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : null,
+  // Perbaikan URL Gambar: Cek apakah sudah absolut atau butuh prefix [cite: 2026-01-10]
+  image: post.featuredImage?.url 
+    ? (post.featuredImage.url.startsWith('http') 
+        ? post.featuredImage.url 
+        : `${PAYLOAD_URL}${post.featuredImage.url}`)
+    : null,
   isPayload: true
 } : localPost ? {
   ...localPost.data,
@@ -88,18 +91,20 @@ const payloadFrontmatter = post ? {
   <ArticleLayout frontmatter={payloadFrontmatter as any} headings={allHeadings}>
     <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
       
-      {/* 4. LOGIKA GAMBAR [cite: 2026-01-10] */}
+      {/* 4. LOGIKA GAMBAR FIX [cite: 2026-01-10] */}
       {payloadFrontmatter.image && (
         <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
           {payloadFrontmatter.isPayload ? (
-            /* Gambar dari Render/Cloudflare R2 */
+            /* Payload: Gunakan img murni agar tidak bentrok dengan optimasi lokal [cite: 2026-01-10] */
             <img 
-              src={payloadFrontmatter.image as string} 
+              src={payloadFrontmatter.image} 
               alt={payloadFrontmatter.title} 
-              class="w-full h-auto object-cover max-h-[600px]" 
+              class="w-full h-auto object-cover max-h-[600px] block" 
+              loading="eager"
+              onerror="this.style.display='none'"
             />
           ) : (
-            /* Gambar Lokal */
+            /* Lokal */
             <Image 
               src={payloadFrontmatter.image as any} 
               alt={payloadFrontmatter.title} 
