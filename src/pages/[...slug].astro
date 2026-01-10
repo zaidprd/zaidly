@@ -23,10 +23,12 @@ let DynamicContent: any = null;
 let allHeadings: any[] = []; 
 
 if (localPost) {
+  // JIKA DATA LOKAL ADA (.md/.mdx) [cite: 2026-01-10]
   const rendered = await localPost.render();
   DynamicContent = rendered.Content; 
   allHeadings = rendered.headings; 
 } else {
+  // JIKA LOKAL TIDAK ADA, CARI DI PAYLOAD CMS [cite: 2026-01-10]
   try {
     const res = await fetch(`${PAYLOAD_URL}/api/posts?where[slug][equals]=${slug}`);
     const data = await res.json();
@@ -42,16 +44,8 @@ if (localPost) {
           };
           const fullText = getInnerText(node).trim();
           const isHeading = node.type === 'heading';
-          const isMarkdown = fullText.startsWith('#');
-
-          if (isHeading || isMarkdown) {
-            let depth = 2;
-            if (isHeading) {
-                depth = parseInt(node.tag.replace('h', ''));
-            } else {
-                const match = fullText.match(/^#+/);
-                depth = match ? match[0].length : 2;
-            }
+          if (isHeading || fullText.startsWith('#')) {
+            let depth = isHeading ? parseInt(node.tag.replace('h', '')) : 2;
             const cleanText = fullText.replace(/^#+\s*/, '');
             return {
               depth,
@@ -74,7 +68,7 @@ const payloadFrontmatter = post ? {
   description: post.description || "",
   pubDate: post.pubDate ? new Date(post.pubDate) : new Date(),
   author: "admin",
-  // Perbaikan URL Gambar: Cek apakah sudah absolut atau butuh prefix [cite: 2026-01-10]
+  // Fix URL Gambar R2/Render [cite: 2026-01-10]
   image: post.featuredImage?.url 
     ? (post.featuredImage.url.startsWith('http') 
         ? post.featuredImage.url 
@@ -91,11 +85,11 @@ const payloadFrontmatter = post ? {
   <ArticleLayout frontmatter={payloadFrontmatter as any} headings={allHeadings}>
     <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
       
-      {/* 4. LOGIKA GAMBAR FIX [cite: 2026-01-10] */}
+      {/* 4. LOGIKA GAMBAR UNIVERSAL [cite: 2026-01-10] */}
       {payloadFrontmatter.image && (
         <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
           {payloadFrontmatter.isPayload ? (
-            /* Payload: Gunakan img murni agar tidak bentrok dengan optimasi lokal [cite: 2026-01-10] */
+            /* Gambar dari Render/R2 [cite: 2026-01-10] */
             <img 
               src={payloadFrontmatter.image} 
               alt={payloadFrontmatter.title} 
@@ -104,7 +98,7 @@ const payloadFrontmatter = post ? {
               onerror="this.style.display='none'"
             />
           ) : (
-            /* Lokal */
+            /* Gambar Lokal (.md) [cite: 2026-01-10] */
             <Image 
               src={payloadFrontmatter.image as any} 
               alt={payloadFrontmatter.title} 
@@ -116,7 +110,7 @@ const payloadFrontmatter = post ? {
         </div>
       )}
       
-      {/* 5. CONTENT [cite: 2026-01-10] */}
+      {/* 5. KONTEN (RICH TEXT ATAU MD) [cite: 2026-01-10] */}
       {payloadFrontmatter.isPayload ? (
         <RichText content={post.content} />
       ) : (
