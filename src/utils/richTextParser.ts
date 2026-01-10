@@ -1,6 +1,9 @@
 export const parseLexicalToMarkdown = (node: any): string => {
   if (!node) return '';
 
+  // DEFINISI URL RENDER [cite: 2026-01-10]
+  const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
+
   if (node.type === 'text') {
     return node.text;
   }
@@ -8,8 +11,9 @@ export const parseLexicalToMarkdown = (node: any): string => {
   if (node.type === 'linebreak') return '\n';
 
   if (node.type === 'upload') {
+    // FIX: Ganti localhost ke PAYLOAD_URL agar gambar R2 muncul di Cloudflare [cite: 2026-01-10]
     const url = node.value?.url
-      ? `http://localhost:3000${node.value.url}`
+      ? `${PAYLOAD_URL}${node.value.url}`
       : '';
     const alt = node.value?.alt || 'image';
     return `\n\n![${alt}](${url})\n\n`;

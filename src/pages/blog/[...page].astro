@@ -5,15 +5,14 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import HeroBlog from '../../components/HeroBlog.astro';
 
-// PAKSA URL RENDER AGAR TABS MENU MUNCUL [cite: 2026-01-10]
+// 1. KONFIGURASI URL RENDER [cite: 2026-01-10]
 const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
 const { page: pageParam } = Astro.params;
 const currentPage = pageParam ? parseInt(pageParam) : 1;
 const pageSize = 9;
-const now = new Date().getTime();
 
-// AMBIL ARTIKEL LOKAL [cite: 2026-01-10]
+// 2. AMBIL ARTIKEL LOKAL [cite: 2026-01-10]
 const blogPosts = await getCollection("blog");
 const localPosts = blogPosts.map(post => ({
     title: post.data.title,
@@ -25,17 +24,20 @@ const localPosts = blogPosts.map(post => ({
     isPayload: false
 }));
 
-// AMBIL ARTIKEL PAYLOAD DARI RENDER US [cite: 2026-01-10]
+// 3. AMBIL ARTIKEL PAYLOAD (FIXED QUERY & STATUS) [cite: 2026-01-10]
 let payloadPosts = [];
 try {
-    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[status][equals]=published&limit=100&sort=-pubDate`);
+    // FIX: Gunakan _status (pakai garis bawah) dan draft=false sesuai log Render abang [cite: 2026-01-10]
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100&sort=-pubDate&draft=false`);
     const data = await res.json();
+    
     payloadPosts = (data.docs || []).map((post: any) => ({
         title: post.title,
         category: post.category,
         pubDate: new Date(post.pubDate),
         description: post.description,
         slug: post.slug,
+        // Pastikan URL gambar absolut agar muncul di Cloudflare [cite: 2026-01-10]
         image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : undefined,
         isPayload: true
     }));
@@ -43,20 +45,20 @@ try {
     console.error("Gagal ambil data Payload di Blog:", e); 
 }
 
-// GABUNGKAN DAN URUTKAN [cite: 2026-01-10]
+// 4. GABUNGKAN DAN URUTKAN BERDASARKAN TANGGAL [cite: 2026-01-10]
 const allCombinedPosts = [...localPosts, ...payloadPosts].sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
 );
 
-// LOGIKA PAGINATION [cite: 2026-01-10]
+// 5. LOGIKA PAGINATION
 const totalPages = Math.ceil(allCombinedPosts.length / pageSize);
 const posts = allCombinedPosts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
 
-// GENERATE DAFTAR KATEGORI UNTUK TABS MENU [cite: 2026-01-10]
+// GENERATE DAFTAR KATEGORI
 const allCategories = ['all', ...new Set(allCombinedPosts.map((post) => post.category).filter(Boolean))];
 ---
 
-<BaseLayout title="Blog"> 
+<BaseLayout title="Blog | Zaidly"> 
     {currentPage === 1 && <HeroBlog />}
     
     <main class="bg-cream-latte/30 min-h-screen">
@@ -74,7 +76,12 @@ const allCategories = ['all', ...new Set(allCombinedPosts.map((post) => post.cat
             </nav>
 
             <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                {posts.map((post) => <PostCard post={post} />)}
+                {posts.map((post) => (
+                    /* PENTING: Pastikan komponen PostCard abang menerima data 
+                       isPayload agar dia bisa buat link yang benar (tanpa /blog/)
+                    */
+                    <PostCard post={post} />
+                ))}
             </section>
 
             <div class="mt-24 border-t border-coffee-brown/10 pt-16 flex justify-between items-center">

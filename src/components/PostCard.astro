@@ -4,7 +4,7 @@ import { Image } from 'astro:assets';
 
 const { post, postType = "Blog" } = Astro.props;
 
-// Data sudah diseragamkan di [...page].astro, tinggal panggil langsung [cite: 2026-01-10]
+// Data sudah diseragamkan di halaman pemanggil
 const { title, description, category, slug, image, pubDate, isPayload } = post;
 
 const formattedDate = pubDate instanceof Date 
@@ -15,17 +15,22 @@ const formattedDate = pubDate instanceof Date
       })
     : 'Recent';
 
+// SEMUA KE ROOT SESUAI REQUEST [cite: 2026-01-10]
 const postUrl = `/${slug}`; 
 ---
 
-<div class="relative group">
+<div class="relative group h-full">
     <a href={postUrl} class="absolute inset-0 z-20" aria-label={title}></a>
-    <div class="bg-white border border-coffee-brown/10 group-hover:border-accent-primary transition-all duration-500 shadow-sm group-hover:shadow-xl">
+    <div class="bg-white border border-coffee-brown/10 group-hover:border-accent-primary transition-all duration-500 shadow-sm group-hover:shadow-xl h-full flex flex-col">
         <div class="relative h-64 w-full bg-coffee-light overflow-hidden">
             {image ? (
-                /* Jika dari Payload pakai img biasa, jika lokal pakai Image Astro [cite: 2026-01-09, 2026-01-10] */
                 isPayload ? (
-                    <img src={image} alt={title} class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s]" />
+                    <img 
+                      src={image} 
+                      alt={title} 
+                      class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s]" 
+                      loading="lazy"
+                    />
                 ) : (
                     <Image src={image} alt={title} width={800} height={450} class="w-full h-full object-cover grayscale-[40%] group-hover:grayscale-0 group-hover:scale-105 transition duration-[1.5s]" />
                 )
@@ -37,13 +42,14 @@ const postUrl = `/${slug}`;
             </div>
         </div>
 
-        <div class="p-8">
+        <div class="p-8 flex flex-col flex-grow">
             {category && (
                 <span class="text-accent-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2 block relative z-30">{category.replace('-', ' ')}</span>
             )}
             <h3 class="text-xl font-black text-coffee-dark mb-4 leading-tight uppercase group-hover:text-accent-primary transition duration-300">{title}</h3>
-            <p class="text-coffee-brown text-base mb-8 line-clamp-3 italic opacity-80">{description}</p>
-            <div class="flex items-center justify-between pt-6 border-t border-coffee-brown/10">
+            <p class="text-coffee-brown text-base mb-8 line-clamp-3 italic opacity-80 flex-grow">{description}</p>
+            
+            <div class="flex items-center justify-between pt-6 border-t border-coffee-brown/10 mt-auto">
                 <div class="flex flex-col">
                     <span class="text-[9px] font-bold text-coffee-brown/40 uppercase tracking-widest">Published</span>
                     <span class="text-[10px] font-black text-coffee-dark uppercase">{formattedDate}</span>

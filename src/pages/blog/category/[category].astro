@@ -5,24 +5,27 @@ import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
 
+// FIXED: Menggunakan URL Render, bukan localhost [cite: 2026-01-10]
+const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 const { category } = Astro.params;
 const now = new Date().getTime();
 
-// 1. AMBIL SEMUA ARTIKEL UNTUK GENERATE TABS [cite: 2026-01-09, 2026-01-10]
+// 1. AMBIL SEMUA ARTIKEL UNTUK GENERATE TABS [cite: 2026-01-10]
 const allLocalForTabs = await getCollection('blog');
 const localPostData = allLocalForTabs.map(p => ({ category: p.data.category }));
 
 let payloadPostData = [];
 try {
-    const res = await fetch(`http://127.0.0.1:3000/api/posts?where[status][equals]=published&limit=100`);
+    // FIX QUERY: Ganti status ke _status dan localhost ke PAYLOAD_URL [cite: 2026-01-10]
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[_status][equals]=published&limit=100&draft=false`);
     const data = await res.json();
     payloadPostData = (data.docs || []).map((p: any) => ({ category: p.category }));
-} catch (e) { console.error(e); }
+} catch (e) { console.error("Error Tab Categories:", e); }
 
-// Gabungkan semua kategori yang ada untuk dijadikan TABS [cite: 2026-01-10]
+// Gabungkan semua kategori untuk TABS
 const allCategories = ['all', ...new Set([...localPostData, ...payloadPostData].map(p => p.category).filter(Boolean))];
 
-// 2. FILTER ARTIKEL KHUSUS KATEGORI INI [cite: 2026-01-09]
+// 2. FILTER ARTIKEL LOKAL
 const filteredLocal = allLocalForTabs
     .filter((post) => post.data.category === category)
     .filter((post) => {
@@ -39,9 +42,11 @@ const filteredLocal = allLocalForTabs
         isPayload: false
     }));
 
+// 3. FILTER ARTIKEL PAYLOAD (FIXED) [cite: 2026-01-10]
 let filteredPayload = [];
 try {
-    const res = await fetch(`http://127.0.0.1:3000/api/posts?where[category][equals]=${category}&where[status][equals]=published`);
+    // FIX: Pastikan memanggil kategori yang benar & status yang benar [cite: 2026-01-10]
+    const res = await fetch(`${PAYLOAD_URL}/api/posts?where[category][equals]=${category}&where[_status][equals]=published&draft=false`);
     const data = await res.json();
     filteredPayload = (data.docs || []).map((post: any) => ({
         title: post.title,
@@ -49,10 +54,11 @@ try {
         pubDate: new Date(post.pubDate),
         category: post.category,
         slug: post.slug,
-        image: post.featuredImage?.url ? `http://127.0.0.1:3000${post.featuredImage.url}` : undefined,
+        // Gunakan URL absolut Render untuk gambar R2 [cite: 2026-01-10]
+        image: post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : undefined,
         isPayload: true
     }));
-} catch (e) { console.error(e); }
+} catch (e) { console.error("Error Filtered Payload:", e); }
 
 const allPosts = [...filteredLocal, ...filteredPayload].sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()

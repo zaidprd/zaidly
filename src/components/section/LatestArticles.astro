@@ -15,17 +15,17 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             {posts.map((post: any) => {
-                // Tentukan apakah ini artikel Payload atau lokal [cite: 2026-01-10]
                 const isPayload = !!post.isPayload;
                 const title = isPayload ? post.title : post.data.title;
                 const slug = isPayload ? post.slug : post.slug;
                 const category = isPayload ? post.category : post.data.category;
                 const description = isPayload ? post.description : post.data.description;
                 
-                // Ambil gambar berdasarkan sumbernya (GANTI KE PAYLOAD_URL RENDER) [cite: 2026-01-10]
-                const imageSrc = isPayload 
-                    ? (post.featuredImage?.url ? `${PAYLOAD_URL}${post.featuredImage.url}` : null)
-                    : post.data.image;
+                // FIXED: Ambil gambar dari properti 'image' yang sudah di-mapping di index.astro [cite: 2026-01-10]
+                const imageSrc = post.image;
+
+                // FIXED LINK: Jika slug berasal dari Payload, link langsung ke /slug [cite: 2026-01-10]
+                const articleUrl = isPayload ? `/${slug}` : `/blog/${slug}`;
 
                 return (
                     <article class="bg-coffee-light rounded-lg overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-accent-primary/20 transition duration-300 flex flex-col h-full">
@@ -33,15 +33,16 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
                         <div class="w-full h-56 overflow-hidden bg-slate-100">
                             {imageSrc ? (
                                 isPayload ? (
-                                    /* Payload: Gunakan img biasa untuk URL luar [cite: 2026-01-10] */
+                                    /* Payload: Menggunakan URL absolut Render/R2 [cite: 2026-01-10] */
                                     <img 
                                         src={imageSrc} 
                                         alt={title} 
                                         class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                                         loading="lazy"
+                                        onerror="this.src='/placeholder-coffee.jpg'"
                                     />
                                 ) : (
-                                    /* Lokal: Gunakan Image Astro untuk optimasi [cite: 2026-01-10] */
+                                    /* Lokal */
                                     <Image 
                                         src={imageSrc} 
                                         alt={title} 
@@ -63,7 +64,7 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
                             </span>
 
                             <h3 class="text-xl font-semibold text-coffee-dark mb-2 line-clamp-2">
-                                <a href={`/blog/${slug}`} class="hover:text-[#8b5e3c] transition">
+                                <a href={articleUrl} class="hover:text-[#8b5e3c] transition">
                                     {title}
                                 </a>
                             </h3>
@@ -73,7 +74,7 @@ const PAYLOAD_URL = 'https://zaidlycms.onrender.com';
                             </p>
                             
                             <div class="mt-auto">
-                                <a href={`/blog/${slug}`} class="text-xs font-black uppercase tracking-widest text-accent-primary hover:underline">
+                                <a href={articleUrl} class="text-xs font-black uppercase tracking-widest text-accent-primary hover:underline">
                                     Read More →
                                 </a>
                             </div>
