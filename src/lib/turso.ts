@@ -17,6 +17,8 @@ export async function getTursoPosts() {
     image: post.r2_image_url ? String(post.r2_image_url) : null, 
     author: post.author ? String(post.author) : "Admin",
     pubDate: post.published_at ? String(post.published_at) : new Date().toISOString(),
+    // WAJIB ADA BIAR ARTIKEL GAK KOSONG
+    content_html: post.content_html ? String(post.content_html) : "",
     isExternal: true 
   }));
 }

@@ -1,4 +1,3 @@
-// src/pages/api/sync.ts
 export const prerender = false;
 import { turso } from "../../lib/turso"; 
 import { toHTML } from "@portabletext/to-html";
@@ -10,62 +9,57 @@ export const POST: APIRoute = async ({ request }) => {
     const data = await request.json();
     if (!data._id) return new Response("Missing ID", { status: 400 });
 
-    // 1. Logic Hapus
     if (data.action === 'delete') {
       await turso.execute({ sql: "DELETE FROM posts WHERE id = ?", args: [data._id] });
       return new Response(JSON.stringify({ message: "Deleted" }), { status: 200 });
     }
 
-    // 2. Setup R2 (Pakai import.meta.env agar terbaca di Cloudflare)
-    const ACCOUNT_ID = import.meta.env.ACCOUNT_ID || process.env.ACCOUNT_ID;
-    const ACCESS_KEY = import.meta.env.R2_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID;
-    const SECRET_KEY = import.meta.env.R2_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY;
-
+    // Setup R2
     const s3Client = new S3Client({
       region: "auto",
-      endpoint: `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`,
+      endpoint: `https://${import.meta.env.ACCOUNT_ID || process.env.ACCOUNT_ID}.r2.cloudflarestorage.com`,
       credentials: {
-        accessKeyId: ACCESS_KEY || "",
-        secretAccessKey: SECRET_KEY || "",
+        accessKeyId: import.meta.env.R2_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID || "",
+        secretAccessKey: import.meta.env.R2_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY || "",
       },
     });
 
     let finalImageUrl = "";
     
-    // 3. Proses Gambar
+    // Proses Gambar
     if (data.mainImage?.asset?._ref) {
       try {
-        const assetId = data.mainImage.asset._ref
-          .replace("image-", "").replace("-webp", ".webp").replace("-jpg", ".jpg").replace("-png", ".png");
+        const assetRef = data.mainImage.asset._ref;
+        const parts = assetRef.split("-");
+        const fileName = `${parts[1]}-${parts[2]}.${parts[3]}`;
         
-        const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID;
+        const projId = import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID;
         const dataset = import.meta.env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET;
-        
-        const sanityUrl = `https://cdn.sanity.io/images/${projectId}/${dataset}/${assetId}`;
+        const sanityUrl = `https://cdn.sanity.io/images/${projId}/${dataset}/${fileName}`;
 
         const imageRes = await fetch(sanityUrl);
         const arrayBuffer = await imageRes.arrayBuffer();
-        const fileName = `blog/${data.slug?.current || data._id}.webp`;
 
         await s3Client.send(new PutObjectCommand({
           Bucket: import.meta.env.R2_BUCKET_NAME || process.env.R2_BUCKET_NAME || "",
-          Key: fileName,
+          Key: `blog/${fileName}`,
           Body: Buffer.from(arrayBuffer),
-          ContentType: "image/webp",
+          ContentType: `image/${parts[3]}`,
         }));
         
-        const publicUrl = import.meta.env.R2_PUBLIC_URL || process.env.R2_PUBLIC_URL;
-        finalImageUrl = `${publicUrl}/${fileName}`;
+        finalImageUrl = `${import.meta.env.R2_PUBLIC_URL || process.env.R2_PUBLIC_URL}/blog/${fileName}`;
       } catch (e) {
-        console.error("R2 Upload failed");
-        finalImageUrl = ""; 
+        // BACKUP: Kalau R2 gagal, pakai link Sanity langsung biar gak kosong
+        const assetRef = data.mainImage.asset._ref;
+        const parts = assetRef.split("-");
+        const projId = import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID;
+        const dataset = import.meta.env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET;
+        finalImageUrl = `https://cdn.sanity.io/images/${projId}/${dataset}/${parts[1]}-${parts[2]}.${parts[3]}`;
       }
     }
 
-    // 4. Update Turso (Tambahkan published_at agar sinkron dengan lib/turso.ts)
     const contentHtml = toHTML(data.body || []);
     const tagsString = Array.isArray(data.tags) ? data.tags.join(', ') : '';
-    const publishedAt = data.publishedAt || new Date().toISOString();
 
     await turso.execute({
       sql: `INSERT INTO posts (id, title, slug, description, category, author, tags, r2_image_url, content_html, published_at) 
@@ -73,8 +67,7 @@ export const POST: APIRoute = async ({ request }) => {
             ON CONFLICT(id) DO UPDATE SET 
             title=excluded.title, slug=excluded.slug, description=excluded.description, 
             category=excluded.category, author=excluded.author, tags=excluded.tags, 
-            r2_image_url=excluded.r2_image_url, content_html=excluded.content_html, 
-            published_at=excluded.published_at`,
+            r2_image_url=excluded.r2_image_url, content_html=excluded.content_html, published_at=excluded.published_at`,
       args: [
         data._id,
         data.title || "Untitled",
@@ -85,7 +78,7 @@ export const POST: APIRoute = async ({ request }) => {
         tagsString,
         finalImageUrl,
         contentHtml,
-        publishedAt
+        data.publishedAt || new Date().toISOString()
       ]
     });
 
