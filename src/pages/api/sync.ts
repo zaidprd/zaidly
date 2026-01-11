@@ -1,16 +1,13 @@
----
-// src/pages/api/sync.ts
 import type { APIRoute } from "astro";
 import { createClient } from "@libsql/client/web";
 import { toHTML } from "@portabletext/to-html";
 
-export const prerender = false; // WAJIB FALSE karena ini API dinamis
+export const prerender = false;
 
 export const POST: APIRoute = async ({ request, locals }) => {
   // @ts-ignore
   const env = locals.runtime?.env;
 
-  // 1. CEK KONFIGURASI
   if (!env || !env.TURSO_URL || !env.TURSO_TOKEN) {
     return new Response(JSON.stringify({ error: "Missing Env Vars" }), { status: 500 });
   }
@@ -30,13 +27,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return new Response(JSON.stringify({ message: "Deleted" }), { status: 200 });
     }
 
-    // 2. PROSES GAMBAR (DOWNLOAD DARI SANITY -> UPLOAD KE R2)
     let finalImageUrl = "";
-    const bucket = env.MY_BUCKET; // Pastikan nama binding di Cloudflare adalah MY_BUCKET
+    // @ts-ignore
+    const bucket = env.MY_BUCKET; 
 
     if (data.mainImage?.asset?._ref) {
       const assetRef = data.mainImage.asset._ref;
-      const parts = assetRef.split("-"); // image-ID-SIZE-EXTENSION
+      const parts = assetRef.split("-");
       const fileName = `${parts[1]}-${parts[2]}.${parts[3]}`;
       
       const projId = env.PUBLIC_SANITY_PROJECT_ID;
@@ -45,29 +42,25 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
       if (bucket) {
         try {
-          // DOWNLOAD GAMBAR
           const imageRes = await fetch(sanityUrl);
           if (imageRes.ok) {
             const arrayBuffer = await imageRes.arrayBuffer();
-            
-            // UPLOAD KE R2
             await bucket.put(`blog/${fileName}`, arrayBuffer, {
               httpMetadata: { contentType: imageRes.headers.get("content-type") || "image/jpeg" }
             });
-
-            // GUNAKAN URL R2 (Ganti domain ini dengan Custom Domain R2 abang)
+            // Ganti ini dengan domain R2 abang kalau sudah ada
             finalImageUrl = `https://r2.zaidly.com/blog/${fileName}`;
+          } else {
+            finalImageUrl = sanityUrl;
           }
-        } catch (uploadError) {
-          console.error("R2 Upload Failed, falling back to Sanity URL", uploadError);
-          finalImageUrl = sanityUrl; // Fallback kalau R2 gagal
+        } catch (e) {
+          finalImageUrl = sanityUrl;
         }
       } else {
-        finalImageUrl = sanityUrl; // Kalau bucket belum di-binding
+        finalImageUrl = sanityUrl;
       }
     }
 
-    // 3. INSERT / UPDATE KE TURSO
     const contentHtml = toHTML(data.body || []);
     const tagsString = Array.isArray(data.tags) ? data.tags.join(', ') : '';
 
