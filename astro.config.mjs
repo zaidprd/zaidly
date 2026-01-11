@@ -8,17 +8,19 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://zaidly.com',
   
-  // Set ke static agar Cloudflare tidak menjalankan script berat saat web dibuka
-  output: 'static', 
+  // GANTI INI JADI 'server' ATAU 'hybrid'
+  // Kalau 'static', API sync abang GAK BAKAL JALAN
+  output: 'server', 
 
   adapter: cloudflare({
-    // Mode directory paling stabil untuk SSG
-    mode: 'directory',
+    // Biarkan default (smart mode) biar variabel runtime kebaca
+    platformProxy: {
+      enabled: true,
+    },
   }),
 
   image: {
     service: {
-      // WAJIB: Noop agar Cloudflare tidak mencoba menjalankan Sharp yang bikin Error 1101
       entrypoint: 'astro/assets/services/noop'
     }
   },
