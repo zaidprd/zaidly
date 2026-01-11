@@ -9,7 +9,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const env = locals.runtime?.env;
 
   if (!env || !env.TURSO_URL || !env.TURSO_TOKEN) {
-    return new Response(JSON.stringify({ error: "Missing Env Vars" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Env Turso Hilang" }), { status: 500 });
   }
 
   const turso = createClient({
@@ -21,7 +21,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
     const data = await request.json();
     if (!data._id) return new Response("Missing ID", { status: 400 });
 
-    // Handle Delete
     if (data.action === 'delete') {
       await turso.execute({ sql: "DELETE FROM posts WHERE id = ?", args: [data._id] });
       return new Response(JSON.stringify({ message: "Deleted" }), { status: 200 });
@@ -33,22 +32,28 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     if (data.mainImage?.asset?._ref) {
       const assetRef = data.mainImage.asset._ref;
-      const parts = assetRef.split("-");
-      const fileName = `${parts[1]}-${parts[2]}.${parts[3]}`;
+      const parts = assetRef.split("-"); 
       
-      const projId = env.PUBLIC_SANITY_PROJECT_ID;
+      // FIX EKSTENSI: Sanity ref itu image-ID-SIZE-EXT
+      const assetId = parts[1];
+      const dimensions = parts[2];
+      const extension = parts[3]; 
+      const fileName = `${assetId}-${dimensions}.${extension}`;
+      
+      const projId = env.PUBLIC_SANITY_PROJECT_ID || "6ocswb4i";
       const dataset = env.PUBLIC_SANITY_DATASET || "production";
       const sanityUrl = `https://cdn.sanity.io/images/${projId}/${dataset}/${fileName}`;
 
+      // COBA PUSH KE R2
       if (bucket) {
         try {
           const imageRes = await fetch(sanityUrl);
           if (imageRes.ok) {
             const arrayBuffer = await imageRes.arrayBuffer();
             await bucket.put(`blog/${fileName}`, arrayBuffer, {
-              httpMetadata: { contentType: imageRes.headers.get("content-type") || "image/jpeg" }
+              httpMetadata: { contentType: `image/${extension === 'jpg' ? 'jpeg' : extension}` }
             });
-            // Ganti ini dengan domain R2 abang kalau sudah ada
+            // Gunakan custom domain R2 abang
             finalImageUrl = `https://r2.zaidly.com/blog/${fileName}`;
           } else {
             finalImageUrl = sanityUrl;
@@ -57,6 +62,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
           finalImageUrl = sanityUrl;
         }
       } else {
+        // Kalau bucket masih undefined, dia bakal kesini
         finalImageUrl = sanityUrl;
       }
     }
@@ -68,15 +74,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       sql: `INSERT INTO posts (id, title, slug, description, category, author, tags, r2_image_url, content_html, published_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET 
-            title=excluded.title, 
-            slug=excluded.slug, 
-            description=excluded.description,
-            category=excluded.category,
-            author=excluded.author,
-            tags=excluded.tags,
-            r2_image_url=excluded.r2_image_url,
-            content_html=excluded.content_html,
-            published_at=excluded.published_at`,
+            title=excluded.title, slug=excluded.slug, r2_image_url=excluded.r2_image_url, content_html=excluded.content_html, published_at=excluded.published_at`,
       args: [
         data._id,
         data.title || "Untitled",
@@ -91,7 +89,11 @@ export const POST: APIRoute = async ({ request, locals }) => {
       ]
     });
 
-    return new Response(JSON.stringify({ success: true, url: finalImageUrl }), { status: 200 });
+    return new Response(JSON.stringify({ 
+        success: true, 
+        url: finalImageUrl, 
+        debug: bucket ? "Bucket OK" : "Bucket Missing" 
+    }), { status: 200 });
 
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
