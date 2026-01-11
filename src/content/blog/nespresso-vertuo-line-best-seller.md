@@ -10,7 +10,7 @@ pubDate: 2026-01-03
 draft: true
 category: bean-roastery
 author: admin
-image: ../../../assets/images/blog/nespresso-vertuo-line-best-seller/image.webp
+image: ../../assets/images/blog/nespresso-vertuo-line-best-seller/image.webp
 tags:
   - gear-lab
   - bean-roastery

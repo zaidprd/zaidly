@@ -13,7 +13,7 @@ import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
 import { getCollection } from 'astro:content';
 import { getTursoPosts } from '../lib/turso';
 
-// 1. AMBIL DATA LOKAL
+// 1. AMBIL DATA LOKAL (.md / .mdx)
 const allLocalPosts = await getCollection('blog') || []; 
 const now = new Date().getTime();
 
@@ -21,35 +21,46 @@ const publishedLocal = allLocalPosts.filter((post) => {
     const isNotDraft = (post.data as any).draft !== true;
     const postTime = new Date(post.data.pubDate).getTime();
     return isNotDraft && postTime <= now;
-}).map(post => ({
-    ...post.data, // Spread data lokal agar fieldnya sejajar
-    slug: post.id || post.slug,
-    isExternal: false,
-    pubDate: post.data.pubDate // Pastikan field ini ada untuk sorting
-}));
+}).map(post => {
+    // FIX: Buang ekstensi .md dari slug
+    const cleanSlug = (post.id || post.slug).replace(/\.(md|mdx)$/, '');
+    
+    return {
+        // FLAT DATA: Keluarkan semua dari post.data ke level atas
+        ...post.data, 
+        title: post.data.title,      // Pastikan title ada di sini
+        description: post.data.description,
+        image: post.data.image,      // Pastikan image ada di sini
+        category: post.data.category,
+        slug: cleanSlug,
+        isExternal: false,
+        pubDate: post.data.pubDate
+    };
+});
 
 // 2. AMBIL DATA TURSO
-let tursoPosts = [];
+let tursoPosts: any[] = [];
 try {
-    const rawTurso = await getTursoPosts();
-    tursoPosts = rawTurso.map(p => ({
+    const rawTurso = await getTursoPosts() as any[];
+    tursoPosts = rawTurso.map((p: any) => ({
         ...p,
         isExternal: true,
-        // FIX: Map published_at dari Turso ke pubDate agar konsisten saat sorting
-        pubDate: p.published_at || p.pubDate 
+        // Gunakan mapping field yang konsisten
+        pubDate: p.published_at || p.created_at || p.pubDate || new Date().toISOString(),
+        image: p.r2_image_url || p.image // Ambil link R2
     }));
 } catch (e) {
     console.error("Gagal ambil data Turso di Index:", e);
 }
 
-// 3. GABUNGKAN DAN URUTKAN (DENGAN PROTEKSI ERROR 500)
-const allCombinedPosts = [...publishedLocal, ...tursoPosts].sort((a, b) => {
+// 3. GABUNGKAN DAN URUTKAN
+const allCombinedPosts = [...publishedLocal, ...tursoPosts].sort((a: any, b: any) => {
     const dateA = new Date(a.pubDate || 0).getTime();
     const dateB = new Date(b.pubDate || 0).getTime();
     return dateB - dateA;
 });
 
-// 4. SLICING UNTUK SETIAP SECTION
+// 4. PEMBAGIAN SECTION
 const latestPosts = allCombinedPosts.slice(0, 3);
 const gearPosts = allCombinedPosts.filter(p => p.category === 'gear-lab' || p.category === 'buying-guides').slice(0, 4);
 const beanPosts = allCombinedPosts.filter(p => p.category === 'bean-roastery').slice(0, 4);
@@ -81,12 +92,9 @@ const featuredCategories = [
         linkUrl="/about" 
     />
     
-    {/* SEKSI GEAR */}
     {gearPosts.length > 0 && <CoffeeGearHub posts={gearPosts} />}
     
-    {/* SEKSI BIJI KOPI */}
     {beanPosts.length > 0 && <CoffeeBeanGuides posts={beanPosts} />}
     
-    {/* SEKSI TERBARU */}
     {latestPosts.length > 0 && <LatestPosts posts={latestPosts} />}
 </MainLayout>

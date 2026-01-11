@@ -9,7 +9,7 @@ pubDate: 2026-01-05
 draft: true
 category: bean-roastery
 author: admin
-image: ../../../assets/images/blog/lavazza-super-crema-vs-qualita-oro/image.webp
+image: ../../assets/images/blog/lavazza-super-crema-vs-qualita-oro/image.webp
 tags:
   - gear-lab
   - bean-roastery

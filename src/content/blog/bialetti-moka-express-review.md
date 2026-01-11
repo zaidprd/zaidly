@@ -8,7 +8,7 @@ pubDate: 2026-01-07T00:00:00
 draft: false
 category: brew-mastery
 author: admin
-image: ../../../assets/images/blog/bialetti-moka-express-review/image.webp
+image: ../../assets/images/blog/bialetti-moka-express-review/image.webp
 tags:
  - gear-lab
   - bean-roastery

@@ -11,7 +11,7 @@ draft: false
 category: gear-lab
 author: admin
 image: >-
-  ../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/image.webp
+  ../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/image.webp
 tags:
   - gear-lab
   - bean-roastery
@@ -27,7 +27,7 @@ In this comprehensive guide, we cut through the noise to bring you the five best
 
 Whether you’re a minimalist backpacker counting every gram or a luxury traveler who refuses to compromise on flavor, we have the perfect portable grinder to make your next trip a truly exceptional coffee journey.
 
-![A selection of the best manual coffee grinders for travel, ready for a trip.](../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/7.webp)
+![A selection of the best manual coffee grinders for travel, ready for a trip.](../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/7.webp)
 
 ## Quick Comparison Table: Top Travel Grinders
 
@@ -83,7 +83,7 @@ The 1Zpresso Q Air is a game-changer for the minimalist traveler. Weighing in at
 
 The Q Air’s most celebrated feature is its size: it’s specifically designed to fit snugly inside the plunger of an AeroPress, making it the ultimate space-saver for those who travel with this popular brewer. While the capacity is smaller (around 18 grams), it’s perfect for a single, generous cup of coffee. It’s a testament to the fact that you don't have to sacrifice flavor for portability.
 
-![The 1Zpresso Q Air manual grinder fitting perfectly inside an AeroPress for compact travel.](../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/6.png)
+![The 1Zpresso Q Air manual grinder fitting perfectly inside an AeroPress for compact travel.](../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/6.png)
 
 **Pros:**
 
@@ -110,7 +110,7 @@ The Timemore C3 Pro has quickly become the gold standard for a high-value manual
 
 The C3 Pro features Timemore’s upgraded S2C (Spike to Cut) burrs, which are incredibly efficient and produce a clean, consistent grind, especially for pour-over methods. It offers a comfortable grip and a generous 25-gram capacity, enough for two standard cups. While the grind adjustment is internal, it’s simple to use and reliable. For the traveler who wants a premium feel and excellent performance without breaking the bank, the C3 Pro is the perfect balance.
 
-![Timemore Chestnut C3 Pro manual grinder with its foldable handle, highlighting its compact travel design.](../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/5.png)
+![Timemore Chestnut C3 Pro manual grinder with its foldable handle, highlighting its compact travel design.](../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/5.png)
 
 **Pros:**
 
@@ -137,7 +137,7 @@ When your travels take you off the beaten path, you need a grinder that can hand
 
 The VSSL Java is fast, thanks to its high-quality stainless steel burr set, and its unique push-button grind selection is intuitive even with cold hands. While it is the heaviest on our list, its durability is unmatched, making it the ideal choice for serious campers, hikers, and overlanders. It’s an investment in a lifetime of fresh coffee, no matter how remote your destination.
 
-![The VSSL Java manual grinder clipped to a backpack in a rugged outdoor camping setting.](../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/4.webp)
+![The VSSL Java manual grinder clipped to a backpack in a rugged outdoor camping setting.](../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/4.webp)
 
 **Pros:**
 
@@ -158,7 +158,7 @@ The Porlex Mini II is a classic for a reason. This Japanese-designed grinder is 
 
 The Mini II uses ceramic burrs, which are less prone to dulling than steel and are completely rust-proof, a major plus for humid or wet environments. While ceramic burrs are generally slower and slightly less consistent than modern steel burrs, the Porlex Mini II still delivers a perfectly acceptable grind for most travel brewing methods. Its simplicity and near-indestructibility make it a reliable, no-fuss travel partner.
 
-![The compact Porlex Mini II manual grinder, a minimalist's choice for travel coffee.](../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/3.webp)
+![The compact Porlex Mini II manual grinder, a minimalist's choice for travel coffee.](../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/3.webp)
 
 **Pros:**
 
@@ -179,7 +179,7 @@ For the coffee connoisseur who refuses to accept any drop in quality while trave
 
 The K-Ultra comes with a high-quality travel case, a foldable handle, and a magnetic catch cup, all designed to make the travel experience as smooth as possible. It is a premium piece of equipment for the traveler who views their coffee ritual as a non-negotiable luxury. If you have the space and the budget, this grinder ensures your travel coffee is just as good as your home brew.
 
-![The premium 1Zpresso K-Ultra manual grinder, showcasing its external adjustment dial and foldable handle.](../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/2.webp)
+![The premium 1Zpresso K-Ultra manual grinder, showcasing its external adjustment dial and foldable handle.](../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/2.webp)
 
 **Pros:**
 
@@ -211,7 +211,7 @@ The quality of your coffee is directly tied to the consistency of your grind. A 
 
 If you primarily brew pour-over or espresso, opt for steel burrs. If you only brew French Press or need maximum durability in wet conditions, ceramic may suffice.
 
-![Close-up of a conical stainless steel burr set, illustrating the mechanism for consistent coffee grinding](../../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/1.webp)
+![Close-up of a conical stainless steel burr set, illustrating the mechanism for consistent coffee grinding](../../assets/images/blog/the-5-best-manual-coffee-grinders-for-travel-in-2025-grind-anywhere-brew-better/1.webp)
 
 ### 3. Adjustment Mechanism
 

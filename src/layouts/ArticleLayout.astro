@@ -4,35 +4,13 @@ import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import { Image } from 'astro:assets';
 
-// Import Gambar Iklan dari Assets
+// Iklan tetap pakai import static
 import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
 import adBambinoImg from '../assets/images/BrevilleBambinoPlus.webp';
 
-export interface Heading {
-    depth: number; 
-    slug: string; 
-    text: string; 
-}
-
-interface CustomFrontmatter {
-    title: string; 
-    description: string;
-    pubDate: Date; 
-    author: string; 
-    image?: any; 
-    tags?: string[];
-    isExternal?: boolean; // Pengganti isPayload
-}
-
-interface Props {
-    frontmatter: CustomFrontmatter; 
-    headings: Heading[]; 
-}
-
 const { frontmatter, headings } = Astro.props; 
 
-// Logika Tampilkan Sidebar (TOC)
-const showSidebar = headings && headings.filter((h: Heading) => h.depth > 1 && h.depth < 4).length > 0;
+const showSidebar = headings && headings.filter((h: any) => h.depth > 1 && h.depth < 4).length > 0;
 
 const formattedDate = frontmatter.pubDate 
     ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
@@ -43,25 +21,18 @@ const ads = {
         title: "Brew Conical Burr Coffee Grinder",
         img: adGrinderImg, 
         link: "https://amzn.to/3YEvz65" 
-    },
-    essential: {
-        title: "Breville Bambino Plus",
-        img: adBambinoImg, 
-        link: "https://amzn.to/your-link-2" 
     }
 };
 
-// Logika Gambar: Gunakan isExternal untuk menentukan apakah ini dari Turso/R2 atau Lokal
-const isRemoteImage = !!frontmatter.isExternal || (typeof frontmatter.image === 'string' && frontmatter.image.startsWith('http'));
+const isExternal = !!frontmatter.isExternal;
 ---
 
 <BaseLayout title={frontmatter.title}>
     <main class="bg-cream-latte min-h-screen text-coffee-dark relative">
-        
-        <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10">
+        <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10 text-center md:text-left">
             <div class="container mx-auto max-w-6xl px-4">
                 <div class="max-w-4xl">
-                    <div class="flex items-center space-x-3 mb-8">
+                    <div class="flex items-center justify-center md:justify-start space-x-3 mb-8">
                         <span class="bg-accent-primary text-white text-[10px] font-black px-3 py-1 tracking-[0.2em] uppercase">Expert Guide</span>
                         <time class="text-[10px] font-bold text-coffee-brown/60 uppercase tracking-widest">{formattedDate}</time>
                     </div>
@@ -69,7 +40,7 @@ const isRemoteImage = !!frontmatter.isExternal || (typeof frontmatter.image === 
                         {frontmatter.title}
                     </h1>
                     <p class="text-coffee-brown font-bold text-xs uppercase tracking-[0.2em]">
-                        Written by <span class="text-accent-primary border-b-2 border-accent-primary/20 pb-0.5">{frontmatter.author}</span>
+                        Written by <span class="text-accent-primary border-b-2 border-accent-primary/20">{frontmatter.author}</span>
                     </p>
                 </div>
             </div>
@@ -77,19 +48,12 @@ const isRemoteImage = !!frontmatter.isExternal || (typeof frontmatter.image === 
 
         <div class="container mx-auto max-w-6xl px-4 py-12">
             <div class="flex flex-col lg:flex-row gap-16">
-                
                 <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
                     
+                    {/* GAMBAR UTAMA: PAKAI IMAGE ASTRO BIAR NGEBUT */}
                     {frontmatter.image && (
-                        <div class="mb-12 border border-coffee-brown/15 bg-white p-2 shadow-sm"> 
-                            {isRemoteImage ? (
-                                <img 
-                                    src={frontmatter.image} 
-                                    alt={frontmatter.title} 
-                                    class="w-full aspect-video object-cover" 
-                                    loading="eager"
-                                />
-                            ) : (
+                        <div class="mb-12 border border-coffee-brown/15 bg-white p-2 shadow-sm">
+                            {isExternal ? (
                                 <Image 
                                     src={frontmatter.image} 
                                     alt={frontmatter.title} 
@@ -98,77 +62,37 @@ const isRemoteImage = !!frontmatter.isExternal || (typeof frontmatter.image === 
                                     class="w-full aspect-video object-cover" 
                                     loading="eager"
                                 />
+                            ) : (
+                                <Image 
+                                    src={frontmatter.image} 
+                                    alt={frontmatter.title} 
+                                    class="w-full aspect-video object-cover" 
+                                    loading="eager"
+                                />
                             )}
                         </div>
                     )}
 
-                    {showSidebar && (
-                        <div class="lg:hidden mb-12">
-                            <details class="group bg-white border-l-4 border-accent-primary shadow-sm">
-                                <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
-                                    <div class="flex items-center space-x-3">
-                                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5 text-accent-primary group-open:rotate-90 transition-transform" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                                            <line x1="8" y1="6" x2="21" y2="6"></line><line x1="8" y1="12" x2="21" y2="12"></line><line x1="8" y1="18" x2="21" y2="18"></line>
-                                        </svg>
-                                        <p class="text-[11px] font-black uppercase tracking-[0.3em] text-coffee-dark italic">Table of Contents</p>
-                                    </div>
-                                    <span class="text-accent-primary group-open:rotate-180 transition-transform">↓</span>
-                                </summary>
-                                <div class="px-6 pb-2 border-t border-coffee-brown/5">
-                                    <TableOfContents headings={headings} />
-                                </div>
-                            </details>
-                        </div>
-                    )}
-                    
-                    <div class="prose prose-coffee max-w-none 
-                        prose-p:text-[19px] md:prose-p:text-[21px] 
-                        prose-headings:font-black prose-headings:uppercase 
-                        prose-a:text-accent-primary prose-a:font-bold hover:prose-a:underline">
-                        <slot /> 
-                    </div>
-
-                    {frontmatter.tags && frontmatter.tags.length > 0 && (
-                        <div class="mt-16 pt-8 border-t border-coffee-brown/10">
-                            <p class="text-[10px] font-black uppercase tracking-[0.3em] text-coffee-brown/50 mb-6 italic">Tagged in</p>
-                            <div class="flex flex-wrap gap-3">
-                                {frontmatter.tags.map((tag: string) => (
-                                    <a 
-                                        href={`/blog/category/${tag.toLowerCase()}`} 
-                                        class="bg-white border border-coffee-brown/10 px-4 py-2 text-[11px] font-black uppercase tracking-widest text-coffee-dark hover:bg-accent-primary hover:text-white hover:border-accent-primary transition-all shadow-sm"
-                                    >
-                                        # {tag.replace('-', ' ')}
-                                    </a>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    <slot />
                 </article>
 
-                {/* SIDEBAR DESKTOP */}
                 {showSidebar && (
                     <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit">
                         <div class="space-y-12">
                             <details open class="group bg-white border-l-4 border-accent-primary shadow-sm">
-                                <summary class="flex items-center justify-between p-6 cursor-pointer list-none">
-                                    <div class="flex items-center space-x-3">
-                                        <p class="text-[10px] font-black uppercase tracking-[0.3em] text-coffee-dark italic">Navigation</p>
-                                    </div>
-                                    <span class="text-accent-primary group-open:rotate-180 transition-transform">↓</span>
-                                </summary>
+                                <summary class="p-6 cursor-pointer list-none font-black text-[10px] uppercase tracking-[0.3em]">Navigation ↓</summary>
                                 <div class="px-6 pb-2 border-t border-coffee-brown/5">
                                     <TableOfContents headings={headings} />
                                 </div>
                             </details>
-
-                            <div class="bg-white border border-coffee-brown/15 p-6 text-center shadow-md">
-                                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">The Top Choice</h3>
-                                <a href={ads.topPick.link} target="_blank" rel="nofollow sponsored" class="group block">
-                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4 border border-coffee-brown/5">
-                                        <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform duration-700" />
+                            
+                            <div class="bg-white border border-coffee-brown/15 p-6 text-center">
+                                <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Top Choice</h3>
+                                <a href={ads.topPick.link} target="_blank" class="group block">
+                                    <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4">
+                                        <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
                                     </div>
-                                    <h4 class="text-sm font-black text-coffee-dark uppercase group-hover:text-accent-primary leading-snug">{ads.topPick.title}</h4>
-                                    <div class="bg-coffee-dark text-white text-[11px] font-black py-4 px-4 mt-4 tracking-widest uppercase hover:bg-accent-primary transition-colors">Check Price</div>
+                                    <h4 class="text-sm font-black uppercase leading-snug">{ads.topPick.title}</h4>
                                 </a>
                             </div>
                         </div>

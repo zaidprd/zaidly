@@ -11,7 +11,7 @@ draft: true
 category: brew-mastery
 author: admin
 image: >-
-  ../../../assets/images/blog/lavazza-super-crema-espresso-coffee-beans/image.webp
+  ../../assets/images/blog/lavazza-super-crema-espresso-coffee-beans/image.webp
 tags:
   - gear-lab
   - bean-roastery
@@ -41,7 +41,7 @@ The name is not an exaggeration. The blend is designed to produce a thick, long-
 
 While "Robusta" was once a dirty word in American coffee culture, Lavazza demonstrates how high-grade Robusta contributes essential body, caffeine, and crema without the "burnt rubber" taste associated with low-quality variants.
 
-![Lavazza Super Crema vs. Qualita Oro: Which One Makes Better Crema?](../../../assets/images/blog/lavazza-super-crema-espresso-coffee-beans/LavazzaSuperCrema2.webp)
+![Lavazza Super Crema vs. Qualita Oro: Which One Makes Better Crema?](../../assets/images/blog/lavazza-super-crema-espresso-coffee-beans/LavazzaSuperCrema2.webp)
 
 ## **Product Specifications**
 

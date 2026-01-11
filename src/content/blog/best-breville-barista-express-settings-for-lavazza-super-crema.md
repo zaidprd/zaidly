@@ -11,7 +11,7 @@ draft: true
 category: gear-lab
 author: admin
 image: >-
-  ../../../assets/images/blog/best-breville-barista-express-settings-for-lavazza-super-crema/image.webp
+  ../../assets/images/blog/best-breville-barista-express-settings-for-lavazza-super-crema/image.webp
 tags:
   - gear-lab
   - bean-roastery

@@ -8,19 +8,18 @@ import PostCard from '../../../components/PostCard.astro';
 import { getTursoPosts } from '../../../lib/turso';
 
 /**
- * 1. GENERATE STATIC PATHS (WAJIB UNTUK SSG)
+ * 1. GENERATE STATIC PATHS
  */
 export async function getStaticPaths() {
     const localPosts = await getCollection('blog');
     
-    let tursoPosts = [];
+    let tursoPosts: any[] = [];
     try {
-        tursoPosts = await getTursoPosts();
+        tursoPosts = await getTursoPosts() as any[];
     } catch (e) {
         console.error("Gagal ambil Turso saat build paths:", e);
     }
 
-    // Ambil semua kategori unik dari Lokal & Turso
     const allCategories = [...new Set([
         ...localPosts.map(p => p.data.category), 
         ...tursoPosts.map(p => p.category)
@@ -38,15 +37,15 @@ const { category } = Astro.params;
  * 2. AMBIL DATA UNTUK HALAMAN INI
  */
 const allLocal = await getCollection('blog');
-let allTurso = [];
+let allTurso: any[] = [];
 try {
-    allTurso = await getTursoPosts();
+    allTurso = await getTursoPosts() as any[];
 } catch (e) {
     allTurso = [];
 }
 
 /**
- * 3. GENERATE TABS KATEGORI (NAVIGASI ATAS)
+ * 3. GENERATE TABS KATEGORI
  */
 const allCategoriesForTabs = ['all', ...new Set([
     ...allLocal.map(p => p.data.category), 
@@ -60,23 +59,27 @@ const filteredLocal = allLocal
     .filter((post) => post.data.category === category)
     .map(post => ({
         ...post.data,
-        slug: post.id || post.slug,
+        // FIX: Hapus ekstensi .md agar link tidak 404
+        slug: (post.id || post.slug).replace(/\.(md|mdx)$/, ''),
         isExternal: false
     }));
 
 const filteredTurso = allTurso
     .filter((post) => post.category === category)
-    .map(post => ({
+    .map((post: any) => ({
         ...post,
-        isExternal: true
+        isExternal: true,
+        // FIX: Pastikan pubDate dan Image terpetakan dengan benar
+        pubDate: post.published_at || post.created_at || post.pubDate,
+        image: post.r2_image_url || post.image
     }));
 
-// 5. GABUNG DAN URUTKAN (LOKAL + SANITY/TURSO)
-const allPosts = [...filteredLocal, ...filteredTurso].sort((a, b) => 
-    new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+// 5. GABUNG DAN URUTKAN
+const allPosts = [...filteredLocal, ...filteredTurso].sort((a: any, b: any) => 
+    new Date(b.pubDate || 0).getTime() - new Date(a.pubDate || 0).getTime()
 );
 
-const categoryName = category ? category.replace('-', ' ') : 'Category';
+const categoryName = category ? String(category).replace('-', ' ') : 'Category';
 ---
 
 <BaseLayout title={`${categoryName} - Zaidly Blog`}>
@@ -108,7 +111,7 @@ const categoryName = category ? category.replace('-', ' ') : 'Category';
         </p>
       </header>
 
-      {/* GRID ARTIKEL (CAMPURAN LOKAL + SANITY) */}
+      {/* GRID ARTIKEL */}
       {allPosts.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
           {allPosts.map(post => (

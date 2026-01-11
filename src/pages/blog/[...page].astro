@@ -8,38 +8,52 @@ import { getCollection } from "astro:content";
 import { getTursoPosts } from '../../lib/turso';
 
 export async function getStaticPaths({ paginate }: any) {
-  // 1. Ambil data lokal (.md)
+  // 1. Ambil data lokal
   const localPosts = (await getCollection("blog")).map(p => ({
     ...p.data,
-    slug: p.id || p.slug,
+    slug: (p.id || p.slug).replace(/\.(md|mdx)$/, ''),
     isExternal: false,
+    pubDate: p.data.pubDate
   }));
 
   // 2. Ambil data Turso
-  let tursoPosts = [];
+  let tursoPosts: any[] = [];
   try {
-    tursoPosts = await getTursoPosts();
+    const rawTurso = await getTursoPosts() as any[];
+    tursoPosts = rawTurso.map(p => ({
+      ...p,
+      isExternal: true,
+      pubDate: p.published_at || p.created_at || p.pubDate,
+      image: p.r2_image_url || p.image
+    }));
   } catch (e) {
     console.error("Turso build error:", e);
   }
 
-  // 3. Gabungkan dan Urutkan
   const allPosts = [...localPosts, ...tursoPosts].sort(
-    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+    (a: any, b: any) => new Date(b.pubDate || 0).getTime() - new Date(a.pubDate || 0).getTime()
   );
 
   return paginate(allPosts, { pageSize: 9 });
 }
 
-const { page } = Astro.props;
+// FIX: Definisikan props agar TypeScript tidak menganggap 'never'
+interface Props {
+  page: any;
+}
 
-// --- LOGIKA TABS KATEGORI (BIAR MUNCUL DI ATAS) ---
+const { page } = Astro.props as Props;
+
+// --- LOGIKA TABS KATEGORI ---
 const allLocalForTabs = await getCollection('blog');
-const tursoPostsAll = await getTursoPosts();
+let tursoPostsAll: any[] = [];
+try {
+    tursoPostsAll = await getTursoPosts() as any[];
+} catch(e) {}
 
 const allCategories = ['all', ...new Set([
     ...allLocalForTabs.map(p => p.data.category), 
-    ...tursoPostsAll.map(p => p.category)
+    ...tursoPostsAll.map((p: any) => p.category)
 ].filter(Boolean))];
 ---
 
@@ -64,6 +78,7 @@ const allCategories = ['all', ...new Set([
         ))}
       </div>
 
+      {/* PAGINATION */}
       <div class="flex justify-center items-center gap-6 mt-20">
         {page.url.prev ? (
           <a href={page.url.prev} class="text-[10px] font-black uppercase tracking-widest border border-coffee-dark px-8 py-3 hover:bg-coffee-dark hover:text-white transition">Prev</a>
