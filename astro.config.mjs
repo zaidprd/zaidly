@@ -1,23 +1,24 @@
-// astro.config.mjs
 import { defineConfig } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
-import cloudflare from '@astrojs/cloudflare'; // Tambahkan ini lagi
+import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   site: 'https://zaidly.com',
   
-  // Tetap SSG (Static) agar aman dan kencang
+  // Set ke static agar Cloudflare tidak menjalankan script berat saat web dibuka
   output: 'static', 
 
-  // Adapter tetap butuh Cloudflare untuk proses build yang benar
-  adapter: cloudflare(),
+  adapter: cloudflare({
+    // Mode directory paling stabil untuk SSG
+    mode: 'directory',
+  }),
 
   image: {
     service: {
-      // Noop agar build tidak berat dan tidak butuh Sharp di Cloudflare
+      // WAJIB: Noop agar Cloudflare tidak mencoba menjalankan Sharp yang bikin Error 1101
       entrypoint: 'astro/assets/services/noop'
     }
   },
