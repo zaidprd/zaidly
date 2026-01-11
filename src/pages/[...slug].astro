@@ -1,34 +1,15 @@
 ---
-// src/pages/blog/[...slug].astro
+// src/pages/[...slug].astro
 export const prerender = true;
 
 import { getCollection, render } from 'astro:content'; 
 import { Image } from 'astro:assets'; 
-import BaseLayout from '../../layouts/BaseLayout.astro';
-import ArticleLayout from '../../layouts/ArticleLayout.astro';
-import Error404 from '../../components/Error404.astro';
-import { getTursoPosts } from '../../lib/turso';
-
-/**
- * SATU-SATUNYA FUNGSI SLUG (GLOBAL DI FILE INI)
- */
-const cleanSlug = (text: string) => {
-    if (!text) return '';
-    return text
-        .toString()
-        .toLowerCase()
-        .trim()
-        .replace(/\.mdx$/, '')
-        .replace(/\.md$/, '')
-        .replace(/\s+/g, '-')
-        .replace(/[^\w-]+/g, '')
-        .replace(/--+/g, '-')
-        .replace(/-mdx$/, '')
-        .replace(/-md$/, '');
-};
+import BaseLayout from '../layouts/BaseLayout.astro';
+import ArticleLayout from '../layouts/ArticleLayout.astro';
+import Error404 from '../components/Error404.astro';
+import { getTursoPosts } from '../lib/turso';
 
 export async function getStaticPaths() {
-    // Definisi ulang di dalam scope untuk build-safety Cloudflare
     const internalSlugify = (text: string) => {
         if (!text) return '';
         return text.toString().toLowerCase().trim()
@@ -60,6 +41,14 @@ export async function getStaticPaths() {
 
 const { post, isExternal } = Astro.props;
 
+const cleanSlug = (text: string) => {
+    if (!text) return '';
+    return text.toString().toLowerCase().trim()
+        .replace(/\.mdx$/, '').replace(/\.md$/, '')
+        .replace(/\s+/g, '-').replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-').replace(/-mdx$/, '').replace(/-md$/, '');
+};
+
 let DynamicContent: any = null; 
 let allHeadings: any[] = []; 
 
@@ -71,24 +60,19 @@ if (!isExternal && post) {
 
 const finalFrontmatter = isExternal 
     ? {
-        title: post.title,
-        description: post.description,
-        pubDate: post.pubDate,
-        author: post.author || "Admin",
-        image: post.image,
+        ...post,
         isExternal: true,
-        canonical: `https://zaidly.com/blog/${cleanSlug(post.slug)}`
+        canonical: `https://zaidly.com/${cleanSlug(post.slug)}`
     } 
     : {
         ...post?.data,
         isExternal: false,
-        canonical: `https://zaidly.com/blog/${cleanSlug(post.id || post.slug)}`
+        canonical: `https://zaidly.com/${cleanSlug(post.id || post.slug)}`
     };
 ---
 
 {finalFrontmatter ? (
     <ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
-        {/* CONTAINER PUTIH BEANHUB */}
         <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
             {finalFrontmatter.image && (
                 <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
