@@ -8,17 +8,18 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://zaidly.com',
   
-  // Ganti ke hybrid agar API Sync bisa jalan [cite: 2026-01-11]
-  output: 'static', 
+  // Set ke server agar SSR dan API Sync jalan real-time
+  output: 'server', 
   
   adapter: cloudflare({
     mode: 'directory',
     runtime: { mode: 'complete' } 
   }),
 
+  // PENTING: Matikan Sharp untuk Cloudflare agar tidak Error 1101
   image: {
     service: {
-      entrypoint: 'astro/assets/services/sharp'
+      entrypoint: 'astro/assets/services/noop' 
     }
   },
 
