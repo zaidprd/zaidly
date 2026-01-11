@@ -16,53 +16,65 @@ export const POST: APIRoute = async ({ request }) => {
       return new Response(JSON.stringify({ message: "Deleted" }), { status: 200 });
     }
 
-    // 2. Setup R2 (Gunakan Default jika variabel kosong agar tidak crash)
+    // 2. Setup R2 (Pakai import.meta.env agar terbaca di Cloudflare)
+    const ACCOUNT_ID = import.meta.env.ACCOUNT_ID || process.env.ACCOUNT_ID;
+    const ACCESS_KEY = import.meta.env.R2_ACCESS_KEY_ID || process.env.R2_ACCESS_KEY_ID;
+    const SECRET_KEY = import.meta.env.R2_SECRET_ACCESS_KEY || process.env.R2_SECRET_ACCESS_KEY;
+
     const s3Client = new S3Client({
       region: "auto",
-      endpoint: `https://${process.env.ACCOUNT_ID || ''}.r2.cloudflarestorage.com`,
+      endpoint: `https://${ACCOUNT_ID}.r2.cloudflarestorage.com`,
       credentials: {
-        accessKeyId: process.env.R2_ACCESS_KEY_ID || "",
-        secretAccessKey: process.env.R2_SECRET_ACCESS_KEY || "",
+        accessKeyId: ACCESS_KEY || "",
+        secretAccessKey: SECRET_KEY || "",
       },
     });
 
     let finalImageUrl = "";
     
-    // 3. Proses Gambar (Dalam blok try sendiri agar jika gagal, teks tetap masuk)
+    // 3. Proses Gambar
     if (data.mainImage?.asset?._ref) {
       try {
         const assetId = data.mainImage.asset._ref
           .replace("image-", "").replace("-webp", ".webp").replace("-jpg", ".jpg").replace("-png", ".png");
-        const sanityUrl = `https://cdn.sanity.io/images/${process.env.PUBLIC_SANITY_PROJECT_ID}/${process.env.PUBLIC_SANITY_DATASET}/${assetId}`;
+        
+        const projectId = import.meta.env.PUBLIC_SANITY_PROJECT_ID || process.env.PUBLIC_SANITY_PROJECT_ID;
+        const dataset = import.meta.env.PUBLIC_SANITY_DATASET || process.env.PUBLIC_SANITY_DATASET;
+        
+        const sanityUrl = `https://cdn.sanity.io/images/${projectId}/${dataset}/${assetId}`;
 
         const imageRes = await fetch(sanityUrl);
         const arrayBuffer = await imageRes.arrayBuffer();
         const fileName = `blog/${data.slug?.current || data._id}.webp`;
 
         await s3Client.send(new PutObjectCommand({
-          Bucket: process.env.R2_BUCKET_NAME || "",
+          Bucket: import.meta.env.R2_BUCKET_NAME || process.env.R2_BUCKET_NAME || "",
           Key: fileName,
           Body: Buffer.from(arrayBuffer),
           ContentType: "image/webp",
         }));
-        finalImageUrl = `${process.env.R2_PUBLIC_URL}/${fileName}`;
+        
+        const publicUrl = import.meta.env.R2_PUBLIC_URL || process.env.R2_PUBLIC_URL;
+        finalImageUrl = `${publicUrl}/${fileName}`;
       } catch (e) {
-        console.error("R2 Upload failed, using placeholder");
-        finalImageUrl = "https://placehold.co/600x400?text=Image+Upload+Failed";
+        console.error("R2 Upload failed");
+        finalImageUrl = ""; 
       }
     }
 
-    // 4. Update Turso
+    // 4. Update Turso (Tambahkan published_at agar sinkron dengan lib/turso.ts)
     const contentHtml = toHTML(data.body || []);
     const tagsString = Array.isArray(data.tags) ? data.tags.join(', ') : '';
+    const publishedAt = data.publishedAt || new Date().toISOString();
 
     await turso.execute({
-      sql: `INSERT INTO posts (id, title, slug, description, category, author, tags, r2_image_url, content_html) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      sql: `INSERT INTO posts (id, title, slug, description, category, author, tags, r2_image_url, content_html, published_at) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET 
             title=excluded.title, slug=excluded.slug, description=excluded.description, 
             category=excluded.category, author=excluded.author, tags=excluded.tags, 
-            r2_image_url=excluded.r2_image_url, content_html=excluded.content_html`,
+            r2_image_url=excluded.r2_image_url, content_html=excluded.content_html, 
+            published_at=excluded.published_at`,
       args: [
         data._id,
         data.title || "Untitled",
@@ -72,13 +84,13 @@ export const POST: APIRoute = async ({ request }) => {
         data.author || "Admin",
         tagsString,
         finalImageUrl,
-        contentHtml
+        contentHtml,
+        publishedAt
       ]
     });
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error: any) {
-    // Ini yang akan muncul di log Cloudflare jika masih Exception
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
   }
 };
