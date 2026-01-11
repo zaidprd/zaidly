@@ -1,6 +1,5 @@
 import type { APIRoute } from "astro";
 import { createClient } from "@libsql/client/web";
-import { toHTML } from "@portabletext/to-html";
 
 export const prerender = false;
 
@@ -9,7 +8,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
   const env = locals.runtime?.env;
 
   if (!env || !env.TURSO_URL || !env.TURSO_TOKEN) {
-    return new Response(JSON.stringify({ error: "Env Turso Hilang" }), { status: 500 });
+    return new Response(JSON.stringify({ error: "Config Turso Missing" }), { status: 500 });
   }
 
   const turso = createClient({
@@ -23,9 +22,10 @@ export const POST: APIRoute = async ({ request, locals }) => {
 
     if (data.action === 'delete') {
       await turso.execute({ sql: "DELETE FROM posts WHERE id = ?", args: [data._id] });
-      return new Response(JSON.stringify({ message: "Deleted" }), { status: 200 });
+      return new Response("Deleted", { status: 200 });
     }
 
+    // --- LOGIC GAMBAR R2 TETAP SAMA ---
     let finalImageUrl = "";
     // @ts-ignore
     const bucket = env.MY_BUCKET; 
@@ -33,18 +33,13 @@ export const POST: APIRoute = async ({ request, locals }) => {
     if (data.mainImage?.asset?._ref) {
       const assetRef = data.mainImage.asset._ref;
       const parts = assetRef.split("-"); 
-      
-      // FIX EKSTENSI: Sanity ref itu image-ID-SIZE-EXT
       const assetId = parts[1];
       const dimensions = parts[2];
-      const extension = parts[3]; 
+      const extension = parts[parts.length - 1]; 
       const fileName = `${assetId}-${dimensions}.${extension}`;
-      
       const projId = env.PUBLIC_SANITY_PROJECT_ID || "6ocswb4i";
-      const dataset = env.PUBLIC_SANITY_DATASET || "production";
-      const sanityUrl = `https://cdn.sanity.io/images/${projId}/${dataset}/${fileName}`;
+      const sanityUrl = `https://cdn.sanity.io/images/${projId}/production/${fileName}`;
 
-      // COBA PUSH KE R2
       if (bucket) {
         try {
           const imageRes = await fetch(sanityUrl);
@@ -53,7 +48,6 @@ export const POST: APIRoute = async ({ request, locals }) => {
             await bucket.put(`blog/${fileName}`, arrayBuffer, {
               httpMetadata: { contentType: `image/${extension === 'jpg' ? 'jpeg' : extension}` }
             });
-            // Gunakan custom domain R2 abang
             finalImageUrl = `https://r2.zaidly.com/blog/${fileName}`;
           } else {
             finalImageUrl = sanityUrl;
@@ -62,19 +56,29 @@ export const POST: APIRoute = async ({ request, locals }) => {
           finalImageUrl = sanityUrl;
         }
       } else {
-        // Kalau bucket masih undefined, dia bakal kesini
         finalImageUrl = sanityUrl;
       }
     }
 
-    const contentHtml = toHTML(data.body || []);
+    // --- PERBAIKAN DI SINI (SISTEM MARKDOWN) ---
+    // Karena data.body sekarang sudah string Markdown, kita simpan MENTAH ke Turso.
+    // Kita tidak perlu lagi toHTML di sini.
+    const bodyContent = typeof data.body === 'string' ? data.body : ""; 
     const tagsString = Array.isArray(data.tags) ? data.tags.join(', ') : '';
 
     await turso.execute({
       sql: `INSERT INTO posts (id, title, slug, description, category, author, tags, r2_image_url, content_html, published_at) 
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET 
-            title=excluded.title, slug=excluded.slug, r2_image_url=excluded.r2_image_url, content_html=excluded.content_html, published_at=excluded.published_at`,
+            title=excluded.title, 
+            slug=excluded.slug, 
+            description=excluded.description,
+            category=excluded.category,
+            author=excluded.author,
+            tags=excluded.tags,
+            r2_image_url=excluded.r2_image_url,
+            content_html=excluded.content_html,
+            published_at=excluded.published_at`,
       args: [
         data._id,
         data.title || "Untitled",
@@ -84,16 +88,12 @@ export const POST: APIRoute = async ({ request, locals }) => {
         data.author || "Admin",
         tagsString,
         finalImageUrl,
-        contentHtml,
+        bodyContent, // Simpan sebagai string Markdown mentah
         data.publishedAt || new Date().toISOString()
       ]
     });
 
-    return new Response(JSON.stringify({ 
-        success: true, 
-        url: finalImageUrl, 
-        debug: bucket ? "Bucket OK" : "Bucket Missing" 
-    }), { status: 200 });
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
 
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });

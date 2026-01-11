@@ -30,10 +30,9 @@ export default {
             '--tw-prose-captions': theme('colors.coffee-brown'),
             '--tw-prose-hr': theme('colors.coffee-dark / 0.1'),
             
-            // Pengaturan Keterbacaan (Readability)
             'p': {
-              marginBottom: '1.8rem', // Jarak antar paragraf lebih lega (Standar US)
-              lineHeight: '1.8',      // Spasi antar baris teks
+              marginBottom: '1.8rem',
+              lineHeight: '1.8',
               fontWeight: '400',
             },
             'h2, h3, h4': {
@@ -48,7 +47,7 @@ export default {
               borderLeftColor: theme('colors.accent-primary'),
               fontStyle: 'italic',
               fontWeight: '500',
-              backgroundColor: '#FFFFFF', // Kotak putih tipis untuk quote
+              backgroundColor: '#FFFFFF',
               padding: '1rem 1.5rem',
             },
             'li': {
@@ -65,6 +64,28 @@ export default {
                 backgroundColor: theme('colors.accent-primary'),
                 color: '#FFFFFF',
               },
+            },
+            // --- FIX TABEL BIAR GARISNYA MUNCUL ---
+            'table': {
+              width: '100%',
+              marginTop: '2rem',
+              marginBottom: '2rem',
+              borderCollapse: 'collapse',
+            },
+            'thead th': {
+              backgroundColor: theme('colors.cream-latte'),
+              color: theme('colors.coffee-dark'),
+              padding: '0.75rem',
+              borderWidth: '1px',
+              borderColor: 'rgba(60, 47, 47, 0.1)',
+              textAlign: 'left',
+              fontWeight: '700',
+            },
+            'tbody td': {
+              padding: '0.75rem',
+              borderWidth: '1px',
+              borderColor: 'rgba(60, 47, 47, 0.1)',
+              color: theme('colors.coffee-brown'),
             },
           },
         },

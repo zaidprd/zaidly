@@ -8,25 +8,28 @@ import cloudflare from '@astrojs/cloudflare';
 export default defineConfig({
   site: 'https://zaidly.com',
   
-  // GANTI INI JADI 'server' ATAU 'hybrid'
-  // Kalau 'static', API sync abang GAK BAKAL JALAN
+  // Tetap 'server' agar Webhook Sanity -> Turso abang bisa diproses secara dinamis
   output: 'server', 
 
   adapter: cloudflare({
-    // Biarkan default (smart mode) biar variabel runtime kebaca
     platformProxy: {
       enabled: true,
     },
   }),
 
   image: {
+    // Pakai noop karena abang pakai R2/Cloudflare untuk handle gambar eksternal
     service: {
       entrypoint: 'astro/assets/services/noop'
     }
   },
 
   integrations: [
-    tailwind(),
+    tailwind({
+      // Ini memastikan config di tailwind.config.mjs (termasuk plugin typography) 
+      // terbaca dengan sempurna oleh Astro
+      applyBaseStyles: true,
+    }),
     sitemap(),
     mdx(),
     react(),
