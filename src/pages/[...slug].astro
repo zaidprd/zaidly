@@ -1,6 +1,6 @@
 ---
 // src/pages/[...slug].astro
-export const prerender = true; // WAJIB TRUE agar tidak Error 1101
+export const prerender = true; // WAJIB TRUE agar web tidak Error 1101
 
 import { getCollection, render } from 'astro:content'; 
 import { Image } from 'astro:assets'; 
@@ -9,7 +9,10 @@ import ArticleLayout from '../layouts/ArticleLayout.astro';
 import Error404 from '../components/Error404.astro';
 import { getTursoPosts } from '../lib/turso';
 
-// FUNGSI PEMBERSIH URL (Sama dengan di PostCard)
+/**
+ * 1. DEFINISI FUNGSI PEMBERSIH URL (Paling Atas)
+ * Menghilangkan .md, .mdx, spasi, dan buntut "md/mdx"
+ */
 const cleanSlug = (text: string) => {
     return text
         .toString()
@@ -24,21 +27,23 @@ const cleanSlug = (text: string) => {
         .replace(/-md$/, '');
 };
 
+/**
+ * 2. GENERATE PATHS SAAT BUILD
+ */
 export async function getStaticPaths() {
-    // 1. Ambil Data Lokal (.md / .mdx)
+    // Ambil Data Lokal (.md / .mdx)
     const localPosts = await getCollection('blog');
     const localPaths = localPosts.map(post => ({
-        // Kita BERSIHKAN slug-nya di sini agar URL-nya cantik
         params: { slug: cleanSlug(post.id || post.slug) }, 
         props: { post, isExternal: false }
     }));
 
-    // 2. Ambil Data Turso
+    // Ambil Data Turso
     let tursoPosts = [];
     try {
         tursoPosts = await getTursoPosts();
     } catch (e) {
-        console.error("Gagal ambil Turso saat build:", e);
+        console.error("Gagal ambil Turso saat build paths:", e);
     }
     
     const tursoPaths = tursoPosts.map(post => ({
@@ -55,13 +60,13 @@ let DynamicContent: any = null;
 let allHeadings: any[] = []; 
 
 if (!isExternal) {
-    // Render Konten Markdown Lokal
+    // Render Markdown Lokal
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
     allHeadings = rendered.headings; 
 }
 
-// Mapping Frontmatter agar seragam
+// Mapping data agar seragam untuk Layout
 const finalFrontmatter = isExternal 
     ? {
         title: post.title,
@@ -77,35 +82,46 @@ const finalFrontmatter = isExternal
     };
 ---
 
-<ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
-    <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
-        
-        {finalFrontmatter.image && (
-            <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
+{finalFrontmatter ? (
+    <ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
+        {/* CONTAINER PUTIH BERSIH (BEANHUB STYLE) */}
+        <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
+            
+            {/* RENDER GAMBAR UTAMA */}
+            {finalFrontmatter.image && (
+                <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
+                    {isExternal ? (
+                        <img 
+                            src={finalFrontmatter.image} 
+                            alt={finalFrontmatter.title} 
+                            class="w-full h-auto object-cover max-h-[600px] block" 
+                        />
+                    ) : (
+                        <Image 
+                            src={finalFrontmatter.image as any} 
+                            alt={finalFrontmatter.title} 
+                            width={1200} 
+                            height={675}
+                            class="w-full h-auto object-cover max-h-[600px]" 
+                        />
+                    )}
+                </div>
+            )}
+            
+            {/* RENDER ISI KONTEN */}
+            <div class="prose prose-coffee max-w-none">
                 {isExternal ? (
-                    <img 
-                        src={finalFrontmatter.image} 
-                        alt={finalFrontmatter.title} 
-                        class="w-full h-auto object-cover max-h-[600px]" 
-                    />
+                    /* RENDER HTML DARI TURSO */
+                    <div set:html={post.body} />
                 ) : (
-                    <Image 
-                        src={finalFrontmatter.image as any} 
-                        alt={finalFrontmatter.title} 
-                        width={1200} 
-                        height={675}
-                        class="w-full h-auto object-cover max-h-[600px]" 
-                    />
+                    /* RENDER MARKDOWN LOKAL */
+                    DynamicContent && <DynamicContent />
                 )}
             </div>
-        )}
-        
-        <div class="prose prose-coffee max-w-none">
-            {isExternal ? (
-                <div set:html={post.body} />
-            ) : (
-                DynamicContent && <DynamicContent />
-            )}
         </div>
-    </div>
-</ArticleLayout>
+    </ArticleLayout>
+) : (
+    <BaseLayout title="404 Not Found">
+        <Error404 />
+    </BaseLayout>
+)}
