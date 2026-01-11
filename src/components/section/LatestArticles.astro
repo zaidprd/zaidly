@@ -12,65 +12,71 @@ const { posts } = Astro.props;
 
         <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
             {posts && posts.map((post: any) => {
-                // LOGIKA PROTEKSI: Cek apakah data dibungkus dalam .data (Lokal) atau langsung (Turso)
+                // 1. IDENTIFIKASI SUMBER DATA
                 const isExternal = !!post.isExternal;
                 
-                // Ambil data dengan fallback agar tidak crash
+                // 2. AMBIL DATA DENGAN FALLBACK (Local pakai .data, Turso langsung)
                 const title = isExternal ? post.title : (post.data?.title || "Untitled");
                 const slug = isExternal ? post.slug : (post.slug || post.id);
-                const category = isExternal ? post.category : (post.data?.category || "Coffee");
+                const category = isExternal ? (post.category || "Coffee") : (post.data?.category || "Coffee");
                 const description = isExternal ? post.description : (post.data?.description || "");
-                const imageSrc = isExternal ? post.image : (post.data?.image || post.image);
+                const imageSrc = isExternal ? post.image : post.data?.image;
 
+                // 3. GENERATE URL (Pastikan sesuai dengan routing [...slug].astro)
                 const articleUrl = `/${slug}`;
 
                 return (
-                    <article class="bg-coffee-light rounded-lg overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-accent-primary/20 transition duration-300 flex flex-col h-full">
+                    <article class="bg-white rounded-[1.5rem] overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-accent-primary/10 transition duration-500 flex flex-col h-full group">
                         
-                        <div class="w-full h-56 overflow-hidden bg-slate-100">
+                        {/* WRAPPER GAMBAR */}
+                        <div class="w-full h-56 overflow-hidden bg-slate-50 relative">
                             {imageSrc ? (
                                 isExternal ? (
                                     <img 
                                         src={imageSrc} 
                                         alt={title} 
-                                        class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                         loading="lazy"
-                                        onerror="this.src='/placeholder-coffee.jpg'"
                                     />
                                 ) : (
                                     <Image 
                                         src={imageSrc} 
                                         alt={title} 
-                                        width={400} 
-                                        height={224} 
-                                        class="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                                        width={600} 
+                                        height={337} 
+                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                     />
                                 )
                             ) : (
-                                <div class="w-full h-full bg-coffee-brown/10 flex items-center justify-center text-coffee-brown/40">
-                                    No Image
+                                <div class="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300 italic text-xs">
+                                    No Image Available
                                 </div>
                             )}
+                            
+                            {/* BADGE KATEGORI DI ATAS GAMBAR */}
+                            <div class="absolute top-4 left-4">
+                                <span class="bg-white/90 backdrop-blur-sm text-coffee-dark text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                                    {category.replace('-', ' ')}
+                                </span>
+                            </div>
                         </div>
 
-                        <div class="p-6 flex flex-col flex-grow">
-                            <span class="inline-block bg-accent-primary/10 text-[#5d4037] text-[10px] font-bold uppercase mb-3 px-2 py-1 rounded w-fit">
-                                {category.replace('-', ' ')}
-                            </span>
-
-                            <h3 class="text-xl font-semibold text-coffee-dark mb-2 line-clamp-2">
-                                <a href={articleUrl} class="hover:text-[#8b5e3c] transition">
+                        {/* ISI KONTEN */}
+                        <div class="p-8 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-coffee-dark mb-3 line-clamp-2 leading-tight group-hover:text-accent-primary transition-colors">
+                                <a href={articleUrl}>
                                     {title}
                                 </a>
                             </h3>
                             
-                            <p class="text-sm text-coffee-brown/95 line-clamp-3 mb-4"> 
+                            <p class="text-sm text-coffee-brown/80 line-clamp-3 mb-6 leading-relaxed"> 
                                 {description}
                             </p>
                             
-                            <div class="mt-auto">
-                                <a href={articleUrl} class="text-xs font-black uppercase tracking-widest text-accent-primary hover:underline">
-                                    Read More →
+                            <div class="mt-auto pt-6 border-t border-slate-50">
+                                <a href={articleUrl} class="text-[10px] font-black uppercase tracking-[0.2em] text-accent-primary flex items-center gap-2 group/link">
+                                    Read Article 
+                                    <span class="transition-transform duration-300 group-hover/link:translate-x-1">→</span>
                                 </a>
                             </div>
                         </div>
@@ -79,9 +85,9 @@ const { posts } = Astro.props;
             })}
         </div>
         
-        {/* Tombol View All */}
-        <div class="text-center mt-12">
-            <a href="/blog" class="inline-block border border-coffee-dark text-coffee-dark font-semibold px-10 py-3 rounded-lg hover:bg-coffee-dark hover:text-white transition duration-300">
+        {/* BUTTON VIEW ALL */}
+        <div class="text-center mt-16">
+            <a href="/blog" class="inline-block bg-coffee-dark text-white text-[11px] font-black uppercase tracking-[0.2em] px-10 py-4 rounded-full hover:bg-accent-primary hover:shadow-lg hover:shadow-accent-primary/30 transition duration-300">
                 View All Articles
             </a>
         </div>
