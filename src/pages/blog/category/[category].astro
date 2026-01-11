@@ -1,24 +1,31 @@
 ---
 // src/pages/blog/category/[category].astro
-export const prerender = true; // WAJIB TRUE biar nggak Error 1101
+export const prerender = true; 
 
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
 import { getTursoPosts } from '../../../lib/turso';
 
-// 1. FUNGSI WAJIB UNTUK SSG (Static)
+/**
+ * 1. GENERATE STATIC PATHS (WAJIB UNTUK SSG)
+ */
 export async function getStaticPaths() {
     const localPosts = await getCollection('blog');
-    const tursoPosts = await getTursoPosts();
+    
+    let tursoPosts = [];
+    try {
+        tursoPosts = await getTursoPosts();
+    } catch (e) {
+        console.error("Gagal ambil Turso saat build paths:", e);
+    }
 
-    // Ambil semua kategori unik dari lokal dan database
+    // Ambil semua kategori unik dari Lokal & Turso
     const allCategories = [...new Set([
         ...localPosts.map(p => p.data.category), 
         ...tursoPosts.map(p => p.category)
     ].filter(Boolean))];
 
-    // Beritahu Astro halaman apa saja yang harus dibuat pas build
     return allCategories.map(cat => ({
         params: { category: cat },
         props: { category: cat }
@@ -27,17 +34,28 @@ export async function getStaticPaths() {
 
 const { category } = Astro.params;
 
-// 2. AMBIL SEMUA DATA
+/**
+ * 2. AMBIL DATA UNTUK HALAMAN INI
+ */
 const allLocal = await getCollection('blog');
-const allTurso = await getTursoPosts();
+let allTurso = [];
+try {
+    allTurso = await getTursoPosts();
+} catch (e) {
+    allTurso = [];
+}
 
-// 3. GENERATE TABS KATEGORI
+/**
+ * 3. GENERATE TABS KATEGORI (NAVIGASI ATAS)
+ */
 const allCategoriesForTabs = ['all', ...new Set([
     ...allLocal.map(p => p.data.category), 
     ...allTurso.map(p => p.category)
 ].filter(Boolean))];
 
-// 4. FILTERING
+/**
+ * 4. FILTERING & MAPPING
+ */
 const filteredLocal = allLocal
     .filter((post) => post.data.category === category)
     .map(post => ({
@@ -46,9 +64,14 @@ const filteredLocal = allLocal
         isExternal: false
     }));
 
-const filteredTurso = allTurso.filter((post) => post.category === category);
+const filteredTurso = allTurso
+    .filter((post) => post.category === category)
+    .map(post => ({
+        ...post,
+        isExternal: true
+    }));
 
-// 5. GABUNG DAN URUTKAN
+// 5. GABUNG DAN URUTKAN (LOKAL + SANITY/TURSO)
 const allPosts = [...filteredLocal, ...filteredTurso].sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
 );
@@ -60,6 +83,7 @@ const categoryName = category ? category.replace('-', ' ') : 'Category';
   <main class="bg-cream-latte/30 min-h-screen pt-32 pb-20">
     <div class="container mx-auto max-w-6xl px-4">
       
+      {/* TABS KATEGORI */}
       <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12" aria-label="Blog categories">
         {allCategoriesForTabs.map((cat) => (
             <a 
@@ -74,6 +98,7 @@ const categoryName = category ? category.replace('-', ' ') : 'Category';
         ))}
       </nav>
 
+      {/* HEADER KATEGORI */}
       <header class="mb-12 border-b-2 border-coffee-dark pb-6">
         <h1 class="text-5xl font-black uppercase italic text-coffee-dark">
           {categoryName}
@@ -83,6 +108,7 @@ const categoryName = category ? category.replace('-', ' ') : 'Category';
         </p>
       </header>
 
+      {/* GRID ARTIKEL (CAMPURAN LOKAL + SANITY) */}
       {allPosts.length > 0 ? (
         <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
           {allPosts.map(post => (
@@ -90,7 +116,7 @@ const categoryName = category ? category.replace('-', ' ') : 'Category';
           ))}
         </div>
       ) : (
-        <div class="text-center py-20 bg-white/50 border-2 border-dashed border-coffee-brown/20">
+        <div class="text-center py-20 bg-white/50 border-2 border-dashed border-coffee-brown/20 rounded-[2rem]">
           <p class="text-coffee-brown italic">New articles for this category are being brewed. Check back soon!</p>
         </div>
       )}
