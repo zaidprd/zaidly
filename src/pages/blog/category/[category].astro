@@ -1,59 +1,54 @@
 ---
-export const prerender = false;
+// src/pages/blog/category/[category].astro
+export const prerender = true; // WAJIB TRUE biar nggak Error 1101
 
 import { getCollection } from 'astro:content';
 import BaseLayout from '../../../layouts/BaseLayout.astro';
 import PostCard from '../../../components/PostCard.astro';
-// 1. IMPORT KONEKSI TURSO
-import { turso, getTursoPosts } from '../../../lib/turso';
+import { getTursoPosts } from '../../../lib/turso';
+
+// 1. FUNGSI WAJIB UNTUK SSG (Static)
+export async function getStaticPaths() {
+    const localPosts = await getCollection('blog');
+    const tursoPosts = await getTursoPosts();
+
+    // Ambil semua kategori unik dari lokal dan database
+    const allCategories = [...new Set([
+        ...localPosts.map(p => p.data.category), 
+        ...tursoPosts.map(p => p.category)
+    ].filter(Boolean))];
+
+    // Beritahu Astro halaman apa saja yang harus dibuat pas build
+    return allCategories.map(cat => ({
+        params: { category: cat },
+        props: { category: cat }
+    }));
+}
 
 const { category } = Astro.params;
-const now = new Date().getTime();
 
-// 2. AMBIL SEMUA DATA (Lokal & Turso) UNTUK GENERATE TABS KATEGORI
-const allLocalForTabs = await getCollection('blog');
-const tursoPostsAll = await getTursoPosts();
+// 2. AMBIL SEMUA DATA
+const allLocal = await getCollection('blog');
+const allTurso = await getTursoPosts();
 
-const allCategories = ['all', ...new Set([
-    ...allLocalForTabs.map(p => p.data.category), 
-    ...tursoPostsAll.map(p => p.category)
+// 3. GENERATE TABS KATEGORI
+const allCategoriesForTabs = ['all', ...new Set([
+    ...allLocal.map(p => p.data.category), 
+    ...allTurso.map(p => p.category)
 ].filter(Boolean))];
 
-// 3. FILTER ARTIKEL LOKAL BERDASARKAN KATEGORI
-const filteredLocal = allLocalForTabs
+// 4. FILTERING
+const filteredLocal = allLocal
     .filter((post) => post.data.category === category)
     .map(post => ({
-        title: post.data.title,
-        description: post.data.description,
-        pubDate: post.data.pubDate,
-        category: post.data.category,
-        slug: post.slug || post.id,
-        image: post.data.image,
+        ...post.data,
+        slug: post.id || post.slug,
         isExternal: false
     }));
 
-// 4. FILTER ARTIKEL TURSO BERDASARKAN KATEGORI (Query SQL Langsung)
-let filteredTurso = [];
-try {
-    const result = await turso.execute({
-      sql: "SELECT * FROM posts WHERE category = ? ORDER BY published_at DESC",
-      args: [category]
-    });
-    
-    filteredTurso = result.rows.map(post => ({
-      title: post.title,
-      description: post.description,
-      pubDate: post.published_at,
-      category: post.category,
-      slug: post.slug,
-      image: post.r2_image_url,
-      isExternal: true
-    }));
-} catch (e) { 
-    console.error("Error Filtered Turso:", e); 
-}
+const filteredTurso = allTurso.filter((post) => post.category === category);
 
-// 5. GABUNGKAN DAN URUTKAN
+// 5. GABUNG DAN URUTKAN
 const allPosts = [...filteredLocal, ...filteredTurso].sort((a, b) => 
     new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
 );
@@ -66,7 +61,7 @@ const categoryName = category ? category.replace('-', ' ') : 'Category';
     <div class="container mx-auto max-w-6xl px-4">
       
       <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12" aria-label="Blog categories">
-        {allCategories.map((cat) => (
+        {allCategoriesForTabs.map((cat) => (
             <a 
                 href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
                 class:list={[
