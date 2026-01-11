@@ -1,15 +1,17 @@
 ---
-// src/pages/[...slug].astro
+// src/pages/blog/[...slug].astro
 export const prerender = true;
 
 import { getCollection, render } from 'astro:content'; 
 import { Image } from 'astro:assets'; 
-import BaseLayout from '../layouts/BaseLayout.astro';
-import ArticleLayout from '../layouts/ArticleLayout.astro';
-import Error404 from '../components/Error404.astro';
-import { getTursoPosts } from '../lib/turso';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ArticleLayout from '../../layouts/ArticleLayout.astro';
+import Error404 from '../../components/Error404.astro';
+import { getTursoPosts } from '../../lib/turso';
 
-// 1. FUNGSI INI HARUS ADA DI DALAM PAGAR --- DAN DI ATAS getStaticPaths
+/**
+ * SATU-SATUNYA FUNGSI SLUG (GLOBAL DI FILE INI)
+ */
 const cleanSlug = (text: string) => {
     if (!text) return '';
     return text
@@ -26,24 +28,30 @@ const cleanSlug = (text: string) => {
 };
 
 export async function getStaticPaths() {
-    // Ambil Data Lokal
+    // Definisi ulang di dalam scope untuk build-safety Cloudflare
+    const internalSlugify = (text: string) => {
+        if (!text) return '';
+        return text.toString().toLowerCase().trim()
+            .replace(/\.mdx$/, '').replace(/\.md$/, '')
+            .replace(/\s+/g, '-').replace(/[^\w-]+/g, '')
+            .replace(/--+/g, '-').replace(/-mdx$/, '').replace(/-md$/, '');
+    };
+
     const localPosts = await getCollection('blog');
     const localPaths = localPosts.map(post => ({
-        // Panggil fungsi cleanSlug yang sudah didefinisikan di atas
-        params: { slug: cleanSlug(post.id || post.slug) }, 
+        params: { slug: internalSlugify(post.id || post.slug) }, 
         props: { post, isExternal: false }
     }));
 
-    // Ambil Data Turso
     let tursoPosts = [];
     try {
         tursoPosts = await getTursoPosts();
     } catch (e) {
-        console.error("Gagal ambil Turso:", e);
+        console.error("Turso error:", e);
     }
     
     const tursoPaths = tursoPosts.map(post => ({
-        params: { slug: cleanSlug(post.slug) },
+        params: { slug: internalSlugify(post.slug) },
         props: { post, isExternal: true }
     }));
 
@@ -68,33 +76,26 @@ const finalFrontmatter = isExternal
         pubDate: post.pubDate,
         author: post.author || "Admin",
         image: post.image,
-        isExternal: true 
+        isExternal: true,
+        canonical: `https://zaidly.com/blog/${cleanSlug(post.slug)}`
     } 
     : {
         ...post?.data,
-        isExternal: false
+        isExternal: false,
+        canonical: `https://zaidly.com/blog/${cleanSlug(post.id || post.slug)}`
     };
 ---
 
 {finalFrontmatter ? (
     <ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
+        {/* CONTAINER PUTIH BEANHUB */}
         <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
             {finalFrontmatter.image && (
                 <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
                     {isExternal ? (
-                        <img 
-                            src={finalFrontmatter.image} 
-                            alt={finalFrontmatter.title} 
-                            class="w-full h-auto object-cover max-h-[600px] block" 
-                        />
+                        <img src={finalFrontmatter.image} alt={finalFrontmatter.title} class="w-full h-auto object-cover max-h-[600px] block" />
                     ) : (
-                        <Image 
-                            src={finalFrontmatter.image as any} 
-                            alt={finalFrontmatter.title} 
-                            width={1200} 
-                            height={675}
-                            class="w-full h-auto object-cover max-h-[600px]" 
-                        />
+                        <Image src={finalFrontmatter.image as any} alt={finalFrontmatter.title} width={1200} height={675} class="w-full h-auto object-cover max-h-[600px]" />
                     )}
                 </div>
             )}
