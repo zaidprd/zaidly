@@ -1,93 +1,53 @@
 ---
-export const prerender = false;
-import { getCollection } from "astro:content";
+// src/pages/blog/[...page].astro
+export const prerender = true; // WAJIB TRUE!
+
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
-import HeroBlog from '../../components/HeroBlog.astro';
-
-// 1. IMPORT FUNGSI TURSO
+import { getCollection } from "astro:content";
 import { getTursoPosts } from '../../lib/turso';
 
-const { page: pageParam } = Astro.params;
-const currentPage = pageParam ? parseInt(pageParam) : 1;
-const pageSize = 9;
+export async function getStaticPaths({ paginate }: any) {
+  // 1. Ambil data lokal (.md)
+  const localPosts = (await getCollection("blog")).map(p => ({
+    ...p.data,
+    slug: p.id || p.slug,
+    isExternal: false,
+  }));
 
-// 2. AMBIL ARTIKEL LOKAL (.md)
-const blogPosts = await getCollection("blog");
-const localPosts = blogPosts.map(post => ({
-    title: post.data.title,
-    category: post.data.category,
-    pubDate: post.data.pubDate,
-    description: post.data.description,
-    slug: post.slug || post.id,
-    image: post.data.image,
-    isExternal: false // Pengganti isPayload
-}));
-
-// 3. AMBIL ARTIKEL TURSO (SANITY SYNC)
-let tursoPosts = [];
-try {
+  // 2. Ambil data Turso
+  let tursoPosts = [];
+  try {
     tursoPosts = await getTursoPosts();
-} catch (e) { 
-    console.error("Gagal ambil data Turso di Blog:", e); 
+  } catch (e) {
+    console.error("Turso build error:", e);
+  }
+
+  // 3. Gabungkan dan Urutkan
+  const allPosts = [...localPosts, ...tursoPosts].sort(
+    (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+  );
+
+  // 4. Generate Pagination (9 post per halaman)
+  return paginate(allPosts, { pageSize: 9 });
 }
 
-// 4. GABUNGKAN DAN URUTKAN
-// Kita urutkan berdasarkan pubDate (Terbaru di atas)
-const allCombinedPosts = [...localPosts, ...tursoPosts].sort((a, b) => 
-    new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
-);
-
-// 5. LOGIKA PAGINATION
-const totalPages = Math.ceil(allCombinedPosts.length / pageSize);
-const posts = allCombinedPosts.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-
-// GENERATE DAFTAR KATEGORI
-const allCategories = ['all', ...new Set(allCombinedPosts.map((post) => post.category).filter(Boolean))];
+// Data 'page' didapat otomatis dari Astro.props hasil paginate()
+const { page } = Astro.props;
 ---
 
-<BaseLayout title="Blog | Zaidly"> 
-    {currentPage === 1 && <HeroBlog />}
-    
-    <main class="bg-cream-latte/30 min-h-screen">
-        <div class="container mx-auto max-w-6xl px-4 py-12">
-            
-            <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12">
-                {allCategories.map((cat) => (
-                    <a 
-                        href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
-                        class="text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border border-coffee-dark/10 bg-white text-coffee-brown hover:border-accent-primary hover:text-accent-primary transition-all shadow-sm"
-                    >
-                        {cat.replace('-', ' ')}
-                    </a>
-                ))}
-            </nav>
+<BaseLayout title={`Blog Page ${page.currentPage} | Zaidly`}>
+  <section class="max-w-7xl mx-auto px-4 py-12">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      {page.data.map((post: any) => (
+        <PostCard post={post} />
+      ))}
+    </div>
 
-            <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-16">
-                {posts.map((post) => (
-                    <PostCard post={post} />
-                ))}
-            </section>
-
-            <div class="mt-24 border-t border-coffee-brown/10 pt-16 flex justify-between items-center">
-                {currentPage > 1 ? (
-                    <a href={currentPage === 2 ? "/blog" : `/blog/${currentPage - 1}`} class="group flex flex-col items-start gap-4">
-                        <span class="text-[11px] font-black uppercase tracking-[0.4em] text-coffee-brown group-hover:text-accent-primary transition-colors">
-                            ← Previous Page
-                        </span>
-                        <div class="w-12 h-[1px] bg-coffee-dark group-hover:w-24 group-hover:bg-accent-primary transition-all duration-500"></div>
-                    </a>
-                ) : <div />}
-
-                {currentPage < totalPages ? (
-                    <a href={`/blog/${currentPage + 1}`} class="group flex flex-col items-end gap-4">
-                        <span class="text-[11px] font-black uppercase tracking-[0.4em] text-coffee-brown group-hover:text-accent-primary transition-colors">
-                            Next Page →
-                        </span>
-                        <div class="w-12 h-[1px] bg-coffee-dark group-hover:w-24 group-hover:bg-accent-primary transition-all duration-500"></div>
-                    </a>
-                ) : <div />}
-            </div>
-        </div>
-    </main>
+    <div class="flex justify-center gap-4 mt-12">
+      {page.url.prev ? <a href={page.url.prev} class="p-2 border rounded">Prev</a> : null}
+      <span class="p-2">Page {page.currentPage} of {page.lastPage}</span>
+      {page.url.next ? <a href={page.url.next} class="p-2 border rounded">Next</a> : null}
+    </div>
+  </section>
 </BaseLayout>
