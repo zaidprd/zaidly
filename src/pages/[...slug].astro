@@ -1,6 +1,6 @@
 ---
 // src/pages/[...slug].astro
-export const prerender = true; // WAJIB TRUE agar web tidak Error 1101
+export const prerender = true;
 
 import { getCollection, render } from 'astro:content'; 
 import { Image } from 'astro:assets'; 
@@ -9,11 +9,9 @@ import ArticleLayout from '../layouts/ArticleLayout.astro';
 import Error404 from '../components/Error404.astro';
 import { getTursoPosts } from '../lib/turso';
 
-/**
- * 1. DEFINISI FUNGSI PEMBERSIH URL (Paling Atas)
- * Menghilangkan .md, .mdx, spasi, dan buntut "md/mdx"
- */
+// 1. FUNGSI INI HARUS ADA DI DALAM PAGAR --- DAN DI ATAS getStaticPaths
 const cleanSlug = (text: string) => {
+    if (!text) return '';
     return text
         .toString()
         .toLowerCase()
@@ -27,13 +25,11 @@ const cleanSlug = (text: string) => {
         .replace(/-md$/, '');
 };
 
-/**
- * 2. GENERATE PATHS SAAT BUILD
- */
 export async function getStaticPaths() {
-    // Ambil Data Lokal (.md / .mdx)
+    // Ambil Data Lokal
     const localPosts = await getCollection('blog');
     const localPaths = localPosts.map(post => ({
+        // Panggil fungsi cleanSlug yang sudah didefinisikan di atas
         params: { slug: cleanSlug(post.id || post.slug) }, 
         props: { post, isExternal: false }
     }));
@@ -43,7 +39,7 @@ export async function getStaticPaths() {
     try {
         tursoPosts = await getTursoPosts();
     } catch (e) {
-        console.error("Gagal ambil Turso saat build paths:", e);
+        console.error("Gagal ambil Turso:", e);
     }
     
     const tursoPaths = tursoPosts.map(post => ({
@@ -59,14 +55,12 @@ const { post, isExternal } = Astro.props;
 let DynamicContent: any = null; 
 let allHeadings: any[] = []; 
 
-if (!isExternal) {
-    // Render Markdown Lokal
+if (!isExternal && post) {
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
     allHeadings = rendered.headings; 
 }
 
-// Mapping data agar seragam untuk Layout
 const finalFrontmatter = isExternal 
     ? {
         title: post.title,
@@ -77,17 +71,14 @@ const finalFrontmatter = isExternal
         isExternal: true 
     } 
     : {
-        ...post.data,
+        ...post?.data,
         isExternal: false
     };
 ---
 
 {finalFrontmatter ? (
     <ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
-        {/* CONTAINER PUTIH BERSIH (BEANHUB STYLE) */}
         <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
-            
-            {/* RENDER GAMBAR UTAMA */}
             {finalFrontmatter.image && (
                 <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
                     {isExternal ? (
@@ -107,14 +98,10 @@ const finalFrontmatter = isExternal
                     )}
                 </div>
             )}
-            
-            {/* RENDER ISI KONTEN */}
             <div class="prose prose-coffee max-w-none">
                 {isExternal ? (
-                    /* RENDER HTML DARI TURSO */
                     <div set:html={post.body} />
                 ) : (
-                    /* RENDER MARKDOWN LOKAL */
                     DynamicContent && <DynamicContent />
                 )}
             </div>
