@@ -5,7 +5,11 @@
     "paths": {
       "@assets/*": ["src/assets/*"]
     },
-    "skipLibCheck": true 
+    "skipLibCheck": true,
+    // --- TAMBAHKAN DUA BARIS INI ---
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+    // ------------------------------
   },
   "include": [".astro/types.d.ts", "**/*"],
   "exclude": ["dist"]

@@ -3,8 +3,9 @@ export const prerender = true;
 import { getCollection, render } from 'astro:content'; 
 import ArticleLayout from '../layouts/ArticleLayout.astro';
 import { getTursoPosts } from '../lib/turso';
-// 1. IMPORT MARKED UNTUK NERJEMAHIN MARKDOWN
 import { marked } from 'marked';
+// 1. IMPORT RENDERER PORTABLE TEXT
+import { PortableText } from '@portabletext/react';
 
 export async function getStaticPaths() {
     const localPosts = await getCollection('blog');
@@ -36,21 +37,30 @@ if (!post) return Astro.redirect('/404');
 let finalFrontmatter;
 let DynamicContent: any = null; 
 let allHeadings: any[] = []; 
-let htmlContent = ''; // Wadah untuk konten Sanity
+let htmlContent = ''; 
+let visualData: any = null; // Wadah untuk data Portable Text (Gambar/Tombol)
 
 if (isExternal) {
     finalFrontmatter = {
         title: post.title,
         description: post.description || '',
-        image: post.image, // Menggunakan r2_image_url dari turso.ts
+        image: post.image, 
         author: post.author || 'Zaidly Team',
         pubDate: post.pubDate,
         isExternal: true
     };
     
-    // 2. PROSES MARKDOWN MENJADI HTML
-    // post.content_html sekarang isinya teks mentah Markdown
     htmlContent = await marked.parse(post.content_html || '');
+    
+    // 2. AMBIL DATA VISUAL CONTENT DARI TURSO
+    // Pastikan field di database namanya visual_content (JSON)
+    try {
+        visualData = typeof post.visual_content === 'string' 
+            ? JSON.parse(post.visual_content) 
+            : post.visual_content;
+    } catch (e) {
+        visualData = null;
+    }
 } else {
     finalFrontmatter = {
         ...post.data,
@@ -63,18 +73,26 @@ if (isExternal) {
 ---
 
 <ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
-    {/* CONTAINER PUTIH BERSIH - STYLE BEANHUB */}
     <div class="bg-white p-6 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
         <div class="prose prose-coffee max-w-none 
                     prose-table:border-collapse prose-table:w-full
                     prose-th:border prose-th:border-slate-200 prose-th:p-4 prose-th:bg-slate-50
                     prose-td:border prose-td:border-slate-200 prose-td:p-4
                     prose-img:rounded-2xl prose-img:mx-auto">
+            
             {isExternal ? (
-                /* 3. TAMPILKAN HASIL MARKED */
-                <article set:html={htmlContent} />
+                <>
+                    {/* 3. RENDER TEKS MARKDOWN DULU */}
+                    <article set:html={htmlContent} />
+
+                    {/* 4. RENDER GAMBAR & TOMBOL DI BAWAHNYA */}
+                    {visualData && (
+                        <div class="mt-8 flex flex-col gap-6">
+                            <PortableText value={visualData} />
+                        </div>
+                    )}
+                </>
             ) : (
-                /* Render Komponen untuk Lokal */
                 DynamicContent && <DynamicContent />
             )}
         </div>
