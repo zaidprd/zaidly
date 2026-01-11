@@ -4,8 +4,19 @@ import { Image } from 'astro:assets';
 
 const { post, postType = "Blog" } = Astro.props;
 
-// Sekarang kita hanya punya dua kondisi: Lokal (md) atau External (Turso)
+// Ambil data
 const { title, description, category, slug, image, pubDate, isExternal } = post;
+
+// FUNGSI UTAMA: Paksa spasi jadi strip agar tidak muncul %20
+const cleanSlug = (text: string) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\s+/g, '-')      // Ganti spasi dengan -
+        .replace(/[^\w-]+/g, '')    // Hapus karakter aneh
+        .replace(/--+/g, '-');      // Ganti double -- jadi satu -
+};
 
 const formattedDate = pubDate instanceof Date 
     ? pubDate.toLocaleDateString('en-US', { 
@@ -19,7 +30,8 @@ const formattedDate = pubDate instanceof Date
         day: 'numeric'
       }) : 'Recent');
 
-const postUrl = `/${slug}`; 
+// TERAPKAN CLEAN SLUG DI SINI
+const postUrl = `/${cleanSlug(slug)}`; 
 ---
 
 <div class="relative group h-full">
@@ -27,7 +39,6 @@ const postUrl = `/${slug}`;
     <div class="bg-white border border-coffee-brown/10 group-hover:border-accent-primary transition-all duration-500 shadow-sm group-hover:shadow-xl h-full flex flex-col">
         <div class="relative h-64 w-full bg-coffee-light overflow-hidden">
             {image ? (
-                /* Jika dari Turso, pakai <img> biasa untuk R2. Jika lokal, pakai <Image /> Astro */
                 isExternal ? (
                     <img 
                       src={image} 
