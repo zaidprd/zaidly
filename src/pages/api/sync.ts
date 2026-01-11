@@ -1,27 +1,20 @@
+---
+// src/pages/api/sync.ts
 import type { APIRoute } from "astro";
 import { createClient } from "@libsql/client/web";
 import { toHTML } from "@portabletext/to-html";
 
-export const prerender = false;
+export const prerender = false; // WAJIB FALSE karena ini API dinamis
 
 export const POST: APIRoute = async ({ request, locals }) => {
-  // 1. AMBIL ENV LANGSUNG DARI CLOUDFLARE RUNTIME
-  // Di Astro Cloudflare Adapter, env HANYA ada di sini.
   // @ts-ignore
   const env = locals.runtime?.env;
 
-  // 2. CEK APAKAH SERVER CLOUDFLARE SUDAH KONFIGURASI DENGAN BENAR
+  // 1. CEK KONFIGURASI
   if (!env || !env.TURSO_URL || !env.TURSO_TOKEN) {
-    return new Response(
-      JSON.stringify({ 
-        error: "Server Configuration Error: Environment Variables Not Found",
-        details: "Pastikan adapter: cloudflare() sudah ada di astro.config.mjs dan variabel sudah di-save di dashboard Cloudflare."
-      }), 
-      { status: 500 }
-    );
+    return new Response(JSON.stringify({ error: "Missing Env Vars" }), { status: 500 });
   }
 
-  // 3. SETUP DATABASE CLIENT
   const turso = createClient({
     url: env.TURSO_URL,
     authToken: env.TURSO_TOKEN,
@@ -37,23 +30,44 @@ export const POST: APIRoute = async ({ request, locals }) => {
       return new Response(JSON.stringify({ message: "Deleted" }), { status: 200 });
     }
 
-    // 4. PROSES DATA GAMBAR (Fallback ke URL Sanity Langsung biar aman)
+    // 2. PROSES GAMBAR (DOWNLOAD DARI SANITY -> UPLOAD KE R2)
     let finalImageUrl = "";
+    const bucket = env.MY_BUCKET; // Pastikan nama binding di Cloudflare adalah MY_BUCKET
+
     if (data.mainImage?.asset?._ref) {
       const assetRef = data.mainImage.asset._ref;
       const parts = assetRef.split("-"); // image-ID-SIZE-EXTENSION
       const fileName = `${parts[1]}-${parts[2]}.${parts[3]}`;
       
-      // Ambil Project ID dari env yang sudah kita tarik tadi
       const projId = env.PUBLIC_SANITY_PROJECT_ID;
       const dataset = env.PUBLIC_SANITY_DATASET || "production";
-      
-      // Kita pakai URL Sanity dulu untuk memastikan database terisi, 
-      // Nanti kalau R2 mau diaktifkan lagi tinggal tambahkan fetch-nya di sini.
-      finalImageUrl = `https://cdn.sanity.io/images/${projId}/${dataset}/${fileName}`;
+      const sanityUrl = `https://cdn.sanity.io/images/${projId}/${dataset}/${fileName}`;
+
+      if (bucket) {
+        try {
+          // DOWNLOAD GAMBAR
+          const imageRes = await fetch(sanityUrl);
+          if (imageRes.ok) {
+            const arrayBuffer = await imageRes.arrayBuffer();
+            
+            // UPLOAD KE R2
+            await bucket.put(`blog/${fileName}`, arrayBuffer, {
+              httpMetadata: { contentType: imageRes.headers.get("content-type") || "image/jpeg" }
+            });
+
+            // GUNAKAN URL R2 (Ganti domain ini dengan Custom Domain R2 abang)
+            finalImageUrl = `https://r2.zaidly.com/blog/${fileName}`;
+          }
+        } catch (uploadError) {
+          console.error("R2 Upload Failed, falling back to Sanity URL", uploadError);
+          finalImageUrl = sanityUrl; // Fallback kalau R2 gagal
+        }
+      } else {
+        finalImageUrl = sanityUrl; // Kalau bucket belum di-binding
+      }
     }
 
-    // 5. INSERT / UPDATE KE TURSO
+    // 3. INSERT / UPDATE KE TURSO
     const contentHtml = toHTML(data.body || []);
     const tagsString = Array.isArray(data.tags) ? data.tags.join(', ') : '';
 
@@ -84,7 +98,7 @@ export const POST: APIRoute = async ({ request, locals }) => {
       ]
     });
 
-    return new Response(JSON.stringify({ success: true }), { status: 200 });
+    return new Response(JSON.stringify({ success: true, url: finalImageUrl }), { status: 200 });
 
   } catch (error: any) {
     return new Response(JSON.stringify({ error: error.message }), { status: 500 });
