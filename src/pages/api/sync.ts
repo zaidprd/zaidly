@@ -1,5 +1,5 @@
 // src/pages/api/sync.ts
-export const prerender = false; // WAJIB: Biar API bisa nerima data kapan saja!
+export const prerender = false;
 
 import { turso } from "../../lib/turso"; 
 import { toHTML } from "@portabletext/to-html";
@@ -20,16 +20,22 @@ export const POST: APIRoute = async ({ request }) => {
 
     // 2. Convert Body ke HTML
     const contentHtml = toHTML(data.body || []);
+    
+    // 3. Gabungkan Tags array menjadi String agar masuk ke database Turso
+    const tagsString = Array.isArray(data.tags) ? data.tags.join(', ') : '';
 
-    // 3. Simpan/Update ke Turso
+    // 4. Masukkan ke Turso (Tambahkan kolom 'tags' dan 'pub_date')
     await turso.execute({
-      sql: `INSERT INTO posts (id, title, slug, description, category, author, r2_image_url, content_html) 
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+      sql: `INSERT INTO posts (id, title, slug, description, category, author, tags, pub_date, r2_image_url, content_html) 
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON CONFLICT(id) DO UPDATE SET 
             title=excluded.title, 
             slug=excluded.slug,
             description=excluded.description, 
             category=excluded.category,
+            author=excluded.author,
+            tags=excluded.tags,
+            pub_date=excluded.pub_date,
             r2_image_url=excluded.r2_image_url,
             content_html=excluded.content_html`,
       args: [
@@ -37,8 +43,10 @@ export const POST: APIRoute = async ({ request }) => {
         data.title, 
         data.slug?.current || '', 
         data.description || '', 
-        data.category || 'blog', 
-        data.author || 'admin', 
+        data.category || 'gear-lab', 
+        data.author || 'Admin', 
+        tagsString, // DATA TAGS MASUK SINI
+        data.pubDate || new Date().toISOString(), // TANGGAL MASUK SINI
         data.r2_image_url || '',
         contentHtml
       ]
