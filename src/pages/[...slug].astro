@@ -1,33 +1,48 @@
 ---
 // src/pages/[...slug].astro
-export const prerender = true; // GANTI KE TRUE!
+export const prerender = true; // WAJIB TRUE agar tidak Error 1101
 
 import { getCollection, render } from 'astro:content'; 
 import { Image } from 'astro:assets'; 
 import BaseLayout from '../layouts/BaseLayout.astro';
 import ArticleLayout from '../layouts/ArticleLayout.astro';
 import Error404 from '../components/Error404.astro';
-import { getTursoPosts } from '../lib/turso'; // Pakai fungsi fetch yang sudah kita buat
+import { getTursoPosts } from '../lib/turso';
 
-// 1. FUNGSI WAJIB UNTUK MODE STATIC
+// FUNGSI PEMBERSIH URL (Sama dengan di PostCard)
+const cleanSlug = (text: string) => {
+    return text
+        .toString()
+        .toLowerCase()
+        .trim()
+        .replace(/\.mdx$/, '')
+        .replace(/\.md$/, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-')
+        .replace(/-mdx$/, '')
+        .replace(/-md$/, '');
+};
+
 export async function getStaticPaths() {
-    // Ambil data lokal
+    // 1. Ambil Data Lokal (.md / .mdx)
     const localPosts = await getCollection('blog');
     const localPaths = localPosts.map(post => ({
-        params: { slug: post.id || post.slug },
+        // Kita BERSIHKAN slug-nya di sini agar URL-nya cantik
+        params: { slug: cleanSlug(post.id || post.slug) }, 
         props: { post, isExternal: false }
     }));
 
-    // Ambil data Turso
+    // 2. Ambil Data Turso
     let tursoPosts = [];
     try {
         tursoPosts = await getTursoPosts();
     } catch (e) {
-        console.error("Gagal ambil Turso saat build paths:", e);
+        console.error("Gagal ambil Turso saat build:", e);
     }
     
     const tursoPaths = tursoPosts.map(post => ({
-        params: { slug: post.slug },
+        params: { slug: cleanSlug(post.slug) },
         props: { post, isExternal: true }
     }));
 
@@ -35,19 +50,18 @@ export async function getStaticPaths() {
 }
 
 const { post, isExternal } = Astro.props;
-const { slug } = Astro.params;
 
 let DynamicContent: any = null; 
 let allHeadings: any[] = []; 
 
 if (!isExternal) {
-    // JIKA LOKAL
+    // Render Konten Markdown Lokal
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
     allHeadings = rendered.headings; 
 }
 
-// 2. MAPPING DATA
+// Mapping Frontmatter agar seragam
 const finalFrontmatter = isExternal 
     ? {
         title: post.title,
@@ -63,10 +77,29 @@ const finalFrontmatter = isExternal
     };
 ---
 
-{/* Bagian HTML di bawahnya tetap sama seperti kodingan abang */}
 <ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
     <div class="bg-white p-8 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
-        {/* Konten gambar dan isi... */}
+        
+        {finalFrontmatter.image && (
+            <div class="mb-10 overflow-hidden rounded-2xl border border-slate-100 shadow-sm bg-slate-50">
+                {isExternal ? (
+                    <img 
+                        src={finalFrontmatter.image} 
+                        alt={finalFrontmatter.title} 
+                        class="w-full h-auto object-cover max-h-[600px]" 
+                    />
+                ) : (
+                    <Image 
+                        src={finalFrontmatter.image as any} 
+                        alt={finalFrontmatter.title} 
+                        width={1200} 
+                        height={675}
+                        class="w-full h-auto object-cover max-h-[600px]" 
+                    />
+                )}
+            </div>
+        )}
+        
         <div class="prose prose-coffee max-w-none">
             {isExternal ? (
                 <div set:html={post.body} />
