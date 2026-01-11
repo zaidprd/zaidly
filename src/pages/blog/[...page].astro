@@ -1,6 +1,6 @@
 ---
 // src/pages/blog/[...page].astro
-export const prerender = true; // WAJIB TRUE!
+export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
@@ -28,26 +28,55 @@ export async function getStaticPaths({ paginate }: any) {
     (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
   );
 
-  // 4. Generate Pagination (9 post per halaman)
   return paginate(allPosts, { pageSize: 9 });
 }
 
-// Data 'page' didapat otomatis dari Astro.props hasil paginate()
 const { page } = Astro.props;
+
+// --- LOGIKA TABS KATEGORI (BIAR MUNCUL DI ATAS) ---
+const allLocalForTabs = await getCollection('blog');
+const tursoPostsAll = await getTursoPosts();
+
+const allCategories = ['all', ...new Set([
+    ...allLocalForTabs.map(p => p.data.category), 
+    ...tursoPostsAll.map(p => p.category)
+].filter(Boolean))];
 ---
 
-<BaseLayout title={`Blog Page ${page.currentPage} | Zaidly`}>
-  <section class="max-w-7xl mx-auto px-4 py-12">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      {page.data.map((post: any) => (
-        <PostCard post={post} />
-      ))}
-    </div>
+<BaseLayout title={`Blog - Page ${page.currentPage} | Zaidly`}>
+  <main class="bg-cream-latte/30 min-h-screen pt-32 pb-20">
+    <div class="container mx-auto max-w-6xl px-4">
+      
+      <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12" aria-label="Blog categories">
+        {allCategories.map((cat) => (
+            <a 
+                href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
+                class="text-[10px] font-black uppercase tracking-[0.2em] px-6 py-3 border border-coffee-dark/10 text-coffee-brown transition-all duration-300 bg-white shadow-sm hover:shadow-md hover:border-accent-primary hover:text-accent-primary"
+            >
+                {String(cat).replace('-', ' ')}
+            </a>
+        ))}
+      </nav>
 
-    <div class="flex justify-center gap-4 mt-12">
-      {page.url.prev ? <a href={page.url.prev} class="p-2 border rounded">Prev</a> : null}
-      <span class="p-2">Page {page.currentPage} of {page.lastPage}</span>
-      {page.url.next ? <a href={page.url.next} class="p-2 border rounded">Next</a> : null}
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+        {page.data.map((post: any) => (
+          <PostCard post={post} />
+        ))}
+      </div>
+
+      <div class="flex justify-center items-center gap-6 mt-20">
+        {page.url.prev ? (
+          <a href={page.url.prev} class="text-[10px] font-black uppercase tracking-widest border border-coffee-dark px-8 py-3 hover:bg-coffee-dark hover:text-white transition">Prev</a>
+        ) : <div class="w-[100px]"></div>}
+        
+        <span class="text-[10px] font-black uppercase tracking-widest text-coffee-dark">
+          Page {page.currentPage} / {page.lastPage}
+        </span>
+        
+        {page.url.next ? (
+          <a href={page.url.next} class="text-[10px] font-black uppercase tracking-widest border border-coffee-dark px-8 py-3 hover:bg-coffee-dark hover:text-white transition">Next</a>
+        ) : <div class="w-[100px]"></div>}
+      </div>
     </div>
-  </section>
+  </main>
 </BaseLayout>
