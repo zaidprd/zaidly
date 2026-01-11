@@ -1,5 +1,7 @@
 ---
 // src/pages/index.astro
+export const prerender = true;
+
 import MainLayout from '../layouts/BaseLayout.astro';
 import Hero from '../components/Hero.astro'; 
 import WhoIsZaidly from '../components/section/WhoIsZaidly.astro'; 
@@ -9,11 +11,9 @@ import CoffeeGearHub from '../components/section/CoffeeGearHub.astro';
 import LatestPosts from '../components/section/LatestArticles.astro'; 
 import CoffeeBeanGuides from '../components/section/CoffeeBeanGuides.astro';
 import { getCollection } from 'astro:content';
-
-// 1. IMPORT FUNGSI TURSO [cite: 2026-01-11]
 import { getTursoPosts } from '../lib/turso';
 
-// 2. AMBIL DATA LOKAL (.md)
+// 1. AMBIL DATA LOKAL
 const allLocalPosts = await getCollection('blog') || []; 
 const now = new Date().getTime();
 
@@ -22,31 +22,34 @@ const publishedLocal = allLocalPosts.filter((post) => {
     const postTime = new Date(post.data.pubDate).getTime();
     return isNotDraft && postTime <= now;
 }).map(post => ({
-    ...post,
-    isExternal: false, // Flag baru
-    title: post.data.title,
-    pubDate: post.data.pubDate,
-    category: post.data.category,
-    description: post.data.description,
-    image: post.data.image,
-    slug: post.id || post.slug
+    ...post.data, // Spread data lokal agar fieldnya sejajar
+    slug: post.id || post.slug,
+    isExternal: false,
+    pubDate: post.data.pubDate // Pastikan field ini ada untuk sorting
 }));
 
-// 3. AMBIL DATA TURSO (SANITY SYNC) [cite: 2026-01-11]
+// 2. AMBIL DATA TURSO
 let tursoPosts = [];
 try {
-    tursoPosts = await getTursoPosts();
+    const rawTurso = await getTursoPosts();
+    tursoPosts = rawTurso.map(p => ({
+        ...p,
+        isExternal: true,
+        // FIX: Map published_at dari Turso ke pubDate agar konsisten saat sorting
+        pubDate: p.published_at || p.pubDate 
+    }));
 } catch (e) {
     console.error("Gagal ambil data Turso di Index:", e);
 }
 
-// 4. GABUNGKAN DAN URUTKAN (Lokal + Turso)
+// 3. GABUNGKAN DAN URUTKAN (DENGAN PROTEKSI ERROR 500)
 const allCombinedPosts = [...publishedLocal, ...tursoPosts].sort((a, b) => {
-    return new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime();
+    const dateA = new Date(a.pubDate || 0).getTime();
+    const dateB = new Date(b.pubDate || 0).getTime();
+    return dateB - dateA;
 });
 
-// 5. SLICING UNTUK SETIAP SECTION
-// Slicing otomatis akan mengambil campuran Lokal & Turso yang terbaru
+// 4. SLICING UNTUK SETIAP SECTION
 const latestPosts = allCombinedPosts.slice(0, 3);
 const gearPosts = allCombinedPosts.filter(p => p.category === 'gear-lab' || p.category === 'buying-guides').slice(0, 4);
 const beanPosts = allCombinedPosts.filter(p => p.category === 'bean-roastery').slice(0, 4);
@@ -78,12 +81,12 @@ const featuredCategories = [
         linkUrl="/about" 
     />
     
-    {/* SEKSI GEAR (Gabungan Lokal & Turso) */}
+    {/* SEKSI GEAR */}
     {gearPosts.length > 0 && <CoffeeGearHub posts={gearPosts} />}
     
-    {/* SEKSI BIJI KOPI (Gabungan Lokal & Turso) */}
+    {/* SEKSI BIJI KOPI */}
     {beanPosts.length > 0 && <CoffeeBeanGuides posts={beanPosts} />}
     
-    {/* SEKSI TERBARU (Gabungan Lokal & Turso) */}
+    {/* SEKSI TERBARU */}
     {latestPosts.length > 0 && <LatestPosts posts={latestPosts} />}
 </MainLayout>
