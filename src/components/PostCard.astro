@@ -4,26 +4,27 @@ import { Image } from 'astro:assets';
 
 const { post, postType = "Blog" } = Astro.props;
 
-// Destructuring data dari post
+// Destructuring data
 const { title, description, category, slug, image, pubDate, isExternal } = post;
 
 /**
- * FUNGSI PEMBERSIH SLUG (AUTO-STRIP & NO-MD)
- * Fungsi ini memastikan URL bersih dari spasi (%20) dan buntut "md"
+ * FUNGSI PEMBERSIH SLUG (Sama persis dengan di [...slug].astro)
+ * Menghapus .md, .mdx, dan mengubah spasi jadi strip
  */
 const getCleanSlug = (inputSlug: string) => {
     return inputSlug
         .toString()
         .toLowerCase()
         .trim()
-        .replace(/\.md$/, '')      // Hapus ekstensi .md jika ada
-        .replace(/\s+/g, '-')      // Ganti spasi dengan strip (-)
-        .replace(/[^\w-]+/g, '')    // Hapus karakter spesial/aneh
-        .replace(/--+/g, '-')      // Ganti double strip -- jadi satu -
-        .replace(/-md$/, '');      // Hapus tulisan "md" di paling ujung (jika titiknya hilang)
+        .replace(/\.mdx$/, '')
+        .replace(/\.md$/, '')
+        .replace(/\s+/g, '-')
+        .replace(/[^\w-]+/g, '')
+        .replace(/--+/g, '-')
+        .replace(/-mdx$/, '')
+        .replace(/-md$/, '');
 };
 
-// Format Tanggal
 const formattedDate = pubDate instanceof Date 
     ? pubDate.toLocaleDateString('en-US', { 
         year: 'numeric', 
@@ -36,17 +37,17 @@ const formattedDate = pubDate instanceof Date
         day: 'numeric'
       }) : 'Recent');
 
-// Buat URL Final yang bersih
+// Link yang dihasilkan sudah bersih (Auto-strip & No-extension)
 const postUrl = `/${getCleanSlug(slug)}`; 
 ---
 
 <div class="relative group h-full">
-    {/* Link Area yang menutupi seluruh kartu */}
+    {/* Link Area */}
     <a href={postUrl} class="absolute inset-0 z-20" aria-label={title}></a>
     
     <div class="bg-white border border-coffee-brown/10 group-hover:border-accent-primary transition-all duration-500 shadow-sm group-hover:shadow-xl h-full flex flex-col rounded-xl overflow-hidden">
         
-        {/* BAGIAN GAMBAR */}
+        {/* Gambar */}
         <div class="relative h-64 w-full bg-coffee-light overflow-hidden">
             {image ? (
                 isExternal ? (
@@ -66,44 +67,27 @@ const postUrl = `/${getCleanSlug(slug)}`;
                     />
                 )
             ) : (
-                <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 bg-coffee-light/50 font-black uppercase tracking-widest text-[10px]">
-                    Image coming soon
-                </div>
+                <div class="w-full h-full flex items-center justify-center text-coffee-brown/30 bg-coffee-light/50 font-black uppercase tracking-widest text-[10px]">Image coming soon</div>
             )}
-            
-            {/* BADGE TIPE POST (TOP LEFT) */}
             <div class="absolute top-0 left-0 z-10">
-                 <span class="bg-coffee-dark text-white text-[9px] font-black px-4 py-2 tracking-[0.3em] uppercase inline-block">
-                    {postType}
-                 </span>
+                 <span class="bg-coffee-dark text-white text-[9px] font-black px-4 py-2 tracking-[0.3em] uppercase inline-block">{postType}</span>
             </div>
         </div>
 
-        {/* BAGIAN KONTEN TEKS */}
+        {/* Konten */}
         <div class="p-8 flex flex-col flex-grow">
             {category && (
-                <span class="text-accent-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2 block relative z-30">
-                    {category.replace('-', ' ')}
-                </span>
+                <span class="text-accent-primary text-[10px] font-black uppercase tracking-[0.2em] mb-2 block relative z-30">{category.replace('-', ' ')}</span>
             )}
+            <h3 class="text-xl font-black text-coffee-dark mb-4 leading-tight uppercase group-hover:text-accent-primary transition duration-300">{title}</h3>
+            <p class="text-coffee-brown text-base mb-8 line-clamp-3 italic opacity-80 flex-grow">{description}</p>
             
-            <h3 class="text-xl font-black text-coffee-dark mb-4 leading-tight uppercase group-hover:text-accent-primary transition duration-300">
-                {title}
-            </h3>
-            
-            <p class="text-coffee-brown text-base mb-8 line-clamp-3 italic opacity-80 flex-grow">
-                {description}
-            </p>
-            
-            {/* FOOTER KARTU */}
             <div class="flex items-center justify-between pt-6 border-t border-coffee-brown/10 mt-auto">
                 <div class="flex flex-col">
                     <span class="text-[9px] font-bold text-coffee-brown/40 uppercase tracking-widest">Published</span>
                     <span class="text-[10px] font-black text-coffee-dark uppercase">{formattedDate}</span>
                 </div>
-                <span class="text-coffee-dark font-black text-[10px] uppercase group-hover:text-accent-primary flex items-center gap-2">
-                    View Blog <span>→</span>
-                </span>
+                <span class="text-coffee-dark font-black text-[10px] uppercase group-hover:text-accent-primary flex items-center gap-2">View Blog <span>→</span></span>
             </div>
         </div>
     </div>
