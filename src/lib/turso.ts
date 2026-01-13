@@ -1,30 +1,73 @@
 import { createClient } from "@libsql/client";
 
-// 1. Definisikan Client Turso (Fix Error: Cannot find name 'turso')
 export const turso = createClient({
   url: import.meta.env.TURSO_URL || "",
   authToken: import.meta.env.TURSO_TOKEN || "",
 });
 
+/**
+ * FUNGSI: Reset & Buat Tabel Baru
+ * Menggunakan struktur r2_image_url dan visual_content (Portable Text)
+ */
+export async function createPostsTable() {
+  // Hapus tabel lama jika ingin reset struktur total
+  await turso.execute(`DROP TABLE IF EXISTS posts`);
+
+  await turso.execute(`
+    CREATE TABLE posts (
+      id TEXT PRIMARY KEY,
+      title TEXT,
+      slug TEXT UNIQUE,
+      description TEXT,
+      category TEXT,
+      author TEXT,
+      published_at TEXT,
+      r2_image_url TEXT,
+      visual_content TEXT 
+    )
+  `);
+  console.log("✅ Tabel diperbarui: r2_image_url & visual_content READY.");
+}
+
+/**
+ * FUNGSI: Simpan Data (UPSERT)
+ * Dipanggil oleh api/sync-sanity.ts
+ */
+export async function upsertPost(post: any) {
+  return await turso.execute({
+    sql: `INSERT OR REPLACE INTO posts 
+          (id, title, slug, description, category, author, published_at, r2_image_url, visual_content) 
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+    args: [
+      post.id, 
+      post.title, 
+      post.slug, 
+      post.description, 
+      post.category, 
+      post.author, 
+      post.publishedAt, // Sinkron dengan sync-sanity.ts
+      post.r2ImageUrl,  // Sinkron dengan sync-sanity.ts
+      post.visualContent // JSON String dari Portable Text
+    ],
+  });
+}
+
+/**
+ * FUNGSI: Ambil Data untuk Halaman Astro
+ */
 export async function getTursoPosts() {
-  // Ambil semua kolom termasuk visual_content yang baru kita buat
-  const result = await turso.execute("SELECT * FROM posts ORDER BY published_at DESC");
-  
-  // 2. Tambahkan (post: any) untuk Fix Error TypeScript "implicitly any"
-  return result.rows.map((post: any) => ({
-    id: String(post.id),
-    title: String(post.title),
-    description: String(post.description || ""),
-    slug: String(post.slug),
-    category: post.category ? String(post.category) : "General",
-    image: post.r2_image_url ? String(post.r2_image_url) : null, 
-    author: post.author ? String(post.author) : "Admin",
-    pubDate: post.published_at ? String(post.published_at) : new Date().toISOString(),
-    content_html: post.content_html ? String(post.content_html) : "",
-    
-    // Tarik data Portable Text (Gambar/Tombol) dari database
-    visual_content: post.visual_content ? String(post.visual_content) : null,
-    
-    isExternal: true 
-  }));
+  try {
+    const result = await turso.execute("SELECT * FROM posts ORDER BY published_at DESC");
+    return result.rows.map((post: any) => ({
+      ...post,
+      id: String(post.id),
+      title: String(post.title),
+      slug: String(post.slug),
+      // Di sini visual_content masih dalam bentuk string JSON dari DB
+      visual_content: post.visual_content 
+    }));
+  } catch (error) {
+    console.error("❌ Gagal ambil data Turso:", error);
+    return [];
+  }
 }

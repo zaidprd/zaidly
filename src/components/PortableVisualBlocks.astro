@@ -1,0 +1,31 @@
+---
+import PortableLogic from './PortableLogic';
+const { value } = Astro.props;
+---
+
+<div class="zaidly-render">
+  <PortableLogic value={value} />
+</div>
+
+<style is:global>
+  .zaidly-render { color: #000; }
+  .zaidly-h2 { font-size: 2rem; font-weight: 900; color: #4a3728; margin: 2.5rem 0 1rem; text-transform: uppercase; }
+  .zaidly-h3 { font-size: 1.5rem; font-weight: 800; margin-top: 2rem; }
+  .zaidly-p { font-size: 1.125rem; line-height: 1.8; margin-bottom: 1.5rem; font-weight: 500; }
+  
+  /* TABLE */
+  .zaidly-table-wrapper { overflow-x: auto; margin: 2rem 0; border: 1px solid #eee; }
+  .zaidly-table-content table { width: 100%; border-collapse: collapse; }
+  .zaidly-table-content th { background: #4a3728; color: #fff; padding: 15px; text-align: left; }
+  .zaidly-table-content td { padding: 12px 15px; border-bottom: 1px solid #eee; font-weight: 600; }
+
+  /* BUTTONS */
+  .zaidly-btn-group { display: flex; gap: 12px; margin: 2.5rem 0; flex-wrap: wrap; }
+  .btn-amazon, .btn-ali { padding: 14px 24px; font-weight: 900; text-decoration: none; border-radius: 0 !important; font-size: 12px; display: inline-flex; align-items: center; gap: 8px; }
+  .btn-amazon { background: linear-gradient(180deg, #FFB338 0%, #FF9900 100%); color: #000; }
+  .btn-ali { background: linear-gradient(180deg, #FF5C38 0%, #E62E04 100%); color: #fff; }
+
+  /* BODY IMAGE */
+  .zaidly-body-img { margin: 2.5rem 0; }
+  .zaidly-body-img img { width: 100%; height: auto; border-radius: 0 !important; display: block; }
+</style>

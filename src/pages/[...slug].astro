@@ -2,29 +2,27 @@
 export const prerender = true;
 import { getCollection, render } from 'astro:content'; 
 import ArticleLayout from '../layouts/ArticleLayout.astro';
+import PortableVisualBlocks from '../components/PortableVisualBlocks.astro';
 import { getTursoPosts } from '../lib/turso';
-import { marked } from 'marked';
-// 1. IMPORT RENDERER PORTABLE TEXT
-import { PortableText } from '@portabletext/react';
 
 export async function getStaticPaths() {
+    // Ambil Post Lokal
     const localPosts = await getCollection('blog');
     const localPaths = localPosts.map(post => ({
-        params: { 
-            slug: (post.slug || post.id).replace(/\.(md|mdx)$/, '') 
-        }, 
+        params: { slug: (post.slug || post.id).trim() }, 
         props: { post, isExternal: false }
     }));
 
+    // Ambil Post Turso
     let tursoPosts: any[] = []; 
     try {
         tursoPosts = await getTursoPosts();
     } catch (e) {
-        console.error("Turso error:", e);
+        console.error("Gagal ambil Turso:", e);
     }
     
     const tursoPaths = tursoPosts.map(post => ({
-        params: { slug: String(post.slug).trim() },
+        params: { slug: String(post.slug || '').trim() },
         props: { post, isExternal: true }
     }));
 
@@ -34,64 +32,67 @@ export async function getStaticPaths() {
 const { post, isExternal } = Astro.props;
 if (!post) return Astro.redirect('/404');
 
-let finalFrontmatter;
+let finalFrontmatter: any;
 let DynamicContent: any = null; 
-let allHeadings: any[] = []; 
-let htmlContent = ''; 
-let visualData: any = null; // Wadah untuk data Portable Text (Gambar/Tombol)
+let visualData: any = null;
 
 if (isExternal) {
+    // 1. DATA UNTUK FEATURED IMAGE (BANNER ATAS)
+    const featuredImage = post.r2_image_url;
+    const featuredImageRef = post.sanity_ref || post.mainImage?.asset?._ref;
+
     finalFrontmatter = {
         title: post.title,
-        description: post.description || '',
-        image: post.image, 
-        author: post.author || 'Zaidly Team',
-        pubDate: post.pubDate,
+        description: post.description,
+        image: featuredImage,
+        author: post.author || 'Admin',
+        pubDate: post.published_at,
         isExternal: true
     };
     
-    htmlContent = await marked.parse(post.content_html || '');
-    
-    // 2. AMBIL DATA VISUAL CONTENT DARI TURSO
-    // Pastikan field di database namanya visual_content (JSON)
+    // 2. AMBIL DAN FILTER KONTEN BODY
     try {
-        visualData = typeof post.visual_content === 'string' 
+        const rawContent = typeof post.visual_content === 'string' 
             ? JSON.parse(post.visual_content) 
             : post.visual_content;
-    } catch (e) {
-        visualData = null;
-    }
+
+        // FILTER: Buang Judul H1 dan Buang Gambar yang sama dengan Banner
+        visualData = rawContent.filter((block: any) => {
+            if (block.style === 'h1') return false; // Hapus Judul Double
+
+            const blockImageRef = block.asset?._ref;
+            if (block._type === 'image' && blockImageRef === featuredImageRef) {
+                return false; // Hapus Gambar Double (jika ID-nya sama dengan banner)
+            }
+            return true;
+        });
+    } catch (e) { visualData = []; }
+
 } else {
-    finalFrontmatter = {
-        ...post.data,
-        isExternal: false
-    };
+    // Logic untuk Markdown Lokal
+    finalFrontmatter = { ...post.data, isExternal: false };
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
-    allHeadings = rendered.headings; 
 }
 ---
 
-<ArticleLayout frontmatter={finalFrontmatter as any} headings={allHeadings}>
-    <div class="bg-white p-6 md:p-12 rounded-[2rem] shadow-sm border border-slate-100 min-h-[500px] my-8">
-        <div class="prose prose-coffee max-w-none 
-                    prose-table:border-collapse prose-table:w-full
-                    prose-th:border prose-th:border-slate-200 prose-th:p-4 prose-th:bg-slate-50
-                    prose-td:border prose-td:border-slate-200 prose-td:p-4
-                    prose-img:rounded-2xl prose-img:mx-auto">
-            
-            {isExternal ? (
-                <>
-                    {/* 3. RENDER TEKS MARKDOWN DULU */}
-                    <article set:html={htmlContent} />
+<ArticleLayout frontmatter={finalFrontmatter}>
+    <div class="bg-white p-6 md:p-12 my-8 rounded-none border-none shadow-sm">
+        
+        {finalFrontmatter.image && (
+            <div class="mb-12">
+                <img 
+                    src={finalFrontmatter.image} 
+                    alt={finalFrontmatter.title} 
+                    class="w-full aspect-video object-cover rounded-none border-b-8 border-[#4a3728]"
+                />
+            </div>
+        )}
 
-                    {/* 4. RENDER GAMBAR & TOMBOL DI BAWAHNYA */}
-                    {visualData && (
-                        <div class="mt-8 flex flex-col gap-6">
-                            <PortableText value={visualData} />
-                        </div>
-                    )}
-                </>
+        <div class="prose max-w-none">
+            {isExternal ? (
+                /* BODY CONTENT (Hasil filter tadi) */
+                <PortableVisualBlocks value={visualData} />
             ) : (
                 DynamicContent && <DynamicContent />
             )}

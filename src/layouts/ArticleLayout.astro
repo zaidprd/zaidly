@@ -4,12 +4,12 @@ import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
 import { Image } from 'astro:assets';
 
-// Iklan tetap pakai import static
+// Iklan tetap pakai import static (Ini Aman karena file lokal)
 import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
-import adBambinoImg from '../assets/images/BrevilleBambinoPlus.webp';
 
 const { frontmatter, headings } = Astro.props; 
 
+// Sidebar hanya muncul jika ada heading h2 atau h3
 const showSidebar = headings && headings.filter((h: any) => h.depth > 1 && h.depth < 4).length > 0;
 
 const formattedDate = frontmatter.pubDate 
@@ -50,19 +50,18 @@ const isExternal = !!frontmatter.isExternal;
             <div class="flex flex-col lg:flex-row gap-16">
                 <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
                     
-                    {/* GAMBAR UTAMA: PAKAI IMAGE ASTRO BIAR NGEBUT */}
                     {frontmatter.image && (
                         <div class="mb-12 border border-coffee-brown/15 bg-white p-2 shadow-sm">
                             {isExternal ? (
-                                <Image 
+                                /* DATA TURSO/R2: Wajib pakai tag img biasa karena Astro Config abang 'noop' */
+                                <img 
                                     src={frontmatter.image} 
                                     alt={frontmatter.title} 
-                                    width={1200} 
-                                    height={675} 
                                     class="w-full aspect-video object-cover" 
                                     loading="eager"
                                 />
                             ) : (
+                                /* DATA LOKAL: Boleh pakai Image Astro */
                                 <Image 
                                     src={frontmatter.image} 
                                     alt={frontmatter.title} 
