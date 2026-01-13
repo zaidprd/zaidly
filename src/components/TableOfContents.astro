@@ -1,29 +1,70 @@
 ---
 // src/components/TableOfContents.astro
-import type { Heading } from '../layouts/ArticleLayout.astro'; 
-
 interface Props {
-    headings: Heading[];
+    headings: { depth: number; text: string; slug: string }[];
 }
 
 const { headings } = Astro.props;
 const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
 ---
 
-<nav class="mb-8">
-    <h2 class="font-black text-[10px] uppercase tracking-[0.3em] text-coffee-dark/40 mb-4">
-        On This Page
-    </h2>
-    <ul class="space-y-2 text-coffee-dark">
-        {filteredHeadings.map(h => (
-            <li class:list={[
-                h.depth === 2 ? 'pl-0 font-bold text-xs' : 'pl-4 text-[12px] opacity-70', 
-                'hover:text-accent-primary transition duration-150 leading-snug uppercase tracking-tight'
-            ]}>
-                <a href={`#${h.slug}`} class="block py-0.5">
-                    {h.text}
-                </a>
-            </li>
-        ))}
+{filteredHeadings.length > 0 && (
+  <nav class="toc-container my-12 border-y border-coffee-brown/10 py-10 bg-white/30 backdrop-blur-sm rounded-xl px-6 md:px-8">
+    <div class="flex items-center justify-between">
+      <h2 class="font-black text-[11px] uppercase tracking-[0.4em] text-accent-primary flex items-center gap-3">
+        <span class="w-8 h-[1px] bg-accent-primary/30"></span>
+        Table of Contents
+      </h2>
+      <button 
+        id="toc-toggle-btn" 
+        class="text-[9px] font-black uppercase tracking-[0.2em] border border-coffee-brown/20 px-3 py-1.5 hover:bg-coffee-dark hover:text-white transition-all duration-300 rounded-md shadow-sm bg-white"
+      >
+        [ Show ]
+      </button>
+    </div>
+
+    <ul id="toc-list-items" class="hidden space-y-4 pt-8 transition-all duration-500 ease-in-out">
+      {filteredHeadings.map((h, index) => (
+        <li class:list={[
+          h.depth === 2 ? 'pl-0' : 'pl-8 opacity-80',
+          'group relative border-b border-coffee-brown/5 pb-3 last:border-0'
+        ]}>
+          <a 
+            href={`#${h.slug}`} 
+            class="text-[13px] font-bold uppercase tracking-tight text-coffee-dark hover:text-accent-primary transition-all flex items-start gap-3"
+          >
+            <span class="text-[10px] text-coffee-brown/40 font-black mt-0.5 group-hover:text-accent-primary transition-colors">
+                {String(index + 1).padStart(2, '0')}
+            </span>
+            {h.text}
+          </a>
+        </li>
+      ))}
     </ul>
-</nav>
+  </nav>
+)}
+
+<script is:inline>
+  const setupToggle = () => {
+    const btn = document.getElementById('toc-toggle-btn');
+    const list = document.getElementById('toc-list-items');
+    if (btn && list) {
+      btn.onclick = () => {
+        const isHidden = list.classList.toggle('hidden');
+        btn.textContent = isHidden ? '[ Show ]' : '[ Hide ]';
+      };
+    }
+  };
+
+  setupToggle();
+  document.addEventListener('astro:page-load', setupToggle);
+</script>
+
+<style>
+  .hidden { display: none !important; }
+  ul { list-style: none !important; padding: 0 !important; margin: 0 !important; }
+  .toc-container {
+    /* Background halus menyesuaikan tema Cream Latte */
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.6), rgba(245, 245, 240, 0.4));
+  }
+</style>

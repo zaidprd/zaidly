@@ -4,11 +4,11 @@ export const prerender = true;
 
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
+import HeroBlog from '../../components/HeroBlog.astro'; // TINGGAL PANGGIL FILE INI
 import { getCollection } from "astro:content";
 import { getTursoPosts } from '../../lib/turso';
 
 export async function getStaticPaths({ paginate }: any) {
-  // 1. Ambil data lokal
   const localPosts = (await getCollection("blog")).map(p => ({
     ...p.data,
     slug: (p.id || p.slug).replace(/\.(md|mdx)$/, ''),
@@ -16,7 +16,6 @@ export async function getStaticPaths({ paginate }: any) {
     pubDate: p.data.pubDate
   }));
 
-  // 2. Ambil data Turso
   let tursoPosts: any[] = [];
   try {
     const rawTurso = await getTursoPosts() as any[];
@@ -37,7 +36,6 @@ export async function getStaticPaths({ paginate }: any) {
   return paginate(allPosts, { pageSize: 9 });
 }
 
-// FIX: Definisikan props agar TypeScript tidak menganggap 'never'
 interface Props {
   page: any;
 }
@@ -58,10 +56,15 @@ const allCategories = ['all', ...new Set([
 ---
 
 <BaseLayout title={`Blog - Page ${page.currentPage} | Zaidly`}>
-  <main class="bg-cream-latte/30 min-h-screen pt-32 pb-20">
-    <div class="container mx-auto max-w-6xl px-4">
+  <main class="bg-cream-latte/30 min-h-screen">
+    
+    {/* PANGGIL KOMPONEN HERO DAFTAR BLOG (Hanya di halaman 1) */}
+    {page.currentPage === 1 && <HeroBlog />}
+
+    <div class="container mx-auto max-w-6xl px-4 py-16">
       
-      <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12" aria-label="Blog categories">
+      {/* CATEGORY TABS */}
+      <nav class="flex flex-wrap justify-center gap-3 mb-16 border-b border-coffee-brown/10 pb-12 font-sans" aria-label="Blog categories">
         {allCategories.map((cat) => (
             <a 
                 href={cat === 'all' ? '/blog' : `/blog/category/${cat}`}
@@ -72,6 +75,7 @@ const allCategories = ['all', ...new Set([
         ))}
       </nav>
 
+      {/* GRID POSTS */}
       <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
         {page.data.map((post: any) => (
           <PostCard post={post} />
@@ -79,7 +83,7 @@ const allCategories = ['all', ...new Set([
       </div>
 
       {/* PAGINATION */}
-      <div class="flex justify-center items-center gap-6 mt-20">
+      <div class="flex justify-center items-center gap-6 mt-20 font-sans">
         {page.url.prev ? (
           <a href={page.url.prev} class="text-[10px] font-black uppercase tracking-widest border border-coffee-dark px-8 py-3 hover:bg-coffee-dark hover:text-white transition">Prev</a>
         ) : <div class="w-[100px]"></div>}

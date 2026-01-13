@@ -6,15 +6,12 @@ const { posts } = Astro.props;
 ---
 <section class="pt-32 pb-20 bg-cream-latte"> 
     <div class="container mx-auto max-w-6xl px-4 sm:px-6 lg:px-8">
-        <h2 class="text-3xl font-bold text-center text-coffee-dark mb-10">
+        <h2 class="text-3xl md:text-4xl font-black text-center text-coffee-dark mb-16 uppercase tracking-tighter font-serif">
             Latest Articles
         </h2>
 
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
             {posts && posts.map((post: any) => {
-                const isExternal = !!post.isExternal;
-                
-                // FIX DATA MAPPING: Ambil langsung dari root karena sudah di-flatten di index.astro
                 const title = post.title || "Untitled";
                 const category = post.category || "Coffee";
                 const description = post.description || "";
@@ -22,17 +19,16 @@ const { posts } = Astro.props;
                 const articleUrl = `/${post.slug}`;
 
                 return (
-                    <article class="bg-white rounded-[1.5rem] overflow-hidden shadow-sm border border-slate-100 hover:shadow-xl hover:shadow-accent-primary/10 transition duration-500 flex flex-col h-full group">
+                    <article class="bg-white rounded-2xl overflow-hidden border border-coffee-brown/10 hover:shadow-2xl hover:shadow-accent-primary/5 transition-all duration-500 flex flex-col h-full group">
                         
                         {/* WRAPPER GAMBAR */}
-                        <a href={articleUrl} class="w-full h-56 overflow-hidden bg-slate-50 relative block">
+                        <a href={articleUrl} class="w-full h-60 overflow-hidden bg-coffee-brown/5 relative block">
                             {imageSrc ? (
-                                /* Jika string (Sanity/R2) pakai img biasa, jika objek (Astro) pakai Image */
                                 typeof imageSrc === 'string' ? (
                                     <img 
                                         src={imageSrc} 
                                         alt={title} 
-                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                         loading="lazy"
                                     />
                                 ) : (
@@ -40,39 +36,39 @@ const { posts } = Astro.props;
                                         src={imageSrc} 
                                         alt={title} 
                                         width={600} 
-                                        height={337} 
-                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                        height={400} 
+                                        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                 )
                             ) : (
-                                <div class="w-full h-full bg-slate-100 flex items-center justify-center text-slate-300 italic text-xs">
-                                    No Image Available
+                                <div class="w-full h-full flex items-center justify-center text-coffee-brown/20 italic text-xs uppercase font-black">
+                                    No Image
                                 </div>
                             )}
                             
-                            {/* BADGE KATEGORI */}
+                            {/* BADGE KATEGORI - Lebih Minimalis */}
                             <div class="absolute top-4 left-4 z-10">
-                                <span class="bg-white/90 backdrop-blur-sm text-coffee-dark text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full shadow-sm">
+                                <span class="bg-white text-coffee-dark text-[9px] font-black uppercase tracking-[0.2em] px-3 py-1.5 rounded-md shadow-sm border border-coffee-brown/5">
                                     {category.replace('-', ' ')}
                                 </span>
                             </div>
                         </a>
 
                         {/* ISI KONTEN */}
-                        <div class="p-8 flex flex-col flex-grow">
-                            <h3 class="text-xl font-bold text-coffee-dark mb-3 line-clamp-2 leading-tight group-hover:text-accent-primary transition-colors">
+                        <div class="p-7 flex flex-col flex-grow">
+                            <h3 class="text-xl font-bold text-coffee-dark mb-3 line-clamp-2 leading-tight group-hover:text-accent-primary transition-colors font-serif italic">
                                 <a href={articleUrl}>
                                     {title}
                                 </a>
                             </h3>
                             
-                            <p class="text-sm text-coffee-brown/80 line-clamp-3 mb-6 leading-relaxed"> 
+                            <p class="text-[13px] text-coffee-brown/80 line-clamp-3 mb-6 leading-relaxed font-medium"> 
                                 {description}
                             </p>
                             
-                            <div class="mt-auto pt-6 border-t border-slate-50">
+                            <div class="mt-auto pt-6 border-t border-coffee-brown/5">
                                 <a href={articleUrl} class="text-[10px] font-black uppercase tracking-[0.2em] text-accent-primary flex items-center gap-2 group/link">
-                                    Read Article 
+                                    Read Full Story 
                                     <span class="transition-transform duration-300 group-hover/link:translate-x-1">→</span>
                                 </a>
                             </div>
@@ -82,9 +78,9 @@ const { posts } = Astro.props;
             })}
         </div>
         
-        <div class="text-center mt-16">
-            <a href="/blog" class="inline-block bg-coffee-dark text-white text-[11px] font-black uppercase tracking-[0.2em] px-10 py-4 rounded-full hover:bg-accent-primary hover:shadow-lg hover:shadow-accent-primary/30 transition duration-300">
-                View All Articles
+        <div class="text-center mt-20">
+            <a href="/blog" class="inline-block bg-coffee-dark text-white text-[11px] font-black uppercase tracking-[0.3em] px-12 py-4 rounded-full hover:bg-accent-primary hover:shadow-2xl hover:shadow-accent-primary/20 transition-all duration-300 transform hover:-translate-y-1">
+                Explore All Guides
             </a>
         </div>
     </div>

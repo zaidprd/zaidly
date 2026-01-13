@@ -16,67 +16,80 @@ const currentPath = Astro.url.pathname;
 const absoluteURL = new URL(currentPath, siteOrigin).href;
 
 const {
-  title = "Zaidly - Your Trusted Resource For All Things Coffee",
-  description = "Zaidly is your leading coffee website online.",
+  title = "Zaidly - Professional Coffee Brewing Guides",
+  description = "Expertly curated coffee resources and brewing techniques.",
   image = "/images/zaidly-logo-social.png",
   canonical = absoluteURL 
 } = Astro.props;
-
-const siteName = "Zaidly";
 ---
 
 <!DOCTYPE html>
-<html lang="en-US" class="min-h-screen">
+<html lang="en-US">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="p:domain_verify" content="75ef94da23de9e533c737720247ff3f9"/>
   
   <ViewTransitions />
   <meta name="google-site-verification" content="-_5rR5OonSa46ubUy5I2sHzN1esjGpcnd1em8We3a7c" />
   
   <title>{title}</title>
   <meta name="description" content={description} />
-  
   <link rel="canonical" href={canonical} />
 
-  <meta property="og:type" content="website" />
-  <meta property="og:url" content={canonical} />
-  <meta property="og:title" content={title} />
-  <meta property="og:description" content={description} />
-  <meta property="og:image" content={new URL(image, siteOrigin).href} />
-  <meta property="og:site_name" content={siteName} />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..900&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:title" content={title} />
-  <meta name="twitter:description" content={description} />
-  <meta name="twitter:image" content={new URL(image, siteOrigin).href} />
+<style is:global>
+  :root {
+    /* Jiwa Kopi (Heading) */
+    --font-coffee: 'Fraunces', serif;
+    /* Bersih ala Amazon (Body) */
+    --font-clean: 'Plus Jakarta Sans', sans-serif;
+  }
 
-  <link rel="icon" type="image/webp" href="/favicon.webp" />
-  <link rel="shortcut icon" href="/favicon.webp" />
+  body {
+    font-family: var(--font-clean);
+    background-color: #FDFCF0; /* Cream Latte */
+    color: #2D2424; /* Dark Coffee Bean */
+    -webkit-font-smoothing: antialiased;
+  }
 
-  {/* CSS UNTUK SMOOTH SCROLL & OFFSET [cite: 2026-01-10] */}
-  <style is:global>
-    html {
-      /* Efek meluncur halus saat klik link internal [cite: 2026-01-10] */
-      scroll-behavior: smooth;
-    }
+  /* Judul ala Amazon tapi berjiwa Kopi */
+  h1 {
+    font-family: var(--font-coffee);
+    /* Ukuran mengikuti standar kenyamanan US & Amazon */
+    font-size: clamp(2.25rem, 6vw, 3.5rem); 
+    font-weight: 800; /* Tebal & Berwibawa */
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+    font-style: normal; /* Tegak agar terlihat expert, bukan sekadar gaya-gayaan */
+    color: #3C2F2F;
+  }
 
-    /* Berikan jarak agar judul tidak tertutup Header Sticky saat melompat [cite: 2026-01-10] */
-    /* Kita menargetkan elemen yang memiliki ID (tujuan scroll) [cite: 2026-01-10] */
-    [id] {
-      scroll-margin-top: 100px; /* Sesuaikan dengan tinggi header kamu [cite: 2026-01-10] */
-    }
+  /* Subheadings H2 & H3 */
+  h2, h3 {
+    font-family: var(--font-coffee);
+    font-weight: 700;
+    color: #3C2F2F;
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+  }
 
-    @media (min-width: 768px) {
-      [id] {
-        scroll-margin-top: 120px;
-      }
-    }
-  </style>
+  /* Teks Artikel (Prose) - Ukuran 18px standar Amerika */
+  .prose {
+    font-family: var(--font-clean);
+    font-size: 1.125rem; /* 18px */
+    line-height: 1.75;
+    color: #3C2F2F;
+  }
+
+  .prose p {
+    margin-bottom: 1.5rem;
+  }
+</style>
 </head>
-
-<body class="flex flex-col min-h-screen antialiased bg-cream-latte">
+<body class="flex flex-col min-h-screen">
   <Header />
   <main class="flex-grow pt-16">
     <slot />

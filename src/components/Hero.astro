@@ -1,7 +1,6 @@
 ---
 // src/components/Hero.astro
 import { Image } from 'astro:assets';
-// Kita import langsung filenya agar Astro bisa melakukan optimasi (resize & webp)
 import heroImg from '../assets/images/herozaildy.webp';
 
 interface Props {
@@ -21,38 +20,44 @@ const {
 } = Astro.props;
 ---
 
-<section class="relative h-[400px] md:h-[700px] flex items-center justify-center overflow-hidden bg-coffee-dark">
+<section class="relative h-[500px] md:h-[85vh] min-h-[500px] flex items-center justify-center overflow-hidden bg-coffee-dark">
   
   <Image 
     src={heroImg} 
     alt={imageAlt}
-    width={1200}
-    height={700}
+    width={1920}
+    height={1080}
     loading="eager"
     fetchpriority="high"
     decoding="async"
-    class="absolute inset-0 w-full h-full object-cover z-0"
+    class="absolute inset-0 w-full h-full object-cover z-0 opacity-70"
   />
 
-  <div class="absolute inset-0 bg-black/50 z-10"></div>
+  <div class="absolute inset-0 bg-gradient-to-b from-black/60 via-black/40 to-coffee-dark/80 z-10"></div>
 
-  <div class="relative z-20 container mx-auto max-w-6xl px-4 text-center text-white">
-    <h1 class="text-4xl md:text-7xl font-black mb-6 leading-[1.1] uppercase tracking-tighter drop-shadow-2xl italic">
-      {title}
-    </h1>
+  <div class="relative z-20 container mx-auto max-w-6xl px-4 text-center">
+    <div class="max-w-4xl mx-auto">
+      {/* TITLE: Menggunakan Font Serif Premium & Italic sesuai Jiwa Kopi */}
+      <h1 class="text-4xl md:text-7xl font-black text-white mb-6 leading-[1.05] tracking-tighter italic font-serif drop-shadow-2xl">
+        {title}
+      </h1>
 
-    <p class="text-lg md:text-xl mb-10 drop-shadow-md max-w-2xl mx-auto opacity-95 font-medium leading-relaxed">
-      {subtitle}
-    </p>
+      {/* SUBTITLE: Putih bersih, mudah dibaca pembaca US */}
+      <p class="text-white/90 text-lg md:text-xl mb-10 max-w-2xl mx-auto font-medium leading-relaxed drop-shadow-md">
+        {subtitle}
+      </p>
 
-    {linkText && linkUrl && (
-      <a
-        href={linkUrl}
-        
-        class="inline-block bg-accent-primary text-black font-black px-10 py-5 tracking-widest uppercase text-xs hover:bg-white hover:text-coffee-dark transition-all duration-300 transform hover:-translate-y-1 shadow-xl"
-      >
-        {linkText}
-      </a>
-    )}
+      {/* CALL TO ACTION BUTTON */}
+      {linkText && linkUrl && (
+        <div class="flex justify-center">
+          <a
+            href={linkUrl}
+            class="inline-block bg-accent-primary text-white font-black px-12 py-5 tracking-[0.2em] uppercase text-[10px] md:text-xs hover:bg-white hover:text-coffee-dark transition-all duration-300 transform hover:-translate-y-1 shadow-2xl shadow-black/20 rounded-sm"
+          >
+            {linkText}
+          </a>
+        </div>
+      )}
+    </div>
   </div>
 </section>
