@@ -1,8 +1,9 @@
 import { createClient } from "@libsql/client";
 
 export const turso = createClient({
-  url: import.meta.env.TURSO_URL || "",
-  authToken: import.meta.env.TURSO_TOKEN || "",
+  // Kita tambahkan pengecekan ke process.env untuk Cloudflare Functions
+  url: import.meta.env.TURSO_URL || (globalThis as any).process?.env?.TURSO_URL || "",
+  authToken: import.meta.env.TURSO_TOKEN || (globalThis as any).process?.env?.TURSO_TOKEN || "",
 });
 
 /**

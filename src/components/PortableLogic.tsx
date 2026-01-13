@@ -6,8 +6,15 @@ export default function PortableLogic({ value }: { value: any }) {
   const components = {
     block: {
       h1: ({ children }: any) => <h1 className="zaidly-h1">{children}</h1>,
-      h2: ({ children }: any) => <h2 className="zaidly-h2">{children}</h2>,
-      h3: ({ children }: any) => <h3 className="zaidly-h3">{children}</h3>,
+      // TAMBAHKAN ID DISINI UNTUK TOC
+      h2: ({ children }: any) => {
+        const id = children.toString().toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+        return <h2 id={id} className="zaidly-h2">{children}</h2>;
+      },
+      h3: ({ children }: any) => {
+        const id = children.toString().toLowerCase().trim().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
+        return <h3 id={id} className="zaidly-h3">{children}</h3>;
+      },
       normal: ({ children, value: node }: any) => {
         const text = node.children.map((c: any) => c.text).join('');
         if (text.includes('|')) {
@@ -23,9 +30,9 @@ export default function PortableLogic({ value }: { value: any }) {
     },
     types: {
       image: ({ value }: any) => {
-        // Ambil ID gambar dari asset._ref
         const id = value.asset?._ref;
         if (!id) return null;
+        // Logic Gambar Sanity CDC
         const imageUrl = `https://cdn.sanity.io/images/6ocswb4i/production/${id.replace('image-', '').replace(/-([^-]+)$/, ".$1")}`;
         return (
           <div className="zaidly-body-img">
@@ -34,27 +41,17 @@ export default function PortableLogic({ value }: { value: any }) {
         );
       },
       affiliateButton: ({ value }: any) => {
-        // SESUAIKAN DENGAN JSON: pakai value.url dan value.label
         if (!value.url) return null;
-        
-        // Logika warna: jika ada kata 'amazon' di label jadi orange, jika 'aliexpress' jadi merah
-        const isAli = value.label?.toLowerCase().includes('alliexpress') || value.label?.toLowerCase().includes('aliexpress');
-        const isAmazon = value.label?.toLowerCase().includes('amazon');
-        
+        const isAli = value.label?.toLowerCase().includes('aliexpress');
         return (
           <div className="zaidly-btn-group">
-            <a 
-              href={value.url} 
-              target="_blank" 
-              className={isAli ? "btn-ali" : "btn-amazon"}
-            >
-              {isAli ? '🚀' : '🛒'} {value.label?.toUpperCase() || 'CHECK PRICE'}
+            <a href={value.url} target="_blank" className={isAli ? "btn-ali" : "btn-amazon"}>
+              {isAli ? 'ðŸš€' : 'ðŸ›’'} {value.label?.toUpperCase() || 'CHECK PRICE'}
             </a>
           </div>
         );
       }
     }
   };
-
   return <PortableText value={value} components={components} />;
 }

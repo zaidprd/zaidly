@@ -6,95 +6,80 @@ import PortableVisualBlocks from '../components/PortableVisualBlocks.astro';
 import { getTursoPosts } from '../lib/turso';
 
 export async function getStaticPaths() {
-    // Ambil Post Lokal
     const localPosts = await getCollection('blog');
     const localPaths = localPosts.map(post => ({
         params: { slug: (post.slug || post.id).trim() }, 
         props: { post, isExternal: false }
     }));
 
-    // Ambil Post Turso
     let tursoPosts: any[] = []; 
-    try {
-        tursoPosts = await getTursoPosts();
-    } catch (e) {
-        console.error("Gagal ambil Turso:", e);
-    }
+    try { tursoPosts = await getTursoPosts(); } catch (e) {}
     
     const tursoPaths = tursoPosts.map(post => ({
         params: { slug: String(post.slug || '').trim() },
         props: { post, isExternal: true }
     }));
-
     return [...localPaths, ...tursoPaths];
 }
 
 const { post, isExternal } = Astro.props;
-if (!post) return Astro.redirect('/404');
+if (!post) return new Response(null, { status: 404 });
 
 let finalFrontmatter: any;
-let DynamicContent: any = null; 
+let DynamicContent: any = null;
 let visualData: any = null;
+let headings: any[] = [];
 
 if (isExternal) {
-    // 1. DATA UNTUK FEATURED IMAGE (BANNER ATAS)
     const featuredImage = post.r2_image_url;
     const featuredImageRef = post.sanity_ref || post.mainImage?.asset?._ref;
-
-    finalFrontmatter = {
-        title: post.title,
-        description: post.description,
-        image: featuredImage,
+    
+    finalFrontmatter = { 
+        title: post.title, 
+        image: featuredImage, 
         author: post.author || 'Admin',
         pubDate: post.published_at,
-        isExternal: true
+        isExternal: true 
     };
-    
-    // 2. AMBIL DAN FILTER KONTEN BODY
-    try {
-        const rawContent = typeof post.visual_content === 'string' 
-            ? JSON.parse(post.visual_content) 
-            : post.visual_content;
 
-        // FILTER: Buang Judul H1 dan Buang Gambar yang sama dengan Banner
-        visualData = rawContent.filter((block: any) => {
-            if (block.style === 'h1') return false; // Hapus Judul Double
+    visualData = typeof post.visual_content === 'string' ? JSON.parse(post.visual_content) : post.visual_content;
 
-            const blockImageRef = block.asset?._ref;
-            if (block._type === 'image' && blockImageRef === featuredImageRef) {
-                return false; // Hapus Gambar Double (jika ID-nya sama dengan banner)
-            }
-            return true;
+    // ðŸ”¥ FIX UTAMA: EKSTRAK HEADINGS DARI MARKDOWN PASTE
+    headings = visualData.flatMap((block: any) => {
+        if (block._type !== 'block') return [];
+
+        const text = block.children?.map((c: any) => c.text).join('') || '';
+        // Regex Global: Cari baris baru yang diawali ## atau ###
+        const matches = [...text.matchAll(/^(#{2,3})\s+(.+)$/gm)];
+
+        return matches.map(m => {
+            const title = m[2].trim();
+            return {
+                depth: m[1].length,
+                text: title,
+                slug: title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
+            };
         });
-    } catch (e) { visualData = []; }
+    });
 
 } else {
-    // Logic untuk Markdown Lokal
+    // Artikel MD/MDX Lokal
     finalFrontmatter = { ...post.data, isExternal: false };
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
+    headings = rendered.headings;
 }
 ---
 
-<ArticleLayout frontmatter={finalFrontmatter}>
-    <div class="bg-white p-6 md:p-12 my-8 rounded-none border-none shadow-sm">
-        
-        {finalFrontmatter.image && (
-            <div class="mb-12">
-                <img 
-                    src={finalFrontmatter.image} 
-                    alt={finalFrontmatter.title} 
-                    class="w-full aspect-video object-cover rounded-none border-b-8 border-[#4a3728]"
-                />
-            </div>
-        )}
-
-        <div class="prose max-w-none">
+<ArticleLayout frontmatter={finalFrontmatter} headings={headings}>
+    <div class="bg-white p-6 md:p-12 shadow-sm border border-coffee-brown/10">
+        <div class="prose max-w-none zaidly-content">
             {isExternal ? (
-                /* BODY CONTENT (Hasil filter tadi) */
                 <PortableVisualBlocks value={visualData} />
             ) : (
-                DynamicContent && <DynamicContent />
+                <div class="local-article-fix">
+                    {DynamicContent && <DynamicContent />}
+                </div>
             )}
         </div>
     </div>
