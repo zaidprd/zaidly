@@ -9,34 +9,35 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
 ---
 
 {filteredHeadings.length > 0 && (
-  <nav class="toc-container my-12 border-y border-coffee-brown/10 py-10 bg-white/30 backdrop-blur-sm rounded-xl px-6 md:px-8">
+  <nav class="toc-container my-8 border-y border-coffee-brown/10 py-5 bg-white/30 backdrop-blur-sm rounded-xl px-4 md:px-6">
     <div class="flex items-center justify-between">
-      <h2 class="font-black text-[11px] uppercase tracking-[0.4em] text-accent-primary flex items-center gap-3">
-        <span class="w-8 h-[1px] bg-accent-primary/30"></span>
+      {/* JUDUL: Pakai font-sans biar minimalis dan ukuran dipaksa kecil */}
+      <h2 class="toc-title font-sans font-black uppercase tracking-[0.1em] text-accent-primary">
         Table of Contents
       </h2>
+      
       <button 
         id="toc-toggle-btn" 
-        class="text-[9px] font-black uppercase tracking-[0.2em] border border-coffee-brown/20 px-3 py-1.5 hover:bg-coffee-dark hover:text-white transition-all duration-300 rounded-md shadow-sm bg-white"
+        class="toc-btn font-sans font-black uppercase tracking-widest border border-coffee-brown/20 px-3 py-1 hover:bg-coffee-dark hover:text-white transition-all rounded bg-white shadow-sm"
       >
-        [ Show ]
+        Show
       </button>
     </div>
 
-    <ul id="toc-list-items" class="hidden space-y-4 pt-8 transition-all duration-500 ease-in-out">
+    <ul id="toc-list-items" class="hidden space-y-3 pt-6 transition-all duration-300">
       {filteredHeadings.map((h, index) => (
         <li class:list={[
-          h.depth === 2 ? 'pl-0' : 'pl-8 opacity-80',
-          'group relative border-b border-coffee-brown/5 pb-3 last:border-0'
+          h.depth === 2 ? 'pl-0' : 'pl-6 opacity-80',
+          'group relative border-b border-coffee-brown/5 pb-2 last:border-0'
         ]}>
           <a 
             href={`#${h.slug}`} 
-            class="text-[13px] font-bold uppercase tracking-tight text-coffee-dark hover:text-accent-primary transition-all flex items-start gap-3"
+            class="toc-link font-sans font-bold uppercase tracking-tight text-coffee-dark hover:text-accent-primary transition-all flex items-start gap-2"
           >
-            <span class="text-[10px] text-coffee-brown/40 font-black mt-0.5 group-hover:text-accent-primary transition-colors">
+            <span class="text-[9px] text-coffee-brown/40 font-black mt-0.5">
                 {String(index + 1).padStart(2, '0')}
             </span>
-            {h.text}
+            <span class="line-clamp-2 md:line-clamp-1">{h.text}</span>
           </a>
         </li>
       ))}
@@ -51,20 +52,35 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
     if (btn && list) {
       btn.onclick = () => {
         const isHidden = list.classList.toggle('hidden');
-        btn.textContent = isHidden ? '[ Show ]' : '[ Hide ]';
+        btn.textContent = isHidden ? 'Show' : 'Hide';
       };
     }
   };
-
   setupToggle();
   document.addEventListener('astro:page-load', setupToggle);
 </script>
 
 <style>
+  /* KONTROL UKURAN DI SINI - PASTI BERUBAH */
+  .toc-title {
+    font-size: 12px !important; /* Kecil & elegan */
+    margin: 0 !important;
+  }
+
+  .toc-btn {
+    font-size: 9px !important; /* Tombol kecil */
+    min-width: 65px;
+  }
+
+  .toc-link {
+    font-size: 11px !important; /* Link isi TOC kecil */
+    line-height: 1.4 !important;
+  }
+
   .hidden { display: none !important; }
   ul { list-style: none !important; padding: 0 !important; margin: 0 !important; }
+  
   .toc-container {
-    /* Background halus menyesuaikan tema Cream Latte */
-    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.6), rgba(245, 245, 240, 0.4));
+    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.7), rgba(245, 245, 240, 0.5));
   }
 </style>

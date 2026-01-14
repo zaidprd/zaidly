@@ -31,179 +31,179 @@ const ads = {
 ---
 
 <BaseLayout title={frontmatter.title}>
-    <main class="bg-cream-latte min-h-screen text-coffee-dark relative font-sans">
-        
-        {/* FLOATING ACTION RIGHT (Scroll Top & Ko-fi) */}
-        <div id="floating-action" class="fixed bottom-8 right-8 z-50 flex flex-col gap-4 opacity-0 translate-y-10 transition-all duration-500 pointer-events-none">
-            <a href="https://ko-fi.com/zaidly" target="_blank" class="pointer-events-auto bg-accent-primary text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform border-2 border-white/20 flex items-center justify-center">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+<main class="bg-cream-latte min-h-screen text-coffee-dark relative font-sans">
+
+  {/* FLOATING ACTION RIGHT */}
+  <div id="floating-action" class="fixed bottom-8 right-8 z-50 flex flex-col gap-4 opacity-0 translate-y-10 transition-all duration-500 pointer-events-none">
+      <a href="https://ko-fi.com/zaidly" target="_blank" class="pointer-events-auto bg-accent-primary text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform border-2 border-white/20 flex items-center justify-center">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+      </a>
+      <button id="scroll-top" class="pointer-events-auto bg-white text-coffee-dark p-3 rounded-full shadow-xl hover:bg-coffee-dark hover:text-white transition-all border border-coffee-brown/10 flex items-center justify-center">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+      </button>
+  </div>
+
+  {/* HEADER */}
+  <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10 px-4">
+      <div class="container mx-auto max-w-6xl">
+          <div class="max-w-4xl text-left">
+              <div class="flex items-center justify-start space-x-3 mb-6 font-sans">
+                  <span class="bg-accent-primary text-white text-[9px] font-black px-2.5 py-1 tracking-[0.2em] uppercase rounded-sm">Expert Guide</span>
+                  <time class="text-[10px] font-bold text-coffee-brown/50 uppercase tracking-widest">{formattedDate}</time>
+              </div>
+              <h1 class="mb-8 font-serif italic text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-coffee-dark tracking-tighter text-left">
+                  {frontmatter.title}
+              </h1>
+              <p class="text-coffee-brown font-bold text-[10px] uppercase tracking-[0.2em] font-sans text-left">
+                  Written by <span class="text-accent-primary border-b border-accent-primary/20">{frontmatter.author}</span>
+              </p>
+          </div>
+      </div>
+  </header>
+
+  <div class="container mx-auto max-w-6xl px-4 py-12">
+    <div class="flex flex-col lg:flex-row gap-16 relative">
+
+      {/* SHARE BAR */}
+      <aside class="hidden xl:block absolute -left-20 top-0 h-full">
+        <div class="sticky top-32 flex flex-col gap-7 items-center py-4">
+          <span class="text-[9px] font-black uppercase tracking-[0.3em] text-coffee-dark/50 [writing-mode:vertical-lr] rotate-180 mb-2 font-sans">Share Guide</span>
+          <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-accent-primary transition-all hover:scale-110" aria-label="Share on X">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+          </a>
+        </div>
+      </aside>
+
+      <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
+          {frontmatter.image && (
+              <div class="mb-12 overflow-hidden rounded-xl bg-coffee-brown/5 border border-coffee-brown/10 p-1 md:p-2 bg-white shadow-sm">
+                  {isSanityImage ? (
+                      <img src={frontmatter.image} alt={frontmatter.title} class="w-full aspect-video object-cover rounded-lg" loading="eager" />
+                  ) : (
+                      <Image src={frontmatter.image} alt={frontmatter.title} class="w-full aspect-video object-cover rounded-lg" loading="eager" />
+                  )}
+              </div>
+          )}
+
+          {showSidebar && ( <div id="toc-move-target" class="hidden"><TableOfContents headings={headings} /></div> )}
+
+          <div id="article-content" class="prose prose-stone max-w-none px-0.5 md:px-0 font-sans">
+              <slot />
+          </div>
+
+          <div class="flex flex-row gap-3 mt-10 !prose-none">
+            <a
+              href="https://amzn.to/3YEvz65"
+              target="_blank"
+              class="flex-1 text-center px-4 py-3.5 rounded-lg font-black uppercase transition-all text-[11px] tracking-wider
+                     bg-[#FF9900] text-black hover:bg-[#E68A00] hover:shadow-md active:scale-95"
+            >
+              Amazon
             </a>
-            <button id="scroll-top" class="pointer-events-auto bg-white text-coffee-dark p-3 rounded-full shadow-xl hover:bg-coffee-dark hover:text-white transition-all border border-coffee-brown/10 flex items-center justify-center">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-            </button>
-        </div>
 
-        {/* HEADER AREA */}
-        <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10 px-4">
-            <div class="container mx-auto max-w-6xl">
-                <div class="max-w-4xl text-center md:text-left">
-                    <div class="flex items-center justify-center md:justify-start space-x-3 mb-6 font-sans">
-                        <span class="bg-accent-primary text-white text-[9px] font-black px-2.5 py-1 tracking-[0.2em] uppercase rounded-sm">Expert Guide</span>
-                        <time class="text-[10px] font-bold text-coffee-brown/50 uppercase tracking-widest">{formattedDate}</time>
-                    </div>
-                    <h1 class="mb-8 font-serif italic text-3xl md:text-5xl font-black leading-[1.1] text-coffee-dark tracking-tighter">{frontmatter.title}</h1>
-                    <p class="text-coffee-brown font-bold text-[10px] uppercase tracking-[0.2em] font-sans">Written by <span class="text-accent-primary border-b border-accent-primary/20">{frontmatter.author}</span></p>
-                </div>
-            </div>
-        </header>
+            <a
+              href="https://www.aliexpress.com"
+              target="_blank"
+              class="flex-1 text-center px-4 py-3.5 rounded-lg font-black uppercase transition-all text-[11px] tracking-wider
+                     bg-[#FF4747] text-white hover:bg-[#E63E3E] hover:shadow-md active:scale-95"
+            >
+              AliExpress
+            </a>
+          </div>
 
-        <div class="container mx-auto max-w-6xl px-4 py-12">
-            {/* WRAPPER RELATIVE AGAR SHARE BAR NEMPEL KE ARTIKEL */}
-            <div class="flex flex-col lg:flex-row gap-16 relative">
-                
-                {/* FLOATING SHARE LEFT (US MARKET FOCUS - 5 PLATFORMS) */}
-                <aside class="hidden xl:block absolute -left-20 top-0 h-full">
-                    <div class="sticky top-32 flex flex-col gap-7 items-center py-4">
-                         <span class="text-[9px] font-black uppercase tracking-[0.3em] text-coffee-dark/50 [writing-mode:vertical-lr] rotate-180 mb-2 font-sans">Share Guide</span>
-                         
-                         {/* X (Twitter) */}
-                         <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-accent-primary transition-all hover:scale-110" aria-label="Share on X">
-                            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-                         </a>
 
-                         {/* Reddit */}
-                         <a href={`https://www.reddit.com/submit?url=${shareUrl}&title=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-[#FF4500] transition-all hover:scale-110" aria-label="Share on Reddit">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.309.73-.491 1.207-.491.968 0 1.754.786 1.754 1.754 0 .716-.435 1.333-1.056 1.597.04.282.063.571.063.863 0 2.49-2.854 4.516-6.358 4.516-3.504 0-6.358-2.026-6.358-4.516 0-.291.023-.58.063-.861a1.75 1.75 0 0 1-1.053-1.598c0-.968.786-1.754 1.754-1.754.463 0 .875.18 1.179.472 1.187-.813 2.784-1.353 4.54-1.442l.89-4.187a.25.25 0 0 1 .192-.19l3.015.635z"/></svg>
-                         </a>
+          {/* RELATED POSTS */}
+          <section class="mt-20 pt-10 border-t border-coffee-brown/10">
+              <h3 class="text-2xl font-black uppercase tracking-tighter text-coffee-dark mb-10 font-serif text-center md:text-left">You Might Also Like</h3>
+              <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-2 md:px-0">
+                  {relatedPosts.map((post) => (
+                      <a href={`/${post.slug}`} class="group cursor-pointer block">
+                          <div class="aspect-video bg-coffee-brown/5 rounded-xl overflow-hidden mb-4 border border-coffee-brown/5 relative">
+                              {post.image ? (
+                                   <img src={typeof post.image === 'string' ? post.image : post.image.src} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                              ) : (
+                                  <div class="w-full h-full flex items-center justify-center bg-accent-primary/5 text-accent-primary/20"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path></svg></div>
+                              )}
+                          </div>
+                          <h4 class="text-sm font-bold leading-snug text-coffee-dark group-hover:text-accent-primary transition-colors line-clamp-2 font-serif">{post.title}</h4>
+                      </a>
+                  ))}
+              </div>
+          </section>
 
-                         {/* Threads */}
-                         <a href={`https://www.threads.net/intent/post?text=${shareTitle}%20${shareUrl}`} target="_blank" class="text-coffee-dark hover:text-accent-primary transition-all hover:scale-110" aria-label="Share on Threads">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-                         </a>
+          {/* SUPPORT BOX */}
+          <section class="mt-16 p-6 md:p-10 bg-white border-2 border-coffee-brown/10 rounded-2xl text-center max-w-2xl mx-auto shadow-md">
+              <div class="flex flex-col items-center">
+                  <p class="text-coffee-dark text-base font-bold leading-relaxed mb-8 italic px-2 font-serif">"If this guide has provided value to you, please consider supporting Zaidly to keep our expert research brewing every week."</p>
+                  <a href="https://ko-fi.com/zaidly" target="_blank" class="bg-accent-primary text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-coffee-dark transition-all">Support Zaidly</a>
+              </div>
+          </section>
 
-                         {/* Pinterest */}
-                         <a href={`https://pinterest.com/pin/create/button/?url=${shareUrl}&description=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-[#BD081C] transition-all hover:scale-110" aria-label="Share on Pinterest">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.162-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.966 1.406-5.966s-.359-.72-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 0 1 .083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.261 7.929-7.261 4.162 0 7.398 2.966 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146 1.124.347 2.317.535 3.554.535 6.607 0 11.985-5.365 11.985-11.987C24.021 5.367 18.624 0 12.017 0z"/></svg>
-                         </a>
+          <div class="giscus-container mt-12 border-t border-coffee-brown/10 pt-10"><div class="giscus"></div></div>
+      </article>
 
-                         {/* Facebook */}
-                         <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" class="text-coffee-dark hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Share on Facebook">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-                         </a>
-                    </div>
-                </aside>
+      {/* SIDEBAR */}
+      <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit">
+          <div class="bg-white border border-coffee-brown/15 p-6 text-center rounded-xl shadow-sm">
+              <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Top Choice</h3>
+              <a href={ads.topPick.link} target="_blank" class="group block">
+                  <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4 rounded-lg">
+                      <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                  </div>
+                  <h4 class="text-sm font-black uppercase leading-snug font-serif">{ads.topPick.title}</h4>
+              </a>
+          </div>
+      </aside>
 
-                <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
-                    {frontmatter.image && (
-                        <div class="mb-12 overflow-hidden rounded-xl bg-coffee-brown/5">
-                            {isSanityImage ? (
-                                <img src={frontmatter.image} alt={frontmatter.title} class="w-full aspect-video object-cover" loading="eager" />
-                            ) : (
-                                <Image src={frontmatter.image} alt={frontmatter.title} class="w-full aspect-video object-cover" loading="eager" />
-                            )}
-                        </div>
-                    )}
+    </div>
+  </div>
 
-                    {showSidebar && ( <div id="toc-move-target" class="hidden"><TableOfContents headings={headings} /></div> )}
-
-                    <div id="article-content" class="prose max-w-none font-sans"><slot /></div>
-
-                    {/* RELATED POSTS */}
-                    <section class="mt-20 pt-10 border-t border-coffee-brown/10 font-sans">
-                        <h3 class="text-2xl font-black uppercase tracking-tighter text-coffee-dark mb-10 font-serif text-center md:text-left">You Might Also Like</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                            {relatedPosts.map((post) => (
-                                <a href={`/${post.slug}`} class="group cursor-pointer block">
-                                    <div class="aspect-video bg-coffee-brown/5 rounded-xl overflow-hidden mb-4 border border-coffee-brown/5 relative">
-                                        {post.image ? (
-                                             <img src={typeof post.image === 'string' ? post.image : post.image.src} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                                        ) : (
-                                            <div class="w-full h-full flex items-center justify-center bg-accent-primary/5">
-                                                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#B5651D" stroke-width="1" opacity="0.2"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path></svg>
-                                            </div>
-                                        )}
-                                    </div>
-                                    <h4 class="text-sm font-bold leading-snug text-coffee-dark group-hover:text-accent-primary transition-colors line-clamp-2 font-serif">{post.title}</h4>
-                                    <p class="mt-2 text-[10px] font-bold text-coffee-brown/40 uppercase tracking-widest">{post.category || 'Expert Guide'}</p>
-                                </a>
-                            ))}
-                        </div>
-                    </section>
-
-                    {/* SUPPORT SECTION */}
-                    <section class="mt-16 p-8 bg-white/50 border border-coffee-brown/10 rounded-2xl text-center max-w-2xl mx-auto backdrop-blur-sm shadow-sm font-sans">
-                        <div class="flex flex-col items-center">
-                            <div class="w-12 h-12 bg-white rounded-full flex items-center justify-center mb-5 shadow-sm border border-coffee-brown/5">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#B5651D" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
-                            </div>
-                            <p class="text-coffee-dark text-sm font-medium leading-relaxed mb-6 italic px-4 text-center">
-                                "If this guide has provided value to you, please consider supporting Zaidly to keep our expert research and quality content brewing every week."
-                            </p>
-                            <a href="https://ko-fi.com/zaidly" target="_blank" class="bg-accent-primary text-white px-8 py-3 rounded-xl font-black text-[10px] uppercase tracking-[0.2em] hover:bg-coffee-dark transition-all shadow-lg shadow-accent-primary/15">Support Zaidly</a>
-                        </div>
-                    </section>
-
-                    <div class="giscus-container mt-12 border-t border-coffee-brown/10 pt-10"><div class="giscus"></div></div>
-                </article>
-
-                {/* SIDEBAR */}
-                <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit font-sans">
-                    <div class="bg-white border border-coffee-brown/15 p-6 text-center rounded-xl shadow-sm">
-                        <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Top Choice</h3>
-                        <a href={ads.topPick.link} target="_blank" class="group block">
-                            <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4 rounded-lg">
-                                <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
-                            </div>
-                            <h4 class="text-sm font-black uppercase leading-snug font-serif">{ads.topPick.title}</h4>
-                        </a>
-                    </div>
-                </aside>
-            </div>
-        </div>
-    </main>
+</main>
 </BaseLayout>
 
+<style is:global>
+#article-content { color: #2C1810; }
+#article-content h1:first-child { display: none !important; }
+#article-body h2, #article-content h2 { @apply font-serif italic font-black text-[22px] md:text-3xl mt-10 mb-5 tracking-tight uppercase leading-tight; }
+#article-body h3, #article-content h3 { @apply font-serif italic font-black text-[19px] md:text-2xl mt-8 mb-4 tracking-tight leading-tight; }
+#article-content p { @apply mb-6 leading-[1.7] text-[16px] md:text-[17px] opacity-95; }
+#article-content table { display: block; width: 100% !important; overflow-x: auto; white-space: nowrap; border-collapse: collapse; margin: 2rem 0; border: 1px solid rgba(181, 101, 29, 0.1); }
+@media (max-width: 768px) { #article-content { padding-left: 12px; padding-right: 12px; } }
+</style>
+
 <script is:inline data-astro-rerun>
-  function setupArticleFeatures() {
-    const content = document.getElementById('article-content');
-    const toc = document.getElementById('toc-move-target');
-    if (content && toc) {
-      const paragraphs = content.querySelectorAll('p');
-      const targetPara = paragraphs[1] || paragraphs[0];
-      if (targetPara) { targetPara.after(toc); toc.classList.remove('hidden'); }
-    }
-
-    const floating = document.getElementById('floating-action');
-    const scrollTopBtn = document.getElementById('scroll-top');
-    const handleScroll = () => {
-      if (window.scrollY > 400) {
-        floating.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none');
-        floating.classList.add('opacity-100', 'translate-y-0');
-      } else {
-        floating.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none');
-        floating.classList.remove('opacity-100', 'translate-y-0');
-      }
-    };
-    window.addEventListener('scroll', handleScroll);
-    if (scrollTopBtn) { scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' }); }
-
-    const gContainer = document.querySelector('.giscus');
-    if (gContainer) {
-      gContainer.innerHTML = ''; 
-      const s = document.createElement('script');
-      s.src = "https://giscus.app/client.js";
-      s.setAttribute('data-repo', 'zaidprd/zaidly');
-      s.setAttribute('data-repo-id', 'R_kgDOQmgBjg'); 
-      s.setAttribute('data-category', 'Announcements');
-      s.setAttribute('data-category-id', 'DIC_kwDOQmgBjs4C06bO');
-      s.setAttribute('data-mapping', 'pathname');
-      s.setAttribute('data-theme', 'light');
-      s.setAttribute('data-lang', 'en');
-      s.crossOrigin = "anonymous";
-      s.async = true;
-      gContainer.appendChild(s);
-    }
+function setupArticleFeatures() {
+  const content = document.getElementById('article-content');
+  const toc = document.getElementById('toc-move-target');
+  if (content && toc) {
+    const paragraphs = content.querySelectorAll('p');
+    const targetPara = paragraphs[1] || paragraphs[0];
+    if (targetPara) { targetPara.after(toc); toc.classList.remove('hidden'); }
   }
-  document.addEventListener('astro:page-load', setupArticleFeatures);
-  setupArticleFeatures();
+  const floating = document.getElementById('floating-action');
+  const scrollTopBtn = document.getElementById('scroll-top');
+  window.onscroll = () => {
+    if (window.scrollY > 400) { floating.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); floating.classList.add('opacity-100', 'translate-y-0'); }
+    else { floating.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); floating.classList.remove('opacity-100', 'translate-y-0'); }
+  };
+  if (scrollTopBtn) { scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' }); }
+
+  const gContainer = document.querySelector('.giscus');
+  if (gContainer) {
+    gContainer.innerHTML = ''; 
+    const s = document.createElement('script');
+    s.src = "https://giscus.app/client.js";
+    s.setAttribute('data-repo', 'zaidprd/zaidly');
+    s.setAttribute('data-repo-id', 'R_kgDOQmgBjg'); 
+    s.setAttribute('data-category', 'Announcements');
+    s.setAttribute('data-category-id', 'DIC_kwDOQmgBjs4C06bO');
+    s.setAttribute('data-mapping', 'pathname');
+    s.setAttribute('data-theme', 'light');
+    s.setAttribute('data-lang', 'en');
+    s.crossOrigin = "anonymous"; s.async = true;
+    gContainer.appendChild(s);
+  }
+}
+document.addEventListener('astro:page-load', setupArticleFeatures);
+setupArticleFeatures();
 </script>
