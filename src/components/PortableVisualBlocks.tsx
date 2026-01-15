@@ -1,105 +1,183 @@
 /** @jsxImportSource react */
 import { PortableText } from '@portabletext/react';
 import { marked } from 'marked';
+import { useState, useEffect } from 'react';
 
 const renderer = new marked.Renderer();
 renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
   const cleanText = text.replace(/<[^>]*>/g, '');
-  const id = cleanText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-');
-  if (depth === 1) return ''; 
+  const id = cleanText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
   return `<h${depth} id="${id}" class="zaidly-h${depth}">${text}</h${depth}>`;
 };
 
-const components = (headings: any[]) => ({
+const components = {
   block: {
-    normal: ({ node }: any) => {
-      const rawText = node.children.map((c: any) => c.text).join('');
-      const html = marked.parse(rawText, { renderer }) as string;
-      return <div className="zaidly-p-container text-left" dangerouslySetInnerHTML={{ __html: html }} />;
+    normal: ({ node, children }: any) => {
+      const rawText = node.children?.map((c: any) => c.text).join('') || '';
+      const isMarkdown = rawText.includes('|') || /^#{1,6}\s/m.test(rawText) || /^\s*[-*+]\s+/m.test(rawText);
+
+      if (isMarkdown) {
+        const html = marked.parse(rawText, { renderer }) as string;
+        return <section className="zaidly-markdown-area" dangerouslySetInnerHTML={{ __html: html }} />;
+      }
+      return <p className="zaidly-normal-p">{children}</p>;
+    },
+    h2: ({ children }: any) => {
+      const text = children.toString();
+      const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
+      return <h2 id={id} className="zaidly-h2">{children}</h2>;
+    },
+    h3: ({ children }: any) => {
+      const text = children.toString();
+      const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
+      return <h3 id={id} className="zaidly-h3">{children}</h3>;
     }
   },
   types: {
-    image: ({ value }: any) => {
-      const ref = value.asset?._ref || '';
-      const cleanId = ref.replace('image-', '').replace(/-([^-]+)$/, ".$1");
-      const r2Url = value.url || `https://r2.zaidly.com/blog/${cleanId}`;
-      const sanityUrl = `https://cdn.sanity.io/images/6ocswb4i/production/${cleanId}`;
-      return (
-        <div style={{ margin: '2.5rem 0' }}>
-          <img 
-            src={r2Url} 
-            alt={value.alt || ""} 
-            style={{ width: '100%', borderRadius: '0.75rem', display: 'block' }}
-            onError={(e) => { (e.currentTarget as HTMLImageElement).src = sanityUrl; }}
-          />
-        </div>
-      );
-    },
-    // --- LOGIKA TOMBOL FRONTEND (SAMA DENGAN PREVIEW SANITY) ---
     affiliateButton: ({ value }: any) => {
-      const store = value.storeId || 'amazon';
-      const isAli = store === 'aliexpress';
+      const label = (value.label || '').toLowerCase();
+      const isAli = value.storeId === 'aliexpress' || label.includes('ali');
 
       return (
-        <div style={{ 
-          display: 'inline-flex', 
-          flexDirection: 'column', 
-          alignItems: 'center', 
-          width: 'calc(50% - 15px)', // Biar bagi dua kiri kanan
-          marginRight: '20px', 
-          marginBottom: '25px',
-          verticalAlign: 'top'
-        }}>
-          {/* LOGO AREA */}
-          <div style={{ height: '35px', display: 'flex', alignItems: 'center', marginBottom: '10px' }}>
+        <div className="zaidly-btn-container">
+          <div className="zaidly-logo-box">
             {isAli ? (
-              /* AliExpress Logo Style */
-              <div style={{ display: 'flex', alignItems: 'center', fontWeight: '900', fontFamily: 'sans-serif' }}>
-                 <span style={{ backgroundColor: '#E62E04', color: 'white', padding: '2px 6px', borderRadius: '4px', marginRight: '4px', fontSize: '14px' }}>Ali</span>
-                 <span style={{ color: '#E62E04', fontSize: '16px' }}>Express</span>
+              <div className="ali-logo">
+                <span>Ali</span>Express
               </div>
             ) : (
-              /* Amazon Logo Style */
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-                 <span style={{ color: 'black', fontWeight: '900', fontSize: '18px', fontFamily: 'sans-serif' }}>amazon</span>
-                 <div style={{ width: '45px', height: '4px', borderBottom: '2.5px solid #FF9900', borderRadius: '50%', marginTop: '-6px' }}></div>
+              <div className="amz-logo">
+                amazon<div className="smile"></div>
               </div>
             )}
           </div>
-
-          {/* BUTTON AREA */}
           <a
             href={value.url}
             target="_blank"
             rel="nofollow"
-            style={{
-              backgroundColor: isAli ? '#E62E04' : '#FF9900',
-              color: isAli ? '#ffffff' : '#000000',
-              width: '100%',
-              padding: '14px 5px',
-              borderRadius: '6px',
-              textAlign: 'center',
-              fontWeight: '900',
-              fontSize: '11px',
-              textDecoration: 'none',
-              textTransform: 'uppercase',
-              boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
-              transition: 'all 0.2s ease'
-            }}
+            className={`zaidly-btn ${isAli ? 'ali' : 'amz'}`}
           >
-            {value.label?.toUpperCase() || 'CHECK PRICE'}
+            {(value.label || 'CHECK PRICE').toUpperCase()}
           </a>
         </div>
       );
-    }
-  }
-});
+    },
+    image: ({ value }: any) => {
+      const ref = value.asset?._ref || '';
+      const cleanId = ref.replace('image-', '').replace(/-([^-]+)$/, '.$1');
+      const imageUrl = value.url || `https://r2.zaidly.com/blog/${cleanId}`;
+      return (
+        <div className="zaidly-img-box">
+          <img src={imageUrl} alt={value.alt || ''} loading="lazy" />
+        </div>
+      );
+    },
+  },
+};
 
-export default function PortableVisualBlocks({ value, headings }: { value: any, headings: any[] }) {
+export default function PortableVisualBlocks({ value }: { value: any }) {
+  const [isClient, setIsClient] = useState(false);
+
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
   if (!value) return null;
+
   return (
-    <div className="portable-text-wrapper text-left">
-      <PortableText value={value} components={components(headings)} />
+    <div className={`portable-text-wrapper ${isClient ? 'is-hydrated' : ''}`}>
+      <style
+        dangerouslySetInnerHTML={{
+          __html: `
+/* === WRAPPER UTAMA (TETAP BLOCK BIAR ARTIKEL GAK ANCUR) === */
+.portable-text-wrapper {
+  display: block;
+  width: 100%;
+}
+
+/* === FIX TOMBOL SAMPINGAN (INLINE-FLEX) === */
+.zaidly-btn-container {
+  display: inline-flex !important;
+  flex-direction: column;
+  align-items: center;
+  width: 155px;
+  margin-right: 18px;
+  margin-bottom: 30px;
+  vertical-align: top;
+  text-align: center;
+}
+
+/* === STYLE LOGO & BUTTON (SESUAI YANG ABANG SUKA) === */
+.zaidly-logo-box {
+  height: 35px;
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  font-weight: 900;
+}
+
+.zaidly-btn {
+  width: 100%;
+  padding: 12px 5px;
+  border-radius: 6px; /* Lengkungan 6px sesuai kodingan tadi */
+  font-weight: 900;
+  font-size: 11px;
+  text-decoration: none;
+  text-align: center;
+  display: block;
+}
+
+.ali { background: #e62e04; color: white; }
+.amz { background: #ff9900; color: black; }
+
+.ali-logo span {
+  background: #e62e04;
+  color: white;
+  padding: 2px 5px;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+
+.ali-logo { color: #e62e04; font-family: sans-serif; font-size: 14px; }
+.amz-logo { color: #000; font-family: sans-serif; font-size: 17px; }
+
+.smile {
+  width: 35px;
+  height: 3px;
+  border-bottom: 2.5px solid #ff9900;
+  border-radius: 50%;
+  margin: -6px auto 0;
+}
+
+/* === TYPOGRAPHY (TETAP LEBAR 100%) === */
+.zaidly-normal-p,
+.zaidly-markdown-area p {
+  width: 100%;
+  margin-bottom: 1.5rem;
+  line-height: 1.8;
+  font-size: 1.125rem;
+  display: block;
+}
+
+.zaidly-h2, .zaidly-h3 { width: 100%; display: block; }
+
+.zaidly-img-box img {
+  width: 100%;
+  height: auto;
+  margin: 2rem 0;
+  border-bottom: 4px solid #4a3728;
+}
+
+@media (max-width: 480px) {
+  .zaidly-btn-container {
+    width: 140px;
+    margin-right: 10px;
+  }
+}
+`,
+        }}
+      />
+      <PortableText value={value} components={components} />
     </div>
   );
 }

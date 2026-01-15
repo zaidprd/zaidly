@@ -31,12 +31,9 @@ let visualData: any = null;
 let headings: any[] = [];
 
 if (isExternal) {
-    const featuredImage = post.r2_image_url;
-    const featuredImageRef = post.sanity_ref || post.mainImage?.asset?._ref;
-    
     finalFrontmatter = { 
         title: post.title, 
-        image: featuredImage, 
+        image: post.r2_image_url, 
         author: post.author || 'Admin',
         pubDate: post.published_at,
         isExternal: true 
@@ -44,26 +41,19 @@ if (isExternal) {
 
     visualData = typeof post.visual_content === 'string' ? JSON.parse(post.visual_content) : post.visual_content;
 
-    // ðŸ”¥ FIX UTAMA: EKSTRAK HEADINGS DARI MARKDOWN PASTE
     headings = visualData.flatMap((block: any) => {
-        if (block._type !== 'block') return [];
-
         const text = block.children?.map((c: any) => c.text).join('') || '';
-        // Regex Global: Cari baris baru yang diawali ## atau ###
-        const matches = [...text.matchAll(/^(#{2,3})\s+(.+)$/gm)];
-
-        return matches.map(m => {
-            const title = m[2].trim();
-            return {
-                depth: m[1].length,
-                text: title,
-                slug: title.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-')
-            };
-        });
+        if (block._type === 'block' && (block.style === 'h2' || block.style === 'h3')) {
+            return [{ depth: parseInt(block.style.replace('h', '')), text, slug: text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') }];
+        }
+        if (block._type === 'block') {
+            const matches = [...text.matchAll(/^(#{2,3})\s+(.+)$/gm)];
+            return matches.map(m => ({ depth: m[1].length, text: m[2].trim(), slug: m[2].trim().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') }));
+        }
+        return [];
     });
 
 } else {
-    // Artikel MD/MDX Lokal
     finalFrontmatter = { ...post.data, isExternal: false };
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
@@ -72,15 +62,14 @@ if (isExternal) {
 ---
 
 <ArticleLayout frontmatter={finalFrontmatter} headings={headings}>
-    
-        <div class="prose max-w-none zaidly-content">
-            {isExternal ? (
-                <PortableVisualBlocks value={visualData} />
-            ) : (
-                <div class="local-article-fix">
-                    {DynamicContent && <DynamicContent />}
-                </div>
-            )}
-        </div>
+    <div class="prose max-w-none zaidly-content">
+        {isExternal ? (
+            /* FIX UTAMA: WAJIB PAKAI client:load BIAR SCRIPT TOC DI LAYOUT BISA DETEKSI PARAGRAF */
+            <PortableVisualBlocks value={visualData} client:load />
+        ) : (
+            <div class="local-article-fix">
+                {DynamicContent && <DynamicContent />}
+            </div>
+        )}
     </div>
 </ArticleLayout>

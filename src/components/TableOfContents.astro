@@ -1,43 +1,43 @@
 ---
 // src/components/TableOfContents.astro
 interface Props {
-    headings: { depth: number; text: string; slug: string }[];
+  headings: { depth: number; text: string; slug: string }[];
 }
 
 const { headings } = Astro.props;
+// Filter hanya heading h2 dan h3
 const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
 ---
 
 {filteredHeadings.length > 0 && (
-  <nav class="toc-container my-8 border-y border-coffee-brown/10 py-5 bg-white/30 backdrop-blur-sm rounded-xl px-4 md:px-6">
+  <nav id="toc-container-inner" class="toc-container my-10 border-y border-coffee-brown/10 py-6 bg-white/40 backdrop-blur-md rounded-xl px-5 shadow-sm overflow-hidden">
     <div class="flex items-center justify-between">
-      {/* JUDUL: Pakai font-sans biar minimalis dan ukuran dipaksa kecil */}
       <h2 class="toc-title font-sans font-black uppercase tracking-[0.1em] text-accent-primary">
-        Table of Contents
+        In This Guide
       </h2>
       
       <button 
         id="toc-toggle-btn" 
-        class="toc-btn font-sans font-black uppercase tracking-widest border border-coffee-brown/20 px-3 py-1 hover:bg-coffee-dark hover:text-white transition-all rounded bg-white shadow-sm"
+        class="toc-btn font-sans font-extrabold uppercase tracking-widest border-2 border-coffee-dark/5 px-4 py-1.5 hover:bg-coffee-dark hover:text-white transition-all rounded-lg bg-white/80 text-[10px]"
       >
         Show
       </button>
     </div>
 
-    <ul id="toc-list-items" class="hidden space-y-3 pt-6 transition-all duration-300">
+    <ul id="toc-list-items" class="hidden space-y-3 pt-6 border-t border-coffee-brown/5 mt-4 transition-all duration-300">
       {filteredHeadings.map((h, index) => (
         <li class:list={[
           h.depth === 2 ? 'pl-0' : 'pl-6 opacity-80',
-          'group relative border-b border-coffee-brown/5 pb-2 last:border-0'
+          'group relative border-b border-coffee-brown/5 pb-2 last:border-0 last:pb-0'
         ]}>
           <a 
             href={`#${h.slug}`} 
-            class="toc-link font-sans font-bold uppercase tracking-tight text-coffee-dark hover:text-accent-primary transition-all flex items-start gap-2"
+            class="toc-link font-sans font-bold uppercase tracking-tight text-coffee-dark hover:text-accent-primary transition-all flex items-start gap-3 no-underline"
           >
-            <span class="text-[9px] text-coffee-brown/40 font-black mt-0.5">
+            <span class="text-[9px] text-accent-primary/40 font-black mt-1">
                 {String(index + 1).padStart(2, '0')}
             </span>
-            <span class="line-clamp-2 md:line-clamp-1">{h.text}</span>
+            <span class="line-clamp-2 md:line-clamp-1 flex-1">{h.text}</span>
           </a>
         </li>
       ))}
@@ -46,41 +46,74 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
 )}
 
 <script is:inline>
-  const setupToggle = () => {
+  function setupTOC() {
     const btn = document.getElementById('toc-toggle-btn');
     const list = document.getElementById('toc-list-items');
+    
     if (btn && list) {
-      btn.onclick = () => {
+      // Hapus handler lama biar nggak double trigger
+      btn.onclick = null;
+      
+      btn.onclick = (e) => {
+        e.preventDefault();
         const isHidden = list.classList.toggle('hidden');
         btn.textContent = isHidden ? 'Show' : 'Hide';
+        
+        // Animasi halus munculin list
+        if (!isHidden) {
+          list.style.opacity = '0';
+          setTimeout(() => {
+            list.style.opacity = '1';
+          }, 10);
+        }
       };
     }
-  };
-  setupToggle();
-  document.addEventListener('astro:page-load', setupToggle);
+  }
+
+  // Init pertama kali
+  setupTOC();
+  // Init ulang kalau ganti halaman di Astro
+  document.addEventListener('astro:page-load', setupTOC);
 </script>
 
 <style>
-  /* KONTROL UKURAN DI SINI - PASTI BERUBAH */
+  /* Paksa smooth scroll biar gak kaget pas klik link */
+  :global(html) {
+    scroll-behavior: smooth;
+  }
+
   .toc-title {
-    font-size: 12px !important; /* Kecil & elegan */
+    font-size: 12px !important;
     margin: 0 !important;
+    letter-spacing: 0.15em !important;
+    line-height: 1 !important;
   }
 
   .toc-btn {
-    font-size: 9px !important; /* Tombol kecil */
-    min-width: 65px;
+    min-width: 70px;
+    cursor: pointer;
+    line-height: 1.2 !important;
   }
 
   .toc-link {
-    font-size: 11px !important; /* Link isi TOC kecil */
+    font-size: 11px !important;
     line-height: 1.4 !important;
+    text-decoration: none !important;
   }
 
-  .hidden { display: none !important; }
-  ul { list-style: none !important; padding: 0 !important; margin: 0 !important; }
-  
-  .toc-container {
-    background: linear-gradient(to bottom right, rgba(255, 255, 255, 0.7), rgba(245, 245, 240, 0.5));
+  .hidden { 
+    display: none !important; 
+  }
+
+  ul { 
+    list-style: none !important; 
+    padding: 0 !important; 
+    margin: 0 !important; 
+  }
+
+  /* Animasi hover premiun */
+  .toc-link:hover span:last-child {
+    transform: translateX(3px);
+    transition: transform 0.2s ease;
   }
 </style>
