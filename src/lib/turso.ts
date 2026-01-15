@@ -1,21 +1,26 @@
 import { createClient } from "@libsql/client";
 
-export const turso = createClient({
-  // Kita tambahkan pengecekan ke process.env untuk Cloudflare Functions
-  url: import.meta.env.TURSO_URL || (globalThis as any).process?.env?.TURSO_URL || "",
-  authToken: import.meta.env.TURSO_TOKEN || (globalThis as any).process?.env?.TURSO_TOKEN || "",
-});
+// Fungsi untuk mendapatkan client secara dinamis agar tidak URL_INVALID di Cloudflare
+function getClient() {
+  const url = import.meta.env.TURSO_URL || (globalThis as any).process?.env?.TURSO_URL || "";
+  const authToken = import.meta.env.TURSO_TOKEN || (globalThis as any).process?.env?.TURSO_TOKEN || "";
+  
+  return createClient({
+    url: url,
+    authToken: authToken,
+  });
+}
+
+export const turso = getClient();
 
 /**
- * FUNGSI: Reset & Buat Tabel Baru
+ * FUNGSI: Buat Tabel (Tanpa Menghapus Data Eksis)
  * Menggunakan struktur r2_image_url dan visual_content (Portable Text)
  */
 export async function createPostsTable() {
-  // Hapus tabel lama jika ingin reset struktur total
-  await turso.execute(`DROP TABLE IF EXISTS posts`);
-
+  // Kita ganti DROP TABLE menjadi CREATE TABLE IF NOT EXISTS agar data aman
   await turso.execute(`
-    CREATE TABLE posts (
+    CREATE TABLE IF NOT EXISTS posts (
       id TEXT PRIMARY KEY,
       title TEXT,
       slug TEXT UNIQUE,
@@ -46,9 +51,9 @@ export async function upsertPost(post: any) {
       post.description, 
       post.category, 
       post.author, 
-      post.publishedAt, // Sinkron dengan sync-sanity.ts
-      post.r2ImageUrl,  // Sinkron dengan sync-sanity.ts
-      post.visualContent // JSON String dari Portable Text
+      post.publishedAt, 
+      post.r2ImageUrl,  
+      post.visualContent 
     ],
   });
 }
@@ -64,7 +69,6 @@ export async function getTursoPosts() {
       id: String(post.id),
       title: String(post.title),
       slug: String(post.slug),
-      // Di sini visual_content masih dalam bentuk string JSON dari DB
       visual_content: post.visual_content 
     }));
   } catch (error) {
