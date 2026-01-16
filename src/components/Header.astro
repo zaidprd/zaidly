@@ -10,7 +10,7 @@
         <a href="/" class="flex items-center gap-3 md:gap-4 group">
             <img 
                 src="/logo.webp" 
-                alt="Zaidly Icon" 
+                alt="Zaidly Coffee Logo" 
                 width="84" 
                 height="84" 
                 loading="eager"
@@ -38,7 +38,11 @@
             </ul>
         </nav>
 
-        <button id="mobile-menu-button" class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-300">
+        <button 
+          id="mobile-menu-button" 
+          aria-label="Toggle Navigation Menu" 
+          class="md:hidden text-coffee-dark p-2 focus:outline-none transition-colors duration-300"
+        >
             <svg id="hamburger-icon" class="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
             </svg>
@@ -71,14 +75,12 @@
 
         if (!header || !mobileMenuButton) return;
 
-        // Toggle Mobile Menu
         mobileMenuButton.onclick = () => {
             const isHidden = mobileMenu.classList.toggle('hidden');
             hamburgerIcon.classList.toggle('hidden', !isHidden);
             closeIcon.classList.toggle('hidden', isHidden);
         };
 
-        // Optimized Scroll Handler (requestAnimationFrame)
         let ticking = false;
         const updateHeader = () => {
             const isScrolled = window.scrollY > 20;
@@ -127,7 +129,6 @@
 </script>
 
 <style>
-    /* Prevent layout shift & remove line */
     #main-header {
         border-bottom: none !important;
         box-shadow: none !important;

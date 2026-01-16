@@ -24,21 +24,22 @@ const ads = [
 <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit space-y-8">
   {ads.map((ad) => (
     <div class="bg-white border border-coffee-brown/15 text-center rounded-xl shadow-sm transition-all hover:shadow-md overflow-hidden flex flex-col">
-      <h3 class="font-black text-[12px] text-accent-primary pt-3 pb-3 uppercase tracking-[0.3em]">
+      <h3 class="font-black text-[12px] text-accent-primary pt-4 pb-2 uppercase tracking-[0.3em]">
         {ad.label}
       </h3>
       
-      <a href={ad.link} target="_blank" class="group block px-2"> <div class="w-full aspect-square bg-[#F9F9F7] overflow-hidden rounded-lg">
+      <a href={ad.link} target="_blank" aria-label={`View ${ad.title} on Amazon`} class="group block px-2"> 
+        <div class="w-full aspect-square bg-[#F9F9F7] overflow-hidden rounded-lg">
           {typeof ad.img === 'string' ? (
             <img 
               src={ad.img} 
-              alt={ad.title} 
+              alt={`Photo of ${ad.title}`} 
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
             />
           ) : (
             <Image 
               src={ad.img} 
-              alt={ad.title} 
+              alt={`Photo of ${ad.title}`} 
               width={400} 
               height={400} 
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 

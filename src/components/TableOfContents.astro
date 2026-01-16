@@ -10,7 +10,7 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
 ---
 
 {filteredHeadings.length > 0 && (
-  <nav id="toc-container-inner" class="toc-container my-10 border-y border-coffee-brown/10 py-6 bg-white/40 backdrop-blur-md rounded-xl px-5 shadow-sm overflow-hidden">
+  <nav id="toc-container-inner" aria-label="Table of contents" class="toc-container my-10 border-y border-coffee-brown/10 py-6 bg-white/40 backdrop-blur-md rounded-xl px-5 shadow-sm overflow-hidden">
     <div class="flex items-center justify-between">
       <h2 class="toc-title font-sans font-black uppercase tracking-[0.1em] text-accent-primary">
         In This Guide
@@ -18,23 +18,25 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
       
       <button 
         id="toc-toggle-btn" 
-        class="toc-btn font-sans font-extrabold uppercase tracking-widest border-2 border-coffee-dark/5 px-4 py-1.5 hover:bg-coffee-dark hover:text-white transition-all rounded-lg bg-white/80 text-[10px]"
+        aria-label="Toggle table of contents"
+        aria-expanded="false"
+        class="toc-btn font-sans font-extrabold uppercase tracking-widest border-2 border-coffee-dark/10 px-4 py-1.5 hover:bg-coffee-dark hover:text-white transition-all rounded-lg bg-white/80 text-[10px] text-coffee-dark"
       >
         Show
       </button>
     </div>
 
-    <ul id="toc-list-items" class="hidden space-y-3 pt-6 border-t border-coffee-brown/5 mt-4 transition-all duration-300">
+    <ul id="toc-list-items" class="hidden space-y-3 pt-6 border-t border-coffee-brown/10 mt-4 transition-all duration-300">
       {filteredHeadings.map((h, index) => (
         <li class:list={[
-          h.depth === 2 ? 'pl-0' : 'pl-6 opacity-80',
+          h.depth === 2 ? 'pl-0' : 'pl-6 opacity-90',
           'group relative border-b border-coffee-brown/5 pb-2 last:border-0 last:pb-0'
         ]}>
           <a 
             href={`#${h.slug}`} 
             class="toc-link font-sans font-bold uppercase tracking-tight text-coffee-dark hover:text-accent-primary transition-all flex items-start gap-3 no-underline"
           >
-            <span class="text-[9px] text-accent-primary/40 font-black mt-1">
+            <span class="text-[9px] text-accent-primary/60 font-black mt-1">
                 {String(index + 1).padStart(2, '0')}
             </span>
             <span class="line-clamp-2 md:line-clamp-1 flex-1">{h.text}</span>
@@ -51,15 +53,14 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
     const list = document.getElementById('toc-list-items');
     
     if (btn && list) {
-      // Hapus handler lama biar nggak double trigger
       btn.onclick = null;
       
       btn.onclick = (e) => {
         e.preventDefault();
         const isHidden = list.classList.toggle('hidden');
         btn.textContent = isHidden ? 'Show' : 'Hide';
+        btn.setAttribute('aria-expanded', !isHidden);
         
-        // Animasi halus munculin list
         if (!isHidden) {
           list.style.opacity = '0';
           setTimeout(() => {
@@ -70,14 +71,11 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
     }
   }
 
-  // Init pertama kali
   setupTOC();
-  // Init ulang kalau ganti halaman di Astro
   document.addEventListener('astro:page-load', setupTOC);
 </script>
 
 <style>
-  /* Paksa smooth scroll biar gak kaget pas klik link */
   :global(html) {
     scroll-behavior: smooth;
   }
@@ -111,7 +109,6 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
     margin: 0 !important; 
   }
 
-  /* Animasi hover premiun */
   .toc-link:hover span:last-child {
     transform: translateX(3px);
     transition: transform 0.2s ease;
