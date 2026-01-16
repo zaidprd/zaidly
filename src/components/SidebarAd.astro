@@ -1,0 +1,62 @@
+---
+import { Image } from 'astro:assets';
+import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
+import adBeansImg from '../assets/images/image.webp';
+
+const ads = [
+  {
+    label: "Top Choice",
+    title: "Brew Conical Burr Coffee Grinder",
+    img: adGrinderImg,
+    link: "https://amzn.to/3YEvz65",
+    btnText: "Check Price"
+  },
+  {
+    label: "Top Choice",
+    title: "Lavazza Super Crema Whole Bean Coffee",
+    img: adBeansImg,
+    link: "https://amzn.to/44Z5ClA",
+    btnText: "Check Price"
+  }
+];
+---
+
+<aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit space-y-8">
+  {ads.map((ad) => (
+    <div class="bg-white border border-coffee-brown/15 text-center rounded-xl shadow-sm transition-all hover:shadow-md overflow-hidden flex flex-col">
+      <h3 class="font-black text-[12px] text-accent-primary pt-3 pb-3 uppercase tracking-[0.3em]">
+        {ad.label}
+      </h3>
+      
+      <a href={ad.link} target="_blank" class="group block px-2"> <div class="w-full aspect-square bg-[#F9F9F7] overflow-hidden rounded-lg">
+          {typeof ad.img === 'string' ? (
+            <img 
+              src={ad.img} 
+              alt={ad.title} 
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+            />
+          ) : (
+            <Image 
+              src={ad.img} 
+              alt={ad.title} 
+              width={400} 
+              height={400} 
+              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+            />
+          )}
+        </div>
+
+        <div class="p-5">
+          <h4 class="text-[13px] font-black uppercase leading-tight font-serif text-coffee-dark mb-5 tracking-tighter">
+            {ad.title}
+          </h4>
+          <div class="pt-4 border-t border-coffee-brown/5">
+             <span class="bg-accent-primary text-white text-[10px] font-black px-6 py-2.5 rounded-full uppercase tracking-widest group-hover:bg-coffee-dark transition-colors inline-block">
+               {ad.btnText}
+             </span>
+          </div>
+        </div>
+      </a>
+    </div>
+  ))}
+</aside>

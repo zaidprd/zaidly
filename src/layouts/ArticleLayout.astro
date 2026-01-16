@@ -1,10 +1,8 @@
 ---
-// src/layouts/ArticleLayout.astro
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
-import { Image } from 'astro:assets';
+import SidebarAd from '../components/SidebarAd.astro'; // Import Komponen Baru
 import { getCollection } from 'astro:content';
-import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
 import { getTursoPosts } from '../lib/turso'; 
 
 const { frontmatter, headings } = Astro.props; 
@@ -35,14 +33,14 @@ try {
  console.error("Gagal ambil Turso posts:", e);
 }
 
-// 3. GABUNGKAN & URUTKAN (TERBARU DI ATAS)
+// 3. GABUNGKAN & URUTKAN
 const allPosts = [...localPosts, ...tursoPosts]
  .filter(p => p.slug !== frontmatter.slug)
  .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 
 const relatedPosts = allPosts.slice(0, 3);
 
-// 4. LOGIKA TAGS (BIAR MUNCUL DI SANITY & LOKAL)
+// 4. LOGIKA TAGS
 const rawTags = frontmatter.tags || [];
 const tags = Array.isArray(rawTags) ? rawTags : (typeof rawTags === 'string' ? rawTags.split(',') : []);
 
@@ -54,10 +52,6 @@ const formattedDate = frontmatter.pubDate
 
 const shareUrl = `https://zaidly.com/${frontmatter.slug}`;
 const shareTitle = encodeURIComponent(frontmatter.title);
-
-const ads = {
-   topPick: { title: "Brew Conical Burr Coffee Grinder", img: adGrinderImg, link: "https://amzn.to/3YEvz65" }
-};
 ---
 
 <BaseLayout title={frontmatter.title}>
@@ -112,7 +106,12 @@ const ads = {
              </div>
          )}
 
-         {showSidebar && ( <div id="toc-move-target" class="hidden"><TableOfContents headings={headings} /></div> )}
+         {/* TOC STATIS - PASTI MUNCUL & SEO FRIENDLY */}
+         {showSidebar && ( 
+           <div class="mb-10">
+             <TableOfContents headings={headings} />
+           </div> 
+         )}
 
          <div id="article-content" class="prose prose-stone max-w-none px-0.5 md:px-0 font-sans">
              <slot />
@@ -160,17 +159,9 @@ const ads = {
          <div class="giscus-container mt-12 border-t border-coffee-brown/10 pt-10"><div class="giscus"></div></div>
      </article>
 
-     <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit">
-         <div class="bg-white border border-coffee-brown/15 p-6 text-center rounded-xl shadow-sm">
-             <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Top Choice</h3>
-             <a href={ads.topPick.link} target="_blank" class="group block">
-                 <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4 rounded-lg">
-                     <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
-                 </div>
-                 <h4 class="text-sm font-black uppercase leading-snug font-serif">{ads.topPick.title}</h4>
-             </a>
-         </div>
-     </aside>
+     {/* PAKAI KOMPONEN IKLAN BARU */}
+     <SidebarAd />
+     
    </div>
  </div>
 </main>
@@ -192,78 +183,56 @@ const ads = {
  #article-content table { display: block; overflow-x: auto; white-space: nowrap; } 
  #article-content { padding-left: 12px; padding-right: 12px; }
 }
-#toc-move-target.is-visible { display: block !important; margin: 2.5rem 0; z-index: 40; position: relative; }
 </style>
 
 <script is:inline data-astro-rerun>
 function setupArticleFeatures() {
- const content = document.getElementById('article-content');
- const toc = document.getElementById('toc-move-target');
- if (content && toc) {
-   let attempts = 0;
-   const moveTOC = () => {
-     const allParas = content.querySelectorAll('.zaidly-markdown-area p, .zaidly-normal-p, p');
-     const validParas = Array.from(allParas).filter(p => p.innerText.trim().length > 20);
-     if (validParas.length > 0) {
-       const target = validParas[0];
-       target.after(toc);
-       toc.classList.add('is-visible');
-       toc.classList.remove('hidden');
-       return true;
-     }
-     return false;
-   };
-   const interval = setInterval(() => {
-     attempts++;
-     if (moveTOC() || attempts > 40) {
-       clearInterval(interval);
-       if (attempts > 40 && !toc.classList.contains('is-visible')) {
-         content.prepend(toc);
-         toc.classList.add('is-visible');
-       }
-     }
-   }, 150);
- }
+  // SCRIPT TOC LAMA DIHAPUS BIAR GAK KONFLIK
+  
+  const floating = document.getElementById('floating-action');
+  const scrollTopBtn = document.getElementById('scroll-top');
+  const copyBtn = document.getElementById('copy-link-btn');
+  
+  if (copyBtn) {
+    copyBtn.onclick = () => {
+      navigator.clipboard.writeText(window.location.href);
+      const original = copyBtn.innerHTML;
+      copyBtn.innerHTML = '✓';
+      setTimeout(() => copyBtn.innerHTML = original, 2000);
+    };
+  }
+  
+  window.onscroll = () => {
+    if (window.scrollY > 400) { 
+      floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+      floating?.classList.add('opacity-100', 'translate-y-0'); 
+    } else { 
+      floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+    }
+  };
+  
+  if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
- const floating = document.getElementById('floating-action');
- const scrollTopBtn = document.getElementById('scroll-top');
- const copyBtn = document.getElementById('copy-link-btn');
- if (copyBtn) {
-   copyBtn.onclick = () => {
-     navigator.clipboard.writeText(window.location.href);
-     const original = copyBtn.innerHTML;
-     copyBtn.innerHTML = '✓';
-     setTimeout(() => copyBtn.innerHTML = original, 2000);
-   };
- }
- window.onscroll = () => {
-   if (window.scrollY > 400) { 
-     floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-     floating?.classList.add('opacity-100', 'translate-y-0'); 
-   } else { 
-     floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-   }
- };
- if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
- const gContainer = document.querySelector('.giscus');
- if (gContainer) {
-   gContainer.innerHTML = ''; 
-   const s = document.createElement('script');
-   Object.entries({
-     src: "https://giscus.app/client.js",
-     "data-repo": "zaidprd/zaidly",
-     "data-repo-id": "R_kgDOQmgBjg",
-     "data-category": "Announcements",
-     "data-category-id": "DIC_kwDOQmgBjs4C06bO",
-     "data-mapping": "pathname",
-     "data-theme": "light",
-     "data-lang": "en",
-     crossorigin: "anonymous", async: true
-   }).forEach(([key, val]) => s.setAttribute(key, val));
-   gContainer.appendChild(s);
- }
+  // GISCUS LOADER (DISKUSI GITHUB)
+  const gContainer = document.querySelector('.giscus');
+  if (gContainer) {
+    gContainer.innerHTML = ''; 
+    const s = document.createElement('script');
+    Object.entries({
+      src: "https://giscus.app/client.js",
+      "data-repo": "zaidprd/zaidly",
+      "data-repo-id": "R_kgDOQmgBjg",
+      "data-category": "Announcements",
+      "data-category-id": "DIC_kwDOQmgBjs4C06bO",
+      "data-mapping": "pathname",
+      "data-theme": "light",
+      "data-lang": "en",
+      crossorigin: "anonymous", async: true
+    }).forEach(([key, val]) => s.setAttribute(key, val));
+    gContainer.appendChild(s);
+  }
 }
+
 document.addEventListener('astro:page-load', setupArticleFeatures);
 setupArticleFeatures();
 </script>

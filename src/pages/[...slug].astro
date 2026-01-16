@@ -69,7 +69,7 @@ if (isExternal) {
     <div class="prose max-w-none zaidly-content">
         {isExternal ? (
             /* FIX UTAMA: WAJIB PAKAI client:load BIAR SCRIPT TOC DI LAYOUT BISA DETEKSI PARAGRAF */
-            <PortableVisualBlocks value={visualData} client:load />
+            <PortableVisualBlocks value={visualData} />
         ) : (
             <div class="local-article-fix">
                 {DynamicContent && <DynamicContent />}
