@@ -5,128 +5,174 @@ import TableOfContents from '../components/TableOfContents.astro';
 import { Image } from 'astro:assets';
 import { getCollection } from 'astro:content';
 import adGrinderImg from '../assets/images/BrewConicalBurr.webp';
+import { getTursoPosts } from '../lib/turso'; 
 
 const { frontmatter, headings } = Astro.props; 
 
-const allPostsRaw = await getCollection('blog');
-const allPosts = allPostsRaw
-  .map(post => ({ ...post.data, slug: post.slug }))
-  .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+// 1. AMBIL ARTIKEL LOKAL
+const localPostsRaw = await getCollection('blog');
+const localPosts = localPostsRaw.map(post => ({ 
+ ...post.data, 
+ slug: post.slug,
+ image: post.data.image, 
+ isExternal: false 
+}));
 
-const relatedPosts = allPosts.filter(p => p.slug !== frontmatter.slug).slice(0, 3);
+// 2. AMBIL ARTIKEL DARI TURSO (SANITY)
+let tursoPosts: any[] = [];
+try { 
+ const rawTurso = await getTursoPosts(); 
+ tursoPosts = rawTurso.map(post => ({
+   title: post.title,
+   slug: post.slug,
+   image: post.r2_image_url, 
+   pubDate: post.published_at,
+   author: post.author,
+   tags: post.tags,
+   isExternal: true
+ }));
+} catch (e) {
+ console.error("Gagal ambil Turso posts:", e);
+}
+
+// 3. GABUNGKAN & URUTKAN (TERBARU DI ATAS)
+const allPosts = [...localPosts, ...tursoPosts]
+ .filter(p => p.slug !== frontmatter.slug)
+ .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
+
+const relatedPosts = allPosts.slice(0, 3);
+
+// 4. LOGIKA TAGS (BIAR MUNCUL DI SANITY & LOKAL)
+const rawTags = frontmatter.tags || [];
+const tags = Array.isArray(rawTags) ? rawTags : (typeof rawTags === 'string' ? rawTags.split(',') : []);
+
 const isSanityImage = typeof frontmatter.image === 'string';
 const showSidebar = headings && headings.filter((h: any) => h.depth > 1 && h.depth < 4).length > 0;
 const formattedDate = frontmatter.pubDate 
-    ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
-    : 'Date not available';
+   ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
+   : 'Date not available';
 
 const shareUrl = `https://zaidly.com/${frontmatter.slug}`;
 const shareTitle = encodeURIComponent(frontmatter.title);
 
 const ads = {
-    topPick: { title: "Brew Conical Burr Coffee Grinder", img: adGrinderImg, link: "https://amzn.to/3YEvz65" }
+   topPick: { title: "Brew Conical Burr Coffee Grinder", img: adGrinderImg, link: "https://amzn.to/3YEvz65" }
 };
 ---
 
 <BaseLayout title={frontmatter.title}>
 <main class="bg-cream-latte min-h-screen text-coffee-dark relative font-sans overflow-x-clip">
 
-  <div id="floating-action" class="fixed bottom-8 right-8 z-50 flex flex-col gap-4 opacity-0 translate-y-10 transition-all duration-500 pointer-events-none">
-      <a href="https://ko-fi.com/zaidly" target="_blank" class="pointer-events-auto bg-accent-primary text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform border-2 border-white/20 flex items-center justify-center">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
-      </a>
-      <button id="scroll-top" class="pointer-events-auto bg-white text-coffee-dark p-3 rounded-full shadow-xl hover:bg-coffee-dark hover:text-white transition-all border border-coffee-brown/10 flex items-center justify-center">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
-      </button>
-  </div>
+ <div id="floating-action" class="fixed bottom-8 right-8 z-50 flex flex-col gap-4 opacity-0 translate-y-10 transition-all duration-500 pointer-events-none">
+     <a href="https://ko-fi.com/zaidly" target="_blank" class="pointer-events-auto bg-accent-primary text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform border-2 border-white/20 flex items-center justify-center">
+         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+     </a>
+     <button id="scroll-top" class="pointer-events-auto bg-white text-coffee-dark p-3 rounded-full shadow-xl hover:bg-coffee-dark hover:text-white transition-all border border-coffee-brown/10 flex items-center justify-center">
+         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+     </button>
+ </div>
 
-  <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10 px-4">
-      <div class="container mx-auto max-w-6xl">
-          <div class="max-w-4xl text-left">
-              <div class="flex items-center justify-start space-x-3 mb-6 font-sans">
-                  <span class="bg-accent-primary text-white text-[9px] font-black px-2.5 py-1 tracking-[0.2em] uppercase rounded-sm">Expert Guide</span>
-                  <time class="text-[10px] font-bold text-coffee-brown/50 uppercase tracking-widest">{formattedDate}</time>
-              </div>
-              <h1 class="mb-8 font-serif italic text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-coffee-dark tracking-tighter text-left">{frontmatter.title}</h1>
-              <p class="text-coffee-brown font-bold text-[10px] uppercase tracking-[0.2em] font-sans text-left">Written by <span class="text-accent-primary border-b border-accent-primary/20">{frontmatter.author}</span></p>
-          </div>
-      </div>
-  </header>
+ <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10 px-4">
+     <div class="container mx-auto max-w-6xl">
+         <div class="max-w-4xl text-left">
+             <div class="flex items-center justify-start space-x-3 mb-6 font-sans">
+                 <span class="bg-accent-primary text-white text-[9px] font-black px-2.5 py-1 tracking-[0.2em] uppercase rounded-sm">Expert Guide</span>
+                 <time class="text-[10px] font-bold text-coffee-brown/50 uppercase tracking-widest">{formattedDate}</time>
+             </div>
+             <h1 class="mb-8 font-serif italic text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-coffee-dark tracking-tighter text-left">{frontmatter.title}</h1>
+             <p class="text-coffee-brown font-bold text-[10px] uppercase tracking-[0.2em] font-sans text-left">Written by <span class="text-accent-primary border-b border-accent-primary/20">{frontmatter.author}</span></p>
+         </div>
+     </div>
+ </header>
 
-  <div class="container mx-auto max-w-6xl px-4 py-12">
-    <div class="flex flex-col lg:flex-row gap-16 relative">
+ <div class="container mx-auto max-w-6xl px-4 py-12">
+   <div class="flex flex-col lg:flex-row gap-16 relative">
 
-      <aside class="hidden xl:block absolute -left-20 top-0 h-full">
-        <div class="sticky top-32 flex flex-col gap-6 items-center py-4">
-          <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-[#000000] transition-all hover:scale-110" aria-label="Share on X">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-          </a>
-          <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" class="text-coffee-dark hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Share on Facebook">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-          </a>
-          <a href="https://www.instagram.com/bestcoffee.gear" target="_blank" class="text-coffee-dark hover:text-[#E4405F] transition-all hover:scale-110" aria-label="Follow on Instagram">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-          </a>
-          <button id="copy-link-btn" class="text-coffee-dark hover:text-accent-primary transition-all hover:scale-110" aria-label="Copy Link">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-          </button>
-        </div>
-      </aside>
+     <aside class="hidden xl:block absolute -left-20 top-0 h-full">
+       <div class="sticky top-32 flex flex-col gap-6 items-center py-4">
+         <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-[#000000] transition-all hover:scale-110" aria-label="Share on X">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+         </a>
+         <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" class="text-coffee-dark hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Share on Facebook">
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
+         </a>
+         <a href="https://www.instagram.com/bestcoffee.gear" target="_blank" class="text-coffee-dark hover:text-[#E4405F] transition-all hover:scale-110" aria-label="Follow on Instagram">
+           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+         </a>
+         <button id="copy-link-btn" class="text-coffee-dark hover:text-accent-primary transition-all hover:scale-110" aria-label="Copy Link">
+           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+         </button>
+       </div>
+     </aside>
 
-      <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
-          {frontmatter.image && (
-              <div class="mb-12 overflow-hidden rounded-lg shadow-sm border-none p-0">
-                  <img src={isSanityImage ? frontmatter.image : frontmatter.image.src} alt={frontmatter.title} class="w-full aspect-video object-cover rounded-lg" loading="eager" />
-              </div>
-          )}
+     <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
+         {frontmatter.image && (
+             <div class="mb-12 overflow-hidden rounded-lg shadow-sm border-none p-0">
+                 <img src={isSanityImage ? frontmatter.image : frontmatter.image.src} alt={frontmatter.title} class="w-full aspect-video object-cover rounded-lg" loading="eager" />
+             </div>
+         )}
 
-          {showSidebar && ( <div id="toc-move-target" class="hidden"><TableOfContents headings={headings} /></div> )}
+         {showSidebar && ( <div id="toc-move-target" class="hidden"><TableOfContents headings={headings} /></div> )}
 
-          <div id="article-content" class="prose prose-stone max-w-none px-0.5 md:px-0 font-sans">
-              <slot />
-          </div>
+         <div id="article-content" class="prose prose-stone max-w-none px-0.5 md:px-0 font-sans">
+             <slot />
+         </div>
 
-          <section class="mt-20 pt-10 border-t border-coffee-brown/10">
-              <h3 class="text-2xl font-black uppercase tracking-tighter text-coffee-dark mb-10 font-serif text-center md:text-left">You Might Also Like</h3>
-              <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-2 md:px-0">
-                  {relatedPosts.map((post) => (
-                      <a href={`/${post.slug}`} class="group cursor-pointer block">
-                          <div class="aspect-video bg-coffee-brown/5 rounded-xl overflow-hidden mb-4 border border-coffee-brown/5 relative">
-                               {post.image ? (
-                                    <img src={typeof post.image === 'string' ? post.image : post.image.src} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                               ) : (
-                                   <div class="w-full h-full flex items-center justify-center bg-accent-primary/5 text-accent-primary/20"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path></svg></div>
-                               )}
-                          </div>
-                          <h4 class="text-sm font-bold leading-snug text-coffee-dark group-hover:text-accent-primary transition-colors line-clamp-2 font-serif">{post.title}</h4>
-                      </a>
-                  ))}
-              </div>
-          </section>
-
-          <section class="mt-16 p-6 md:p-10 bg-white border-2 border-coffee-brown/10 rounded-2xl text-center max-w-2xl mx-auto shadow-md">
-              <div class="flex flex-col items-center">
-                  <p class="text-coffee-dark text-base font-bold leading-relaxed mb-8 italic px-2 font-serif">"If this guide has provided value to you, please consider supporting Zaidly to keep our expert research brewing every week."</p>
-                  <a href="https://ko-fi.com/zaidly" target="_blank" class="bg-accent-primary text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-coffee-dark transition-all">Support Zaidly</a>
-              </div>
-          </section>
-
-          <div class="giscus-container mt-12 border-t border-coffee-brown/10 pt-10"><div class="giscus"></div></div>
-      </article>
-
-      <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit">
-          <div class="bg-white border border-coffee-brown/15 p-6 text-center rounded-xl shadow-sm">
-              <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Top Choice</h3>
-              <a href={ads.topPick.link} target="_blank" class="group block">
-                  <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4 rounded-lg">
-                      <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
-                  </div>
-                  <h4 class="text-sm font-black uppercase leading-snug font-serif">{ads.topPick.title}</h4>
+         {tags && tags.length > 0 && (
+          <div class="mt-12 pt-6 border-t border-coffee-brown/10 flex flex-wrap gap-2">
+            <span class="text-[10px] font-black uppercase tracking-widest text-coffee-brown/40 w-full mb-2">Explore Related:</span>
+            {tags.map((tag: string) => (
+              <a 
+                href={`/?tag=${tag.trim().toLowerCase().replace(/\s+/g, '-')}`} 
+                class="bg-white border border-coffee-brown/10 px-3 py-1.5 rounded-full text-[10px] font-bold text-coffee-dark hover:bg-accent-primary hover:text-white hover:border-accent-primary transition-all uppercase tracking-widest no-underline"
+              >
+                #{tag.trim()}
               </a>
+            ))}
           </div>
-      </aside>
-    </div>
-  </div>
+        )}
+
+         <section class="mt-20 pt-10 border-t border-coffee-brown/10">
+             <h3 class="text-2xl font-black uppercase tracking-tighter text-coffee-dark mb-10 font-serif text-center md:text-left">You Might Also Like</h3>
+             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-2 md:px-0">
+                 {relatedPosts.map((post) => (
+                     <a href={`/${post.slug}`} class="group cursor-pointer block">
+                         <div class="aspect-video bg-coffee-brown/5 rounded-xl overflow-hidden mb-4 border border-coffee-brown/5 relative">
+                              {post.image ? (
+                                   <img src={typeof post.image === 'string' ? post.image : post.image.src} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                              ) : (
+                                  <div class="w-full h-full flex items-center justify-center bg-accent-primary/5 text-accent-primary/20"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path></svg></div>
+                              )}
+                         </div>
+                         <h4 class="text-sm font-bold leading-snug text-coffee-dark group-hover:text-accent-primary transition-colors line-clamp-2 font-serif">{post.title}</h4>
+                     </a>
+                 ))}
+             </div>
+         </section>
+
+         <section class="mt-16 p-6 md:p-10 bg-white border-2 border-coffee-brown/10 rounded-2xl text-center max-w-2xl mx-auto shadow-md">
+             <div class="flex flex-col items-center">
+                 <p class="text-coffee-dark text-base font-bold leading-relaxed mb-8 italic px-2 font-serif">"If this guide has provided value to you, please consider supporting Zaidly to keep our expert research brewing every week."</p>
+                 <a href="https://ko-fi.com/zaidly" target="_blank" class="bg-accent-primary text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-coffee-dark transition-all">Support Zaidly</a>
+             </div>
+         </section>
+
+         <div class="giscus-container mt-12 border-t border-coffee-brown/10 pt-10"><div class="giscus"></div></div>
+     </article>
+
+     <aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit">
+         <div class="bg-white border border-coffee-brown/15 p-6 text-center rounded-xl shadow-sm">
+             <h3 class="font-black text-[9px] text-accent-primary mb-6 uppercase tracking-[0.3em]">Top Choice</h3>
+             <a href={ads.topPick.link} target="_blank" class="group block">
+                 <div class="aspect-square bg-[#F9F9F7] overflow-hidden mb-6 p-4 rounded-lg">
+                     <Image src={ads.topPick.img} alt={ads.topPick.title} width={300} height={300} class="w-full h-full object-contain group-hover:scale-110 transition-transform" />
+                 </div>
+                 <h4 class="text-sm font-black uppercase leading-snug font-serif">{ads.topPick.title}</h4>
+             </a>
+         </div>
+     </aside>
+   </div>
+ </div>
 </main>
 </BaseLayout>
 
@@ -136,94 +182,87 @@ const ads = {
 #article-body h2, #article-content h2 { @apply font-serif italic font-black text-[22px] md:text-3xl mt-10 mb-5 tracking-tight uppercase leading-tight; }
 #article-body h3, #article-content h3 { @apply font-serif italic font-black text-[19px] md:text-2xl mt-8 mb-4 tracking-tight leading-tight; }
 #article-content p { @apply mb-6 leading-[1.7] text-[16px] md:text-[17px] opacity-95; }
-
-/* GAMBAR */
 .zaidly-img-box img, #article-content img { border: none !important; border-radius: 8px !important; margin: 2rem 0; }
-
-/* TABEL PREMIUM */
 #article-content table { width: 100% !important; border-collapse: collapse; margin: 2.5rem 0; font-family: inherit; font-size: 12px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(60, 47, 47, 0.05); }
 #article-content th { background-color: #3C2F2F; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 14px; text-align: left; }
 #article-content td { padding: 14px 16px; border-bottom: 1px solid rgba(60, 47, 47, 0.06); color: #4a3728; }
 #article-content tr:nth-child(even) { background-color: #FDFCF0; }
 #article-content tr:last-child td { border-bottom: none; }
-
 @media (max-width: 768px) { 
-  #article-content table { display: block; overflow-x: auto; white-space: nowrap; } 
-  #article-content { padding-left: 12px; padding-right: 12px; }
+ #article-content table { display: block; overflow-x: auto; white-space: nowrap; } 
+ #article-content { padding-left: 12px; padding-right: 12px; }
 }
-
-/* TOC VISIBILITY */
 #toc-move-target.is-visible { display: block !important; margin: 2.5rem 0; z-index: 40; position: relative; }
 </style>
 
 <script is:inline data-astro-rerun>
 function setupArticleFeatures() {
-  const content = document.getElementById('article-content');
-  const toc = document.getElementById('toc-move-target');
-  if (content && toc) {
-    let attempts = 0;
-    const moveTOC = () => {
-      const allParas = content.querySelectorAll('.zaidly-markdown-area p, .zaidly-normal-p, p');
-      const validParas = Array.from(allParas).filter(p => p.innerText.trim().length > 20);
-      if (validParas.length > 0) {
-        const target = validParas[1] || validParas[0];
-        target.after(toc);
-        toc.classList.add('is-visible');
-        toc.classList.remove('hidden');
-        return true;
-      }
-      return false;
-    };
-    const interval = setInterval(() => {
-      attempts++;
-      if (moveTOC() || attempts > 40) {
-        clearInterval(interval);
-        if (attempts > 40 && !toc.classList.contains('is-visible')) {
-          content.prepend(toc);
-          toc.classList.add('is-visible');
-        }
-      }
-    }, 150);
-  }
+ const content = document.getElementById('article-content');
+ const toc = document.getElementById('toc-move-target');
+ if (content && toc) {
+   let attempts = 0;
+   const moveTOC = () => {
+     const allParas = content.querySelectorAll('.zaidly-markdown-area p, .zaidly-normal-p, p');
+     const validParas = Array.from(allParas).filter(p => p.innerText.trim().length > 20);
+     if (validParas.length > 0) {
+       const target = validParas[0];
+       target.after(toc);
+       toc.classList.add('is-visible');
+       toc.classList.remove('hidden');
+       return true;
+     }
+     return false;
+   };
+   const interval = setInterval(() => {
+     attempts++;
+     if (moveTOC() || attempts > 40) {
+       clearInterval(interval);
+       if (attempts > 40 && !toc.classList.contains('is-visible')) {
+         content.prepend(toc);
+         toc.classList.add('is-visible');
+       }
+     }
+   }, 150);
+ }
 
-  const floating = document.getElementById('floating-action');
-  const scrollTopBtn = document.getElementById('scroll-top');
-  const copyBtn = document.getElementById('copy-link-btn');
-  if (copyBtn) {
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(window.location.href);
-      const original = copyBtn.innerHTML;
-      copyBtn.innerHTML = '✓';
-      setTimeout(() => copyBtn.innerHTML = original, 2000);
-    };
-  }
-  window.onscroll = () => {
-    if (window.scrollY > 400) { 
-      floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-      floating?.classList.add('opacity-100', 'translate-y-0'); 
-    } else { 
-      floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-    }
-  };
-  if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+ const floating = document.getElementById('floating-action');
+ const scrollTopBtn = document.getElementById('scroll-top');
+ const copyBtn = document.getElementById('copy-link-btn');
+ if (copyBtn) {
+   copyBtn.onclick = () => {
+     navigator.clipboard.writeText(window.location.href);
+     const original = copyBtn.innerHTML;
+     copyBtn.innerHTML = '✓';
+     setTimeout(() => copyBtn.innerHTML = original, 2000);
+   };
+ }
+ window.onscroll = () => {
+   if (window.scrollY > 400) { 
+     floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+     floating?.classList.add('opacity-100', 'translate-y-0'); 
+   } else { 
+     floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+   }
+ };
+ if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  const gContainer = document.querySelector('.giscus');
-  if (gContainer) {
-    gContainer.innerHTML = ''; 
-    const s = document.createElement('script');
-    Object.entries({
-      src: "https://giscus.app/client.js",
-      "data-repo": "zaidprd/zaidly",
-      "data-repo-id": "R_kgDOQmgBjg",
-      "data-category": "Announcements",
-      "data-category-id": "DIC_kwDOQmgBjs4C06bO",
-      "data-mapping": "pathname",
-      "data-theme": "light",
-      "data-lang": "en",
-      crossorigin: "anonymous", async: true
-    }).forEach(([key, val]) => s.setAttribute(key, val));
-    gContainer.appendChild(s);
-  }
+ const gContainer = document.querySelector('.giscus');
+ if (gContainer) {
+   gContainer.innerHTML = ''; 
+   const s = document.createElement('script');
+   Object.entries({
+     src: "https://giscus.app/client.js",
+     "data-repo": "zaidprd/zaidly",
+     "data-repo-id": "R_kgDOQmgBjg",
+     "data-category": "Announcements",
+     "data-category-id": "DIC_kwDOQmgBjs4C06bO",
+     "data-mapping": "pathname",
+     "data-theme": "light",
+     "data-lang": "en",
+     crossorigin: "anonymous", async: true
+   }).forEach(([key, val]) => s.setAttribute(key, val));
+   gContainer.appendChild(s);
+ }
 }
 document.addEventListener('astro:page-load', setupArticleFeatures);
 setupArticleFeatures();

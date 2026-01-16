@@ -31,11 +31,15 @@ let visualData: any = null;
 let headings: any[] = [];
 
 if (isExternal) {
+    const postTags = typeof post.tags === 'string' ? JSON.parse(post.tags) : (post.tags || []);
+
     finalFrontmatter = { 
         title: post.title, 
         image: post.r2_image_url, 
         author: post.author || 'Admin',
         pubDate: post.published_at,
+        tags: postTags, // <--- GUNAKAN postTags YANG SUDAH DI-PARSE
+        slug: post.slug,
         isExternal: true 
     };
 

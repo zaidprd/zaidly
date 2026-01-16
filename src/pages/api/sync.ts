@@ -45,8 +45,10 @@ export const ALL: APIRoute = async (context) => {
   }
 
   try {
+    // 1. TAMBAH tags DI QUERY
     const query = encodeURIComponent(`*[_type=="post"]{
       _id, title, "slug": slug.current, description, category, author,
+      tags,
       "published_at": coalesce(publishedAt, _createdAt),
       "feature_ref": mainImage.asset._ref,
       visualContent
@@ -69,11 +71,10 @@ export const ALL: APIRoute = async (context) => {
       const fixedVisualContent = await Promise.all(
         (post.visualContent || []).map(async (block: any) => {
           if (block._type === "image" && block.asset?._ref) {
-            // Gunakan _key unik dari Sanity untuk nama file di R2
             const r2Url = await uploadToR2(block.asset._ref, `body-${block._key}`);
             return { 
               ...block, 
-              url: r2Url, // Suntikkan URL R2 ke JSON
+              url: r2Url, 
               asset: { ...block.asset, _ref: "uploaded-to-r2" } 
             };
           }
@@ -81,22 +82,24 @@ export const ALL: APIRoute = async (context) => {
         })
       );
 
-      // 3. Simpan ke Turso
+      // 3. SIMPAN KE TURSO - TAMBAH tags (WAJIB JSON.stringify)
       await upsertPost({
-        id: post._id,
-        title: post.title,
-        slug: post.slug,
-        description: post.description,
-        category: post.category,
-        author: post.author,
-        publishedAt: post.published_at,
+        id: String(post._id),
+        title: String(post.title || ''),
+        slug: String(post.slug || ''),
+        description: String(post.description || ''),
+        category: String(post.category || ''),
+        author: String(post.author || 'Admin'),
+        publishedAt: String(post.published_at),
         r2ImageUrl: featureUrl,
         visualContent: JSON.stringify(fixedVisualContent),
+        tags: JSON.stringify(post.tags || []) // INI DISISIPKAN
       }, context);
     }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (e: any) {
+    console.error("Sync Error Details:", e.message);
     return new Response(JSON.stringify({ error: e.message }), { status: 500 });
   }
 };
