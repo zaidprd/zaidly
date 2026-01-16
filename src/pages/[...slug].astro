@@ -38,8 +38,12 @@ if (isExternal) {
         image: post.r2_image_url, 
         author: post.author || 'Admin',
         pubDate: post.published_at,
-        tags: postTags, // <--- GUNAKAN postTags YANG SUDAH DI-PARSE
+        tags: postTags,
         slug: post.slug,
+        // --- INI FIX-NYA: TAMBAHKAN DUA BARIS INI ---
+        rating: post.rating, 
+        price: post.price,
+        // --------------------------------------------
         isExternal: true 
     };
 
@@ -68,7 +72,6 @@ if (isExternal) {
 <ArticleLayout frontmatter={finalFrontmatter} headings={headings}>
     <div class="prose max-w-none zaidly-content">
         {isExternal ? (
-            /* FIX UTAMA: WAJIB PAKAI client:load BIAR SCRIPT TOC DI LAYOUT BISA DETEKSI PARAGRAF */
             <PortableVisualBlocks value={visualData} />
         ) : (
             <div class="local-article-fix">

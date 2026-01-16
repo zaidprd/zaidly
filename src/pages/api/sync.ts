@@ -11,7 +11,7 @@ export const ALL: APIRoute = async (context) => {
   const ACCESS_KEY = env.R2_ACCESS_KEY_ID;
   const SECRET_KEY = env.R2_SECRET_ACCESS_KEY;
   const BUCKET = env.R2_BUCKET_NAME;
-  const PUBLIC_URL = env.R2_PUBLIC_URL; // Pastikan isinya https://r2.zaidly.com
+  const PUBLIC_URL = env.R2_PUBLIC_URL;
 
   const s3 = new S3Client({
     region: "auto",
@@ -45,10 +45,12 @@ export const ALL: APIRoute = async (context) => {
   }
 
   try {
-    // 1. TAMBAH tags DI QUERY
+    // 1. TAMBAH price DAN rating DI QUERY SANITY
     const query = encodeURIComponent(`*[_type=="post"]{
       _id, title, "slug": slug.current, description, category, author,
       tags,
+      price,
+      rating,
       "published_at": coalesce(publishedAt, _createdAt),
       "feature_ref": mainImage.asset._ref,
       visualContent
@@ -82,19 +84,23 @@ export const ALL: APIRoute = async (context) => {
         })
       );
 
-      // 3. SIMPAN KE TURSO - TAMBAH tags (WAJIB JSON.stringify)
+      // 3. SIMPAN KE TURSO - TAMBAH price DAN rating
       await upsertPost({
-        id: String(post._id),
-        title: String(post.title || ''),
-        slug: String(post.slug || ''),
-        description: String(post.description || ''),
-        category: String(post.category || ''),
-        author: String(post.author || 'Admin'),
-        publishedAt: String(post.published_at),
-        r2ImageUrl: featureUrl,
-        visualContent: JSON.stringify(fixedVisualContent),
-        tags: JSON.stringify(post.tags || []) // INI DISISIPKAN
-      }, context);
+  id: String(post._id),
+  title: String(post.title || ''),
+  slug: String(post.slug || ''),
+  description: String(post.description || ''),
+  category: String(post.category || ''),
+  author: String(post.author || 'Admin'),
+  publishedAt: String(post.published_at),
+  r2ImageUrl: featureUrl,
+  visualContent: JSON.stringify(fixedVisualContent),
+  tags: JSON.stringify(post.tags || []),
+  price: post.price ? Number(post.price) : 0,
+  // JANGAN PAKAI Number(post.rating || null)
+  // PAKAI LOGIKA INI:
+  rating: post.rating !== undefined && post.rating !== null ? Number(post.rating) : null 
+}, context);
     }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });

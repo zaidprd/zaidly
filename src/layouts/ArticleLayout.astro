@@ -27,6 +27,7 @@ try {
    pubDate: post.published_at,
    author: post.author,
    tags: post.tags,
+   rating: post.rating, // Pastikan field rating ditarik dari Turso
    isExternal: true
  }));
 } catch (e) {
@@ -52,6 +53,11 @@ const formattedDate = frontmatter.pubDate
 
 const shareUrl = `https://zaidly.com/${frontmatter.slug}`;
 const shareTitle = encodeURIComponent(frontmatter.title);
+
+// --- LOGIKA BINTANG MANUAL (FIX: Jangan kasih default 0 di sini) ---
+const hasRating = frontmatter.rating !== undefined && frontmatter.rating !== null && frontmatter.rating > 0;
+const ratingScore = hasRating ? Math.round(frontmatter.rating) : 0;
+const starArray = [1, 2, 3, 4, 5];
 ---
 
 <BaseLayout title={frontmatter.title}>
@@ -69,9 +75,21 @@ const shareTitle = encodeURIComponent(frontmatter.title);
  <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10 px-4">
      <div class="container mx-auto max-w-6xl">
          <div class="max-w-4xl text-left">
-             <div class="flex items-center justify-start space-x-3 mb-6 font-sans">
+             <div class="flex items-center justify-start space-x-3 mb-6 font-sans flex-wrap gap-y-2">
                  <span class="bg-accent-primary text-white text-[9px] font-black px-2.5 py-1 tracking-[0.2em] uppercase rounded-sm">Expert Guide</span>
                  <time class="text-[10px] font-bold text-coffee-brown/80 uppercase tracking-widest">{formattedDate}</time>
+                 
+                 {/* FIX: SEKARANG CEK PAKAI hasRating. Kalau FALSE, GAK BAKAL MUNCUL SAMA SEKALI */}
+                 {hasRating && (
+                  <div class="flex items-center pl-3 border-l border-coffee-brown/20 ml-1">
+                    <div class="flex mr-2">
+                      {starArray.map((num) => (
+                        <span class={num <= ratingScore ? "text-yellow-500 text-[12px]" : "text-gray-300 text-[12px]"}>★</span>
+                      ))}
+                    </div>
+                    <span class="text-[10px] font-black text-coffee-dark uppercase tracking-tighter">({frontmatter.rating})</span>
+                  </div>
+                 )}
              </div>
              <h1 class="mb-8 font-serif italic text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-coffee-dark tracking-tighter text-left">{frontmatter.title}</h1>
              <p class="text-coffee-brown font-bold text-[10px] uppercase tracking-[0.2em] font-sans text-left">Written by <span class="text-accent-primary border-b border-accent-primary/20">{frontmatter.author}</span></p>
@@ -106,7 +124,6 @@ const shareTitle = encodeURIComponent(frontmatter.title);
              </div>
          )}
 
-         {/* TOC STATIS - PASTI MUNCUL & SEO FRIENDLY */}
          {showSidebar && ( 
            <div class="mb-10">
              <TableOfContents headings={headings} />
@@ -186,48 +203,47 @@ const shareTitle = encodeURIComponent(frontmatter.title);
 
 <script is:inline data-astro-rerun>
 function setupArticleFeatures() {
-  const floating = document.getElementById('floating-action');
-  const scrollTopBtn = document.getElementById('scroll-top');
-  const copyBtn = document.getElementById('copy-link-btn');
+ const floating = document.getElementById('floating-action');
+ const scrollTopBtn = document.getElementById('scroll-top');
+ const copyBtn = document.getElementById('copy-link-btn');
   
-  if (copyBtn) {
-    copyBtn.onclick = () => {
-      navigator.clipboard.writeText(window.location.href);
-      const original = copyBtn.innerHTML;
-      copyBtn.innerHTML = '✓';
-      setTimeout(() => copyBtn.innerHTML = original, 2000);
-    };
-  }
+ if (copyBtn) {
+   copyBtn.onclick = () => {
+     navigator.clipboard.writeText(window.location.href);
+     const original = copyBtn.innerHTML;
+     copyBtn.innerHTML = '✓';
+     setTimeout(() => copyBtn.innerHTML = original, 2000);
+   };
+ }
   
-  window.onscroll = () => {
-    if (window.scrollY > 400) { 
-      floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-      floating?.classList.add('opacity-100', 'translate-y-0'); 
-    } else { 
-      floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-    }
-  };
+ window.onscroll = () => {
+   if (window.scrollY > 400) { 
+     floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+     floating?.classList.add('opacity-100', 'translate-y-0'); 
+   } else { 
+     floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+   }
+ };
   
-  if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+ if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-  // GISCUS LOADER (DISKUSI GITHUB)
-  const gContainer = document.querySelector('.giscus');
-  if (gContainer) {
-    gContainer.innerHTML = ''; 
-    const s = document.createElement('script');
-    Object.entries({
-      src: "https://giscus.app/client.js",
-      "data-repo": "zaidprd/zaidly",
-      "data-repo-id": "R_kgDOQmgBjg",
-      "data-category": "Announcements",
-      "data-category-id": "DIC_kwDOQmgBjs4C06bO",
-      "data-mapping": "pathname",
-      "data-theme": "light",
-      "data-lang": "en",
-      crossorigin: "anonymous", async: true
-    }).forEach(([key, val]) => s.setAttribute(key, val));
-    gContainer.appendChild(s);
-  }
+ const gContainer = document.querySelector('.giscus');
+ if (gContainer) {
+   gContainer.innerHTML = ''; 
+   const s = document.createElement('script');
+   Object.entries({
+     src: "https://giscus.app/client.js",
+     "data-repo": "zaidprd/zaidly",
+     "data-repo-id": "R_kgDOQmgBjg",
+     "data-category": "Announcements",
+     "data-category-id": "DIC_kwDOQmgBjs4C06bO",
+     "data-mapping": "pathname",
+     "data-theme": "light",
+     "data-lang": "en",
+     crossorigin: "anonymous", async: true
+   }).forEach(([key, val]) => s.setAttribute(key, val));
+   gContainer.appendChild(s);
+ }
 }
 
 document.addEventListener('astro:page-load', setupArticleFeatures);
