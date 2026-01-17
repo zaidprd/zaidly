@@ -1,6 +1,7 @@
 import type { APIRoute } from "astro";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { createPostsTable, upsertPost } from "../../lib/turso";
+import { google } from 'googleapis'; // Tambahkan ini
 
 export const ALL: APIRoute = async (context) => {
   const env = (context.locals as any).runtime?.env || process.env;
@@ -12,6 +13,10 @@ export const ALL: APIRoute = async (context) => {
   const SECRET_KEY = env.R2_SECRET_ACCESS_KEY;
   const BUCKET = env.R2_BUCKET_NAME;
   const PUBLIC_URL = env.R2_PUBLIC_URL;
+
+  // Data Google Indexing dari Cloudflare Vars
+  const G_EMAIL = env.GOOGLE_SERVICE_ACCOUNT_EMAIL;
+  const G_KEY = env.GOOGLE_PRIVATE_KEY;
 
   const s3 = new S3Client({
     region: "auto",
@@ -45,7 +50,6 @@ export const ALL: APIRoute = async (context) => {
   }
 
   try {
-    // 1. TAMBAH price DAN rating DI QUERY SANITY
     const query = encodeURIComponent(`*[_type=="post"]{
       _id, title, "slug": slug.current, description, category, author,
       tags,
@@ -62,14 +66,17 @@ export const ALL: APIRoute = async (context) => {
 
     await createPostsTable(context);
 
+    // Variabel untuk menampung slug yang akan di-index
+    let lastUpdatedSlug = "";
+
     for (const post of result) {
-      // 1. Upload Feature Image
+      lastUpdatedSlug = post.slug; // Simpan slug terakhir untuk dilaporkan
+
       let featureUrl = "";
       if (post.feature_ref) {
         featureUrl = await uploadToR2(post.feature_ref, `feature-${post._id}`);
       }
 
-      // 2. Upload Body Images (visualContent)
       const fixedVisualContent = await Promise.all(
         (post.visualContent || []).map(async (block: any) => {
           if (block._type === "image" && block.asset?._ref) {
@@ -84,23 +91,47 @@ export const ALL: APIRoute = async (context) => {
         })
       );
 
-      // 3. SIMPAN KE TURSO - TAMBAH price DAN rating
       await upsertPost({
-  id: String(post._id),
-  title: String(post.title || ''),
-  slug: String(post.slug || ''),
-  description: String(post.description || ''),
-  category: String(post.category || ''),
-  author: String(post.author || 'Admin'),
-  publishedAt: String(post.published_at),
-  r2ImageUrl: featureUrl,
-  visualContent: JSON.stringify(fixedVisualContent),
-  tags: JSON.stringify(post.tags || []),
-  price: post.price ? Number(post.price) : 0,
-  // JANGAN PAKAI Number(post.rating || null)
-  // PAKAI LOGIKA INI:
-  rating: post.rating !== undefined && post.rating !== null ? Number(post.rating) : null 
-}, context);
+        id: String(post._id),
+        title: String(post.title || ''),
+        slug: String(post.slug || ''),
+        description: String(post.description || ''),
+        category: String(post.category || ''),
+        author: String(post.author || 'Admin'),
+        publishedAt: String(post.published_at),
+        r2ImageUrl: featureUrl,
+        visualContent: JSON.stringify(fixedVisualContent),
+        tags: JSON.stringify(post.tags || []),
+        price: post.price ? Number(post.price) : 0,
+        rating: post.rating !== undefined && post.rating !== null ? Number(post.rating) : null 
+      }, context);
+    }
+
+    // --- LOGIKA BARU: LAPOR KE GOOGLE (JALUR VIP) ---
+    if (lastUpdatedSlug && G_EMAIL && G_KEY) {
+      try {
+        const auth = new google.auth.JWT(
+          G_EMAIL,
+          null,
+          G_KEY.replace(/\\n/g, '\n'),
+          ['https://www.googleapis.com/auth/indexing']
+        );
+        const tokens = await auth.authorize();
+        await fetch('https://indexing.googleapis.com/v3/urlNotifications:publish', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${tokens.access_token}`,
+          },
+          body: JSON.stringify({
+            url: `https://zaidly.com/${lastUpdatedSlug}`,
+            type: 'URL_UPDATED',
+          }),
+        });
+        console.log("Google Indexing: Laporan terkirim untuk", lastUpdatedSlug);
+      } catch (err) {
+        console.error("Google Indexing Error:", err);
+      }
     }
 
     return new Response(JSON.stringify({ success: true }), { status: 200 });
