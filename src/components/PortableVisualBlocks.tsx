@@ -23,6 +23,24 @@ const components = {
     }
   },
   types: {
+    // --- FITUR BARU: IMAGE HANDLING (DITARUH TANPA HAPUS YANG LAIN) ---
+    image: ({ value }: any) => {
+      const imageUrl = value.asset?.url || (value._key ? `https://pub-84185208466b44b8924b8026779b7631.r2.dev/blog/body-${value._key}.webp` : null);
+      if (!imageUrl) return null;
+      return (
+        <div className="zaidly-body-image-container my-10 w-full flex flex-col items-center">
+          <img 
+            src={imageUrl} 
+            alt={value.alt || 'Zaidly Review Image'} 
+            className="w-full h-auto rounded-xl shadow-sm border-none object-cover"
+            loading="lazy"
+          />
+          {value.caption && <p className="text-center text-sm text-gray-500 mt-3 italic font-sans">{value.caption}</p>}
+        </div>
+      );
+    },
+
+    // --- FITUR LAMA ABANG (DIJAMIN UTUH) ---
     productReviewCard: ({ value }: any) => {
       const hasAmazon = !!value.amazonUrl;
       const hasAli = !!value.aliExpressUrl;
@@ -115,46 +133,30 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         .divider { width: 1px; height: 50px; background: #eee; }
         .zaidly-card-actions { margin-left: auto; display: flex; gap: 15px; }
 
-        /* STANDARDIZED KIT */
         .zaidly-btn-container-kit { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
         .zaidly-btn-kit { padding: 10px 18px; border-radius: 6px; font-weight: 900; font-size: 11px; text-decoration: none; text-align: center; min-width: 115px; position: relative; z-index: 2; transition: transform 0.2s; }
         .zaidly-btn-kit:hover { transform: translateY(-2px); }
         .amz { background: #ff9900; color: #000; }
         .ali { background: #e62e04; color: #fff; }
 
-        /* REAL AMAZON LOGO WITH ARROW SMILE */
         .amz-logo-box { height: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; margin-bottom: 4px; }
         .amz-text { font-family: sans-serif; font-weight: 900; font-size: 18px; color: #000; line-height: 1; }
-        .amz-arrow { 
-          width: 45px; height: 10px; border-bottom: 3px solid #ff9900; border-radius: 0 0 50% 50%; 
-          margin-top: -4px; position: relative; 
-        }
-        .amz-arrow::after { 
-          content: ''; position: absolute; right: -2px; bottom: -3px; 
-          border-left: 5px solid transparent; border-right: 5px solid transparent; 
-          border-top: 6px solid #ff9900; transform: rotate(-25deg); 
-        }
+        .amz-arrow { width: 45px; height: 10px; border-bottom: 3px solid #ff9900; border-radius: 0 0 50% 50%; margin-top: -4px; position: relative; }
+        .amz-arrow::after { content: ''; position: absolute; right: -2px; bottom: -3px; border-left: 5px solid transparent; border-right: 5px solid transparent; border-top: 6px solid #ff9900; transform: rotate(-25deg); }
 
-        /* ALI LOGO */
         .ali-logo-box { height: 35px; display: flex; align-items: center; font-weight: 900; color: #e62e04; font-size: 14px; margin-bottom: 4px; }
         .ali-logo-box span { background: #e62e04; color: #fff; padding: 2px 5px; border-radius: 4px; margin-right: 4px; }
 
-        /* SEO GLOW */
         .seo-glow-blur { position: absolute; bottom: 0; left: 10%; width: 80%; height: 50%; filter: blur(12px); opacity: 0.4; z-index: -1; }
         .amz-blur { background: #ff9900; }
         .ali-blur { background: #e62e04; }
 
-        /* INLINE BUTTONS */
         .zaidly-btn-standalone-inline { display: inline-flex !important; vertical-align: top; margin-right: 20px; margin-bottom: 30px; margin-top: 1rem; }
 
         @media (max-width: 768px) {
           .zaidly-card-body { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
           .divider { display: none; }
-          /* HORIZONTAL DI MOBILE */
-          .zaidly-card-actions { 
-            margin-left: 0; width: 100%; display: flex !important; 
-            flex-direction: row !important; justify-content: flex-start; gap: 12px; 
-          }
+          .zaidly-card-actions { margin-left: 0; width: 100%; display: flex !important; flex-direction: row !important; justify-content: flex-start; gap: 12px; }
           .zaidly-btn-standalone-inline { display: inline-flex !important; margin-right: 12px; width: auto; }
           .zaidly-btn-kit { min-width: 105px; padding: 10px 14px; }
         }
