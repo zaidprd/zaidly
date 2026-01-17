@@ -28,19 +28,18 @@ const components = {
     ),
   },
   types: {
-    // FIX GAMBAR: Menggunakan URL R2 dari Turso/Sanity
     image: ({ value }: any) => {
       const imageUrl = value.url || (value._key ? `https://r2.zaidly.com/blog/body-${value._key}.webp` : null);
       if (!imageUrl) return null;
       return (
-        <div className="zaidly-body-image-container my-10 w-full flex flex-col items-center">
+        <div className="zaidly-body-image-container">
           <img 
             src={imageUrl} 
             alt={value.alt || 'Zaidly Coffee Review'} 
-            className="w-full h-auto rounded-xl shadow-sm border-none object-cover"
+            className="zaidly-main-img"
             loading="lazy"
           />
-          {value.alt && <p className="text-center text-sm text-gray-400 mt-3 italic font-sans">{value.alt}</p>}
+          {value.alt && <p className="zaidly-alt-caption">{value.alt}</p>}
         </div>
       );
     },
@@ -117,17 +116,44 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
       <style dangerouslySetInnerHTML={{ __html: `
         .portable-text-wrapper { width: 100%; color: #000; }
         
+        /* =========================================
+           SETTING JARAK GAMBAR (ATUR DI SINI)
+           ========================================= */
+        .zaidly-body-image-container {
+          width: 100%;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-start; /* Rata Kiri */
+          margin-top: 40px;        /* Jarak Gambar ke teks atas */
+          margin-bottom: 30px;     /* Jarak seluruh blok ke teks bawah */
+        }
+        .zaidly-main-img {
+          width: 100%;
+          height: auto;
+          border-radius: 12px;
+          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+          display: block;
+        margin-bottom: 10px !important;
+        }
+        .zaidly-alt-caption {
+          text-align: left;
+          font-size: 13px;
+          color: #6b7280;           /* Warna cerah */
+          margin-top: 3px !important; /* JARAK TEKS KE GAMBAR (Ubah ini) */
+          margin-bottom: 0px !important;
+          font-style: italic;
+          font-family: sans-serif;
+          padding-left: 4px;
+          opacity: 1;
+        font-weight: 500;
+          line-height: 1.4;
+        }
+
         /* --- STYLE QUOTE CERAH PREMIUM --- */
         .zaidly-blockquote { 
-          border-left: 5px solid #be9b7b; 
-          background: #ffffff; 
-          padding: 2rem; 
-          margin: 3rem 0; 
-          font-style: italic; 
-          font-family: serif;
-          color: #4a3728;
-          border-radius: 0 16px 16px 0; 
-          box-shadow: 0 10px 30px rgba(190, 155, 123, 0.12);
+          border-left: 5px solid #be9b7b; background: #ffffff; padding: 2rem; 
+          margin: 3rem 0; font-style: italic; font-family: serif; color: #4a3728;
+          border-radius: 0 16px 16px 0; box-shadow: 0 10px 30px rgba(190, 155, 123, 0.12);
           position: relative;
         }
         .zaidly-blockquote::before {
@@ -147,7 +173,6 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         }
         .zaidly-markdown-area td { padding: 14px 16px; border-bottom: 1px solid rgba(74, 55, 40, 0.06); color: #4a3728; }
         .zaidly-markdown-area tr:nth-child(even) { background-color: #FDFCF0; }
-        .zaidly-markdown-area tr:hover { background-color: rgba(190, 155, 123, 0.05); }
 
         /* --- FITUR LAMA CARD & BUTTON --- */
         .zaidly-card { margin: 3rem 0; padding: 2rem; border: 1.5px solid rgba(74,55,40,0.1); border-radius: 16px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
@@ -159,7 +184,6 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         .zaidly-card-actions { margin-left: auto; display: flex; gap: 15px; }
         .zaidly-btn-container-kit { display: flex; flex-direction: column; align-items: center; position: relative; z-index: 1; }
         .zaidly-btn-kit { padding: 10px 18px; border-radius: 6px; font-weight: 900; font-size: 11px; text-decoration: none; text-align: center; min-width: 115px; position: relative; z-index: 2; transition: transform 0.2s; }
-        .zaidly-btn-kit:hover { transform: translateY(-2px); }
         .amz { background: #ff9900; color: #000; }
         .ali { background: #e62e04; color: #fff; }
         .amz-logo-box { height: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; margin-bottom: 4px; }
