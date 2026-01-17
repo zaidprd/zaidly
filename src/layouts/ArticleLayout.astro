@@ -1,89 +1,65 @@
 ---
 import BaseLayout from './BaseLayout.astro';
 import TableOfContents from '../components/TableOfContents.astro';
-import SidebarAd from '../components/SidebarAd.astro'; // Import Komponen Baru
+import SidebarAd from '../components/SidebarAd.astro';
 import { getCollection } from 'astro:content';
 import { getTursoPosts } from '../lib/turso'; 
 
 const { frontmatter, headings } = Astro.props; 
 
-// 1. AMBIL ARTIKEL LOKAL
+// 1. DATA FETCHING
 const localPostsRaw = await getCollection('blog');
-const localPosts = localPostsRaw.map(post => ({ 
- ...post.data, 
- slug: post.slug,
- image: post.data.image, 
- isExternal: false 
-}));
-
-// 2. AMBIL ARTIKEL DARI TURSO (SANITY)
+const localPosts = localPostsRaw.map(post => ({ ...post.data, slug: post.slug, image: post.data.image, isExternal: false }));
 let tursoPosts: any[] = [];
 try { 
  const rawTurso = await getTursoPosts(); 
  tursoPosts = rawTurso.map(post => ({
-   title: post.title,
-   slug: post.slug,
-   image: post.r2_image_url, 
-   pubDate: post.published_at,
-   author: post.author,
-   tags: post.tags,
-   rating: post.rating, // Pastikan field rating ditarik dari Turso
-   isExternal: true
+   title: post.title, slug: post.slug, image: post.r2_image_url, 
+   pubDate: post.published_at, author: post.author, tags: post.tags, rating: post.rating, isExternal: true
  }));
-} catch (e) {
- console.error("Gagal ambil Turso posts:", e);
-}
+} catch (e) {}
 
-// 3. GABUNGKAN & URUTKAN
 const allPosts = [...localPosts, ...tursoPosts]
  .filter(p => p.slug !== frontmatter.slug)
  .sort((a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime());
 
 const relatedPosts = allPosts.slice(0, 3);
 
-// 4. LOGIKA TAGS
+// 2. LOGIKA MEDIA & SHARE
 const rawTags = frontmatter.tags || [];
 const tags = Array.isArray(rawTags) ? rawTags : (typeof rawTags === 'string' ? rawTags.split(',') : []);
-
 const isSanityImage = typeof frontmatter.image === 'string';
-const showSidebar = headings && headings.filter((h: any) => h.depth > 1 && h.depth < 4).length > 0;
-const formattedDate = frontmatter.pubDate 
-   ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) 
-   : 'Date not available';
-
+const showSidebar = headings && headings.length > 0;
+const formattedDate = frontmatter.pubDate ? new Date(frontmatter.pubDate).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }) : '';
 const shareUrl = `https://zaidly.com/${frontmatter.slug}`;
 const shareTitle = encodeURIComponent(frontmatter.title);
-
-// --- LOGIKA BINTANG MANUAL (FIX: Jangan kasih default 0 di sini) ---
+const shareImg = isSanityImage ? frontmatter.image : (frontmatter.image?.src || '');
 const hasRating = frontmatter.rating !== undefined && frontmatter.rating !== null && frontmatter.rating > 0;
 const ratingScore = hasRating ? Math.round(frontmatter.rating) : 0;
-const starArray = [1, 2, 3, 4, 5];
 ---
 
 <BaseLayout title={frontmatter.title}>
 <main class="bg-cream-latte min-h-screen text-coffee-dark relative font-sans overflow-x-clip">
 
  <div id="floating-action" class="fixed bottom-8 right-8 z-50 flex flex-col gap-4 opacity-0 translate-y-10 transition-all duration-500 pointer-events-none">
-     <a href="https://ko-fi.com/zaidly" target="_blank" aria-label="Support Zaidly on Ko-fi" class="pointer-events-auto bg-accent-primary text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform border-2 border-white/20 flex items-center justify-center">
-         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
+     <a href="https://ko-fi.com/zaidly" target="_blank" class="pointer-events-auto bg-accent-primary text-white p-4 rounded-full shadow-2xl hover:scale-110 transition-transform border-2 border-white/20 flex items-center justify-center">
+         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path><line x1="6" y1="2" x2="6" y2="4"></line><line x1="10" y1="2" x2="10" y2="4"></line><line x1="14" y1="2" x2="14" y2="4"></line></svg>
      </a>
-     <button id="scroll-top" aria-label="Scroll to top" class="pointer-events-auto bg-white text-coffee-dark p-3 rounded-full shadow-xl hover:bg-coffee-dark hover:text-white transition-all border border-coffee-brown/10 flex items-center justify-center">
-         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m18 15-6-6-6 6"/></svg>
+     <button id="scroll-top" class="pointer-events-auto bg-white text-coffee-dark p-3 rounded-full shadow-xl hover:bg-coffee-dark hover:text-white transition-all border border-coffee-brown/10 flex items-center justify-center">
+         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="m18 15-6-6-6 6"/></svg>
      </button>
  </div>
 
  <header class="pt-28 md:pt-36 pb-12 border-b border-coffee-brown/10 px-4">
      <div class="container mx-auto max-w-6xl">
          <div class="max-w-4xl text-left">
-             <div class="flex items-center justify-start space-x-3 mb-6 font-sans flex-wrap gap-y-2">
+             <div class="flex items-center space-x-3 mb-6 font-sans flex-wrap gap-y-2">
                  <span class="bg-accent-primary text-white text-[9px] font-black px-2.5 py-1 tracking-[0.2em] uppercase rounded-sm">Expert Guide</span>
                  <time class="text-[10px] font-bold text-coffee-brown/80 uppercase tracking-widest">{formattedDate}</time>
-                 
-                 {/* FIX: SEKARANG CEK PAKAI hasRating. Kalau FALSE, GAK BAKAL MUNCUL SAMA SEKALI */}
                  {hasRating && (
                   <div class="flex items-center pl-3 border-l border-coffee-brown/20 ml-1">
                     <div class="flex mr-2">
-                      {starArray.map((num) => (
+                      {[1,2,3,4,5].map((num) => (
                         <span class={num <= ratingScore ? "text-yellow-500 text-[12px]" : "text-gray-300 text-[12px]"}>★</span>
                       ))}
                     </div>
@@ -91,92 +67,72 @@ const starArray = [1, 2, 3, 4, 5];
                   </div>
                  )}
              </div>
-             <h1 class="mb-8 font-serif italic text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-coffee-dark tracking-tighter text-left">{frontmatter.title}</h1>
-             <p class="text-coffee-brown font-bold text-[10px] uppercase tracking-[0.2em] font-sans text-left">Written by <span class="text-accent-primary border-b border-accent-primary/20">{frontmatter.author}</span></p>
+             <h1 class="mb-8 font-serif italic text-3xl md:text-5xl lg:text-6xl font-black leading-[1.1] text-coffee-dark tracking-tighter">{frontmatter.title}</h1>
+             <p class="text-coffee-brown font-bold text-[10px] uppercase tracking-[0.2em]">Written by <span class="text-accent-primary border-b border-accent-primary/20">{frontmatter.author}</span></p>
          </div>
      </div>
  </header>
 
  <div class="container mx-auto max-w-6xl px-4 py-12">
-   <div class="flex flex-col lg:flex-row gap-16 relative">
+   <div class="grid grid-cols-1 lg:grid-cols-[1fr_300px] gap-16 relative">
 
-     <aside class="hidden xl:block absolute -left-20 top-0 h-full">
-       <div class="sticky top-32 flex flex-col gap-6 items-center py-4">
-         <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-[#000000] transition-all hover:scale-110" aria-label="Share on X">
-           <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-         </a>
-         <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" class="text-coffee-dark hover:text-[#1877F2] transition-all hover:scale-110" aria-label="Share on Facebook">
-           <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg>
-         </a>
-         <a href="https://www.instagram.com/bestcoffee.gear" target="_blank" class="text-coffee-dark hover:text-[#E4405F] transition-all hover:scale-110" aria-label="Follow on Instagram">
-           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-         </a>
-         <button id="copy-link-btn" aria-label="Copy page link" class="text-coffee-dark hover:text-accent-primary transition-all hover:scale-110">
-           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
-         </button>
-       </div>
-     </aside>
+     <div class="min-w-0 relative">
+        <aside class="hidden xl:block absolute -left-20 top-0 h-full">
+            <div class="sticky top-32 flex flex-col gap-6 items-center py-4">
+              <a href={`https://twitter.com/intent/tweet?url=${shareUrl}&text=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-black transition-all hover:scale-110"><svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg></a>
+              <a href={`https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`} target="_blank" class="text-coffee-dark hover:text-[#1877F2] transition-all hover:scale-110"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.469h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/></svg></a>
+              <a href="https://www.instagram.com/bestcoffee.gear" target="_blank" class="text-coffee-dark hover:text-[#E4405F] transition-all hover:scale-110"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg></a>
+              <a href={`https://www.reddit.com/submit?url=${shareUrl}&title=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-[#FF4500] transition-all hover:scale-110"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0zm5.01 4.744c.688 0 1.25.561 1.25 1.249a1.25 1.25 0 0 1-2.498.056l-2.597-.547-.8 3.747c1.824.07 3.48.632 4.674 1.488.308-.362.759-.591 1.266-.591.925 0 1.682.757 1.682 1.682 0 .703-.434 1.302-1.041 1.547a4.92 4.92 0 0 1 .041.616c0 2.257-3.235 4.091-7.225 4.091-3.99 0-7.225-1.834-7.225-4.091 0-.206.028-.403.08-.591-.572-.258-.97-.833-.97-1.503 0-.925.757-1.682 1.682-1.682.51 0 .963.23 1.268.596 1.191-.845 2.829-1.4 4.63-1.48l.811-3.811c.017-.08.067-.145.145-.17l3.201.674c.059-.283.312-.497.616-.497zm-8.834 7.641c-.608 0-1.103.491-1.103 1.103 0 .612.495 1.103 1.103 1.103.613 0 1.103-.491 1.103-1.103 0-.612-.49-.103-1.103-1.103zm7.648 0c-.608 0-1.103.491-1.103 1.103 0 .612.495 1.103 1.103 1.103.613 0 1.103-.491 1.103-1.103 0-.612-.495-1.103-1.103-1.103zm-3.824 3.102c-1.353 0-2.498.411-2.91 1.014a.228.228 0 0 0 .041.313.227.227 0 0 0 .315-.04c.323-.47 1.341-.832 2.554-.832 1.212 0 2.231.362 2.554.832a.227.227 0 0 0 .315.04.228.228 0 0 0 .041-.313c-.412-.603-1.557-1.014-2.91-1.014z"/></svg></a>
+              <a href={`https://pinterest.com/pin/create/button/?url=${shareUrl}&media=${shareImg}&description=${shareTitle}`} target="_blank" class="text-coffee-dark hover:text-[#BD081C] transition-all hover:scale-110"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12.017 0c-6.627 0-12 5.373-12 12 0 5.088 3.161 9.441 7.626 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738.098.119.112.224.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.261 7.929-7.261 4.162 0 7.398 2.966 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.631-2.75-1.378l-.748 2.853c-.271 1.033-1.002 2.324-1.49 3.121 1.125.347 2.312.535 3.543.535 6.627 0 12-5.373 12-12s-5.373-12-12-12z"/></svg></a>
+            </div>
+        </aside>
 
-     <article class={showSidebar ? 'lg:w-3/4 w-full' : 'w-full'}>
-         {frontmatter.image && (
-             <div class="mb-12 overflow-hidden rounded-lg shadow-sm border-none p-0">
-                 <img src={isSanityImage ? frontmatter.image : frontmatter.image.src} alt={frontmatter.title} class="w-full aspect-video object-cover rounded-lg" loading="eager" />
-             </div>
-         )}
+        <article>
+            {frontmatter.image && (
+                <div class="mb-12 overflow-hidden rounded-lg">
+                    <img src={isSanityImage ? frontmatter.image : frontmatter.image.src} alt={frontmatter.title} class="w-full aspect-video object-cover rounded-lg" loading="eager" />
+                </div>
+            )}
+            {showSidebar && <div class="mb-10"><TableOfContents headings={headings} /></div>}
+            <slot />
+        </article>
 
-         {showSidebar && ( 
-           <div class="mb-10">
-             <TableOfContents headings={headings} />
-           </div> 
-         )}
-
-         <div id="article-content" class="prose prose-stone max-w-none px-0.5 md:px-0 font-sans">
-             <slot />
-         </div>
-
-         {tags && tags.length > 0 && (
+        {tags.length > 0 && (
           <div class="mt-12 pt-6 border-t border-coffee-brown/10 flex flex-wrap gap-2">
             <span class="text-[10px] font-black uppercase tracking-widest text-coffee-brown/40 w-full mb-2">Explore Related:</span>
             {tags.map((tag: string) => (
-              <a 
-                href={`/?tag=${tag.trim().toLowerCase().replace(/\s+/g, '-')}`} 
-                class="bg-white border border-coffee-brown/10 px-3 py-1.5 rounded-full text-[10px] font-bold text-coffee-dark hover:bg-accent-primary hover:text-white hover:border-accent-primary transition-all uppercase tracking-widest no-underline"
-              >
-                #{tag.trim()}
-              </a>
+              <a href={`/?tag=${tag.trim()}`} class="bg-white border border-coffee-brown/10 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase no-underline hover:bg-accent-primary hover:text-white transition-all">#{tag.trim()}</a>
             ))}
           </div>
         )}
 
-         <section class="mt-20 pt-10 border-t border-coffee-brown/10">
-             <h3 class="text-2xl font-black uppercase tracking-tighter text-coffee-dark mb-10 font-serif text-center md:text-left">You Might Also Like</h3>
-             <div class="grid grid-cols-1 md:grid-cols-3 gap-8 px-2 md:px-0">
-                 {relatedPosts.map((post) => (
-                     <a href={`/${post.slug}`} class="group cursor-pointer block">
-                         <div class="aspect-video bg-coffee-brown/5 rounded-xl overflow-hidden mb-4 border border-coffee-brown/5 relative">
-                              {post.image ? (
-                                   <img src={typeof post.image === 'string' ? post.image : post.image.src} alt={post.title} class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
-                              ) : (
-                                  <div class="w-full h-full flex items-center justify-center bg-accent-primary/5 text-accent-primary/20"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M17 8h1a4 4 0 1 1 0 8h-1"></path><path d="M3 8h14v9a4 4 0 0 1-4 4H7a4 4 0 0 1-4-4Z"></path></svg></div>
-                              )}
-                         </div>
-                         <h4 class="text-sm font-bold leading-snug text-coffee-dark group-hover:text-accent-primary transition-colors line-clamp-2 font-serif">{post.title}</h4>
-                     </a>
-                 ))}
-             </div>
-         </section>
+        <section class="mt-20 pt-10 border-t border-coffee-brown/10">
+            <h3 class="text-2xl font-black uppercase tracking-tighter text-coffee-dark mb-10 font-serif">You Might Also Like</h3>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {relatedPosts.map((p) => (
+                    <a href={`/${p.slug}`} class="group block no-underline">
+                        <div class="aspect-video bg-coffee-brown/5 rounded-xl overflow-hidden mb-4 border border-coffee-brown/5 relative">
+                             <img src={typeof p.image === 'string' ? p.image : p.image.src} alt={p.title} class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        </div>
+                        <h4 class="text-sm font-bold text-coffee-dark group-hover:text-accent-primary line-clamp-2 font-serif">{p.title}</h4>
+                    </a>
+                ))}
+            </div>
+        </section>
 
-         <section class="mt-16 p-6 md:p-10 bg-white border-2 border-coffee-brown/10 rounded-2xl text-center max-w-2xl mx-auto shadow-md">
-             <div class="flex flex-col items-center">
-                 <p class="text-coffee-dark text-base font-bold leading-relaxed mb-8 italic px-2 font-serif">"If this guide has provided value to you, please consider supporting Zaidly to keep our expert research brewing every week."</p>
-                 <a href="https://ko-fi.com/zaidly" target="_blank" class="bg-accent-primary text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] hover:bg-coffee-dark transition-all">Support Zaidly</a>
-             </div>
-         </section>
+        <section class="mt-16 p-6 md:p-10 bg-white border-2 border-coffee-brown/10 rounded-2xl text-center max-w-2xl mx-auto shadow-md">
+            <p class="text-coffee-dark text-base font-bold mb-8 italic font-serif">"If this guide has provided value to you, please consider supporting Zaidly."</p>
+            <a href="https://ko-fi.com/zaidly" target="_blank" class="bg-accent-primary text-white px-10 py-4 rounded-xl font-black text-[11px] uppercase tracking-[0.2em] no-underline hover:bg-coffee-dark transition-all inline-block">Support Zaidly</a>
+        </section>
 
-         <div class="giscus-container mt-12 border-t border-coffee-brown/10 pt-10"><div class="giscus"></div></div>
-     </article>
+        <div class="giscus-container mt-12 border-t border-coffee-brown/10 pt-10"><div class="giscus"></div></div>
+     </div>
 
-     <SidebarAd />
+     <aside class="hidden lg:block relative">
+        <div class="sticky top-32 space-y-8">
+           <SidebarAd />
+        </div>
+     </aside>
      
    </div>
  </div>
@@ -184,68 +140,37 @@ const starArray = [1, 2, 3, 4, 5];
 </BaseLayout>
 
 <style is:global>
-#article-content { color: #2C1810; position: relative; }
-#article-content h1:first-child { display: none !important; }
-#article-body h2, #article-content h2 { @apply font-serif italic font-black text-[22px] md:text-3xl mt-10 mb-5 tracking-tight uppercase leading-tight; }
-#article-body h3, #article-content h3 { @apply font-serif italic font-black text-[19px] md:text-2xl mt-8 mb-4 tracking-tight leading-tight; }
-#article-content p { @apply mb-6 leading-[1.7] text-[16px] md:text-[17px] opacity-95; }
-.zaidly-img-box img, #article-content img { border: none !important; border-radius: 8px !important; margin: 2rem 0; }
-#article-content table { width: 100% !important; border-collapse: collapse; margin: 2.5rem 0; font-family: inherit; font-size: 12px; background: white; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(60, 47, 47, 0.05); }
-#article-content th { background-color: #3C2F2F; color: white; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; padding: 14px; text-align: left; }
-#article-content td { padding: 14px 16px; border-bottom: 1px solid rgba(60, 47, 47, 0.06); color: #4a3728; }
-#article-content tr:nth-child(even) { background-color: #FDFCF0; }
-#article-content tr:last-child td { border-bottom: none; }
-@media (max-width: 768px) { 
- #article-content table { display: block; overflow-x: auto; white-space: nowrap; } 
- #article-content { padding-left: 12px; padding-right: 12px; }
-}
+  /* Override Prose agar tidak merusak Grid */
+  .prose { max-width: none !important; }
+  .prose h2 { @apply font-serif italic font-black text-[22px] md:text-3xl mt-10 mb-5 tracking-tight uppercase leading-tight; }
+  .prose h3 { @apply font-serif italic font-black text-[19px] md:text-2xl mt-8 mb-4 tracking-tight leading-tight; }
+  .prose p { @apply mb-6 leading-[1.7] text-[16px] md:text-[17px] opacity-95; }
 </style>
 
 <script is:inline data-astro-rerun>
-function setupArticleFeatures() {
- const floating = document.getElementById('floating-action');
- const scrollTopBtn = document.getElementById('scroll-top');
- const copyBtn = document.getElementById('copy-link-btn');
-  
- if (copyBtn) {
-   copyBtn.onclick = () => {
-     navigator.clipboard.writeText(window.location.href);
-     const original = copyBtn.innerHTML;
-     copyBtn.innerHTML = '✓';
-     setTimeout(() => copyBtn.innerHTML = original, 2000);
-   };
- }
-  
- window.onscroll = () => {
-   if (window.scrollY > 400) { 
-     floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-     floating?.classList.add('opacity-100', 'translate-y-0'); 
-   } else { 
-     floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
-   }
- };
-  
- if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+function setupArticleBase() {
+  const floating = document.getElementById('floating-action');
+  const scrollTopBtn = document.getElementById('scroll-top');
 
- const gContainer = document.querySelector('.giscus');
- if (gContainer) {
-   gContainer.innerHTML = ''; 
-   const s = document.createElement('script');
-   Object.entries({
-     src: "https://giscus.app/client.js",
-     "data-repo": "zaidprd/zaidly",
-     "data-repo-id": "R_kgDOQmgBjg",
-     "data-category": "Announcements",
-     "data-category-id": "DIC_kwDOQmgBjs4C06bO",
-     "data-mapping": "pathname",
-     "data-theme": "light",
-     "data-lang": "en",
-     crossorigin: "anonymous", async: true
-   }).forEach(([key, val]) => s.setAttribute(key, val));
-   gContainer.appendChild(s);
- }
+  if (scrollTopBtn) scrollTopBtn.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+  window.onscroll = () => {
+    if (window.scrollY > 400) { 
+      floating?.classList.remove('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+      floating?.classList.add('opacity-100', 'translate-y-0'); 
+    } else { 
+      floating?.classList.add('opacity-0', 'translate-y-10', 'pointer-events-none'); 
+    }
+  };
+
+  const gContainer = document.querySelector('.giscus');
+  if (gContainer) {
+    gContainer.innerHTML = ''; 
+    const s = document.createElement('script');
+    Object.entries({ src: "https://giscus.app/client.js", "data-repo": "zaidprd/zaidly", "data-repo-id": "R_kgDOQmgBjg", "data-category": "Announcements", "data-category-id": "DIC_kwDOQmgBjs4C06bO", "data-mapping": "pathname", "data-theme": "light", "data-lang": "en", crossorigin: "anonymous", async: true }).forEach(([key, val]) => s.setAttribute(key, val));
+    gContainer.appendChild(s);
+  }
 }
-
-document.addEventListener('astro:page-load', setupArticleFeatures);
-setupArticleFeatures();
+document.addEventListener('astro:page-load', setupArticleBase);
+setupArticleBase();
 </script>

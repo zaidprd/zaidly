@@ -32,7 +32,6 @@ let headings: any[] = [];
 
 if (isExternal) {
     const postTags = typeof post.tags === 'string' ? JSON.parse(post.tags) : (post.tags || []);
-
     finalFrontmatter = { 
         title: post.title, 
         image: post.r2_image_url, 
@@ -40,27 +39,18 @@ if (isExternal) {
         pubDate: post.published_at,
         tags: postTags,
         slug: post.slug,
-        // --- INI FIX-NYA: TAMBAHKAN DUA BARIS INI ---
         rating: post.rating, 
         price: post.price,
-        // --------------------------------------------
         isExternal: true 
     };
-
     visualData = typeof post.visual_content === 'string' ? JSON.parse(post.visual_content) : post.visual_content;
-
-    headings = visualData.flatMap((block: any) => {
+    headings = (visualData || []).flatMap((block: any) => {
         const text = block.children?.map((c: any) => c.text).join('') || '';
         if (block._type === 'block' && (block.style === 'h2' || block.style === 'h3')) {
             return [{ depth: parseInt(block.style.replace('h', '')), text, slug: text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') }];
         }
-        if (block._type === 'block') {
-            const matches = [...text.matchAll(/^(#{2,3})\s+(.+)$/gm)];
-            return matches.map(m => ({ depth: m[1].length, text: m[2].trim(), slug: m[2].trim().toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') }));
-        }
         return [];
     });
-
 } else {
     finalFrontmatter = { ...post.data, isExternal: false };
     const rendered = await render(post);
@@ -72,7 +62,7 @@ if (isExternal) {
 <ArticleLayout frontmatter={finalFrontmatter} headings={headings}>
     <div class="prose max-w-none zaidly-content">
         {isExternal ? (
-            <PortableVisualBlocks value={visualData} />
+            <PortableVisualBlocks value={visualData} client:load />
         ) : (
             <div class="local-article-fix">
                 {DynamicContent && <DynamicContent />}

@@ -21,38 +21,38 @@ const ads = [
 ];
 ---
 
-<aside class="hidden lg:block lg:w-1/4 sticky top-28 self-start h-fit space-y-8">
+<div class="flex flex-col gap-6 w-full">
   {ads.map((ad) => (
-    <div class="bg-white border border-coffee-brown/15 text-center rounded-xl shadow-sm transition-all hover:shadow-md overflow-hidden flex flex-col">
-      <h3 class="font-black text-[12px] text-accent-primary pt-4 pb-2 uppercase tracking-[0.3em]">
+    <div class="bg-white border border-coffee-brown/15 text-center rounded-xl shadow-sm transition-all hover:shadow-md overflow-hidden flex flex-col w-full">
+      <h3 class="font-black text-[10px] md:text-[11px] text-accent-primary pt-4 pb-2 uppercase tracking-[0.2em]">
         {ad.label}
       </h3>
       
-      <a href={ad.link} target="_blank" aria-label={`View ${ad.title} on Amazon`} class="group block px-2"> 
-        <div class="w-full aspect-square bg-[#F9F9F7] overflow-hidden rounded-lg">
+      <a href={ad.link} target="_blank" aria-label={`View ${ad.title} on Amazon`} class="group block px-3 pb-4"> 
+        <div class="w-full aspect-square bg-[#F9F9F7] overflow-hidden rounded-lg mb-4">
           {typeof ad.img === 'string' ? (
             <img 
               src={ad.img} 
               alt={`Photo of ${ad.title}`} 
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+              class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
             />
           ) : (
             <Image 
               src={ad.img} 
               alt={`Photo of ${ad.title}`} 
-              width={400} 
-              height={400} 
-              class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" 
+              width={300} 
+              height={300} 
+              class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
             />
           )}
         </div>
 
-        <div class="p-5">
-          <h4 class="text-[13px] font-black uppercase leading-tight font-serif text-coffee-dark mb-5 tracking-tighter">
+        <div class="px-2">
+          <h4 class="text-[12px] font-bold uppercase leading-tight font-serif text-coffee-dark mb-4 line-clamp-2 min-h-[32px]">
             {ad.title}
           </h4>
-          <div class="pt-4 border-t border-coffee-brown/5">
-             <span class="bg-accent-primary text-white text-[10px] font-black px-6 py-2.5 rounded-full uppercase tracking-widest group-hover:bg-coffee-dark transition-colors inline-block">
+          <div class="pt-3 border-t border-coffee-brown/5">
+             <span class="bg-accent-primary text-white text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-wider group-hover:bg-coffee-dark transition-colors inline-block w-full">
                {ad.btnText}
              </span>
           </div>
@@ -60,4 +60,4 @@ const ads = [
       </a>
     </div>
   ))}
-</aside>
+</div>
