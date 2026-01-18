@@ -10,8 +10,7 @@ export default defineConfig({
   output: 'server',
 
   adapter: cloudflare({
-    // 1. INI KUNCI UTAMA: Wajib pakai nodeCompat: true (bukan node_compat) 
-    // untuk versi adapter cloudflare terbaru agar fungsi Google jalan.
+    // Tetap gunakan nodeCompat agar library Turso & S3 berjalan lancar
     nodeCompat: true, 
     platformProxy: {
       enabled: true,
@@ -33,12 +32,8 @@ export default defineConfig({
 
   vite: {
     ssr: {
-      // 2. Tambahkan modul node internal di sini agar Vite tidak bingung
+      // Bersihkan daftar external, sisakan yang memang perlu saja
       external: [
-        'googleapis',
-        'google-auth-library',
-        'gaxios',
-        'node-fetch',
         'node:events',
         'node:fs',
         'node:util',
@@ -47,15 +42,5 @@ export default defineConfig({
         'node:url'
       ],
     },
-    // 3. Ini membantu Cloudflare saat proses bundling
-    resolve: {
-      alias: {
-        'node:events': 'events',
-        'node:fs': 'fs',
-        'node:util': 'util',
-        'node:stream': 'stream',
-        'node:path': 'path',
-      }
-    }
   },
 });
