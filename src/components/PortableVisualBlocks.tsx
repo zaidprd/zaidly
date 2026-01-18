@@ -6,12 +6,23 @@ import { useState, useEffect } from 'react';
 const renderer = new marked.Renderer();
 renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
   const cleanText = text.replace(/<[^>]*>/g, '');
-  const id = cleanText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
-  return `<h${depth} id="${id}" class="zaidly-h${depth}">${text}</h${depth}>`;
+  const id = cleanText.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+  return `<h${depth} id="${id}" class="zaidly-h${depth}" style="scroll-margin-top: 120px;">${text}</h${depth}>`;
 };
 
 const components = {
   block: {
+    // FIX: Sinkronisasi ID untuk Heading asli Sanity
+    h2: ({ children, value }: any) => {
+      const text = value.children.map((c: any) => c.text).join('');
+      const id = text.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+      return <h2 id={id} className="zaidly-h2" style={{scrollMarginTop: '120px'}}>{children}</h2>;
+    },
+    h3: ({ children, value }: any) => {
+      const text = value.children.map((c: any) => c.text).join('');
+      const id = text.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
+      return <h3 id={id} className="zaidly-h3" style={{scrollMarginTop: '120px'}}>{children}</h3>;
+    },
     normal: ({ node, children }: any) => {
       const rawText = node.children?.map((c: any) => c.text).join('') || '';
       const isMarkdown = rawText.includes('|') || /^#{1,6}\s/m.test(rawText) || /^\s*[-*+]\s+/m.test(rawText);
@@ -38,14 +49,11 @@ const components = {
         </div>
       );
     },
-
     productReviewCard: ({ value }: any) => {
       const hasAmazon = !!value.amazonUrl;
       const hasAli = !!value.aliExpressUrl;
       const rawRating = value.itemRating || 0;
       const stars = [1, 2, 3, 4, 5];
-
-      // FIX SCHEMA: Memastikan gambar dan deskripsi masuk ke Google
       const productImage = value.asset?.url || value.imageUrl || (value._key ? `https://r2.zaidly.com/blog/body-${value._key}.webp` : "https://zaidly.com/images/default-product.webp");
       const productDesc = value.description || `Expert gear review of ${value.productName} by Zaidly Gear Lab.`;
 
@@ -102,7 +110,6 @@ const components = {
             <div className="zaidly-card-actions">
               {hasAmazon && (
                 <div className="zaidly-btn-container-kit">
-                  {/* LOGO SENYUM AMAZON KEMBALI */}
                   <div className="amz-logo-box"><span className="amz-text">amazon</span><div className="amz-arrow"></div></div>
                   <div className="seo-glow-blur amz-blur"></div>
                   <a href={value.amazonUrl} target="_blank" rel="nofollow" className="zaidly-btn-kit amz">CHECK PRICE</a>
@@ -110,7 +117,6 @@ const components = {
               )}
               {hasAli && (
                 <div className="zaidly-btn-container-kit">
-                  {/* LOGO MERAH ALI KEMBALI */}
                   <div className="ali-logo-box"><span>Ali</span>Express</div>
                   <div className="seo-glow-blur ali-blur"></div>
                   <a href={value.aliExpressUrl} target="_blank" rel="nofollow" className="zaidly-btn-kit ali">CHECK PRICE</a>
@@ -126,7 +132,6 @@ const components = {
       return (
         <div className="zaidly-btn-standalone-inline">
           <div className="zaidly-btn-container-kit">
-            {/* LOGO DI STANDALONE BUTTON JUGA KEMBALI */}
             {isAli ? (
               <div className="ali-logo-box"><span>Ali</span>Express</div>
             ) : (
@@ -168,7 +173,6 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         .zaidly-btn-kit { padding: 10px 18px; border-radius: 6px; font-weight: 900; font-size: 11px; text-decoration: none; text-align: center; min-width: 115px; position: relative; z-index: 2; transition: transform 0.2s; }
         .amz { background: #ff9900; color: #000; }
         .ali { background: #e62e04; color: #fff; }
-        /* STYLE LOGO SENYUM & ALI LENGKAP */
         .amz-logo-box { height: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; margin-bottom: 4px; }
         .amz-text { font-family: sans-serif; font-weight: 900; font-size: 18px; color: #000; line-height: 1; }
         .amz-arrow { width: 45px; height: 10px; border-bottom: 3px solid #ff9900; border-radius: 0 0 50% 50%; margin-top: -4px; position: relative; }
@@ -180,64 +184,16 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         .ali-blur { background: #e62e04; }
         .zaidly-btn-standalone-inline { display: inline-flex !important; vertical-align: top; margin-right: 20px; margin-bottom: 1rem; margin-top: 1rem; }
         @media (max-width: 768px) {
-          /* 1. Card jadi lebih rapat dan modern */
-          .zaidly-card {
-            padding: 1.25rem;
-            margin: 1.5rem 0;
-            border-radius: 20px;
-          }
-          
-          .zaidly-card-title {
-            font-size: 1.4rem;
-            margin-bottom: 1rem;
-          }
-
-          /* 2. Rating & Price jadi sejajar (Kiri-Kanan) */
-          .zaidly-card-body {
-            flex-direction: row; /* Berjejer kesamping */
-            flex-wrap: wrap;    /* Bungkus kalau gak muat */
-            justify-content: space-between;
-            align-items: center;
-            gap: 1rem;
-            padding-top: 1rem;
-          }
-
-          .zaidly-card-stat {
-            flex: 1; /* Biar bagi tempat rata */
-            min-width: 120px;
-          }
-
-          .divider {
-            display: none; /* Hilangkan garis tegak biar gak sempit */
-          }
-
-          /* 3. Tombol Aksi di Mobile */
-          .zaidly-card-actions {
-            width: 100%;
-            margin-left: 0;
-            justify-content: space-between;
-            gap: 10px;
-            margin-top: 0.5rem;
-          }
-
-          .zaidly-btn-container-kit {
-            flex: 1; /* Tombol melebar rata kiri-kanan */
-          }
-
-          .zaidly-btn-kit {
-            width: 100%;
-            min-width: unset;
-            padding: 12px 5px;
-          }
-
-          /* 4. Skala Rating Bintang Lebih Pas */
-          .zaidly-card-stat .text-xl {
-            font-size: 1.1rem;
-          }
-          
-          .zaidly-card-stat .value.price {
-            font-size: 1.3rem;
-          }
+          .zaidly-card { padding: 1.25rem; margin: 1.5rem 0; border-radius: 20px; }
+          .zaidly-card-title { font-size: 1.4rem; margin-bottom: 1rem; }
+          .zaidly-card-body { flex-direction: row; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 1rem; padding-top: 1rem; }
+          .zaidly-card-stat { flex: 1; min-width: 120px; }
+          .divider { display: none; }
+          .zaidly-card-actions { width: 100%; margin-left: 0; justify-content: space-between; gap: 10px; margin-top: 0.5rem; }
+          .zaidly-btn-container-kit { flex: 1; }
+          .zaidly-btn-kit { width: 100%; min-width: unset; padding: 12px 5px; }
+          .zaidly-card-stat .text-xl { font-size: 1.1rem; }
+          .zaidly-card-stat .value.price { font-size: 1.3rem; }
         }
       ` }} />
       <PortableText value={value} components={components} />

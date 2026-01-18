@@ -44,29 +44,31 @@ if (isExternal) {
         isExternal: true 
     };
     visualData = typeof post.visual_content === 'string' ? JSON.parse(post.visual_content) : post.visual_content;
+    
+    // --- FIX FINAL: LOGIKA HEADINGS (CAMPURAN RICH TEXT & MARKDOWN) ---
     headings = (visualData || []).flatMap((block: any) => {
         const rawText = block.children?.map((c: any) => c.text).join('') || '';
         
-        // 1. Cek jika heading Sanity asli (h2/h3)
-        if (block._type === 'block' && (block.style === 'h2' || block.style === 'h3')) {
-            const depth = parseInt(block.style.replace('h', ''));
-            return [{ 
-                depth, 
-                text: rawText, 
-                slug: rawText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim() 
-            }];
-        }
+        // Fungsi standarisasi slug agar sinkron dengan renderer
+        const getSlug = (str: string) => str.toLowerCase()
+            .replace(/[^\w\s-]/g, '')
+            .trim()
+            .replace(/\s+/g, '-')
+            .replace(/-+/g, '-');
+
+        // 1. Cek jika Heading asli Sanity (h1-h6)
+        const isSanityHeading = /^h[1-6]$/.test(block.style || '');
         
-        // 2. Cek jika heading ditulis manual pakai Markdown (## atau ###) di dalam blok normal
-        const match = rawText.match(/^(#{2,3})\s+(.*)/m);
-        if (match) {
-            const depth = match[1].length; // ## jadi 2, ### jadi 3
-            const text = match[2].trim();
-            return [{ 
-                depth, 
-                text: text, 
-                slug: text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim() 
-            }];
+        // 2. Cek jika manual Markdown (# ## ###)
+        const markdownMatch = rawText.match(/^(#{1,6})\s+(.*)/m);
+
+        if (isSanityHeading) {
+            const depth = parseInt(block.style.replace('h', ''));
+            return [{ depth, text: rawText, slug: getSlug(rawText) }];
+        } else if (markdownMatch) {
+            const depth = markdownMatch[1].length;
+            const text = markdownMatch[2].trim();
+            return [{ depth, text, slug: getSlug(text) }];
         }
         
         return [];
@@ -82,7 +84,6 @@ if (isExternal) {
 <ArticleLayout frontmatter={finalFrontmatter} headings={headings}>
     <div class="prose max-w-none zaidly-content">
         {isExternal ? (
-            /* DI SINI PERBAIKANNYA: client:load DIHAPUS */
             <PortableVisualBlocks value={visualData} />
         ) : (
             <div class="local-article-fix">

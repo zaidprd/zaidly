@@ -12,7 +12,7 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
 {filteredHeadings.length > 0 && (
   <nav id="toc-container-inner" aria-label="Table of contents" class="toc-container my-10 border-y border-coffee-brown/10 py-6 bg-white/40 backdrop-blur-md rounded-xl px-5 shadow-sm overflow-hidden">
     <div class="flex items-center justify-between">
-      <h2 class="toc-title font-sans font-black uppercase tracking-[0.1em] text-accent-primary">
+      <h2 class="toc-title font-sans font-black uppercase tracking-[0.15em] text-accent-primary">
         In This Guide
       </h2>
       
@@ -34,6 +34,7 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
         ]}>
           <a 
             href={`#${h.slug}`} 
+            data-target={h.slug}
             class="toc-link font-sans font-bold uppercase tracking-tight text-coffee-dark hover:text-accent-primary transition-all flex items-start gap-3 no-underline"
           >
             <span class="text-[9px] text-accent-primary/60 font-black mt-1">
@@ -53,8 +54,7 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
     const list = document.getElementById('toc-list-items');
     
     if (btn && list) {
-      btn.onclick = null;
-      
+      // Toggle Show/Hide
       btn.onclick = (e) => {
         e.preventDefault();
         const isHidden = list.classList.toggle('hidden');
@@ -68,9 +68,31 @@ const filteredHeadings = headings.filter(h => h.depth > 1 && h.depth < 4);
           }, 10);
         }
       };
+
+      // --- LOGIKA ANTI URL BERUBAH ---
+      const links = document.querySelectorAll('.toc-link');
+      links.forEach(link => {
+        link.onclick = (e) => {
+          e.preventDefault(); // Stop link standar agar URL gak berubah
+          const targetId = link.getAttribute('data-target');
+          const targetEl = document.getElementById(targetId);
+
+          if (targetEl) {
+            // Scroll mulus ke target
+            window.scrollTo({
+              top: targetEl.offsetTop - 100, // Jarak aman dari header
+              behavior: 'smooth'
+            });
+
+            // Update URL di browser secara "silent" (tanpa loncat/nambah history)
+            // history.replaceState(null, null, ' '); // Aktifkan ini jika mau URL beneran bersih total
+          }
+        };
+      });
     }
   }
 
+  // Jalankan
   setupTOC();
   document.addEventListener('astro:page-load', setupTOC);
 </script>
