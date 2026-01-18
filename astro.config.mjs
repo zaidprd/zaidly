@@ -12,6 +12,8 @@ export default defineConfig({
   output: 'server', 
 
   adapter: cloudflare({
+    // AKTIFKAN INI: Agar library Google (Node.js) bisa jalan di Cloudflare
+    node_compat: true,
     platformProxy: {
       enabled: true,
     },
@@ -26,12 +28,20 @@ export default defineConfig({
 
   integrations: [
     tailwind({
-      // Ini memastikan config di tailwind.config.mjs (termasuk plugin typography) 
-      // terbaca dengan sempurna oleh Astro
       applyBaseStyles: true,
     }),
     sitemap(),
     mdx(),
     react(),
   ],
+
+  // TAMBAHKAN INI: Agar Vite tidak bingung saat memproses library googleapis
+  vite: {
+    ssr: {
+      external: ['node:events', 'node:fs', 'node:util', 'node:stream', 'node:path', 'node:url'],
+    },
+    optimizeDeps: {
+      exclude: ['googleapis']
+    }
+  },
 });
