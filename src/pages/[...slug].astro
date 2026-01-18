@@ -25,6 +25,13 @@ export async function getStaticPaths() {
 const { post, isExternal } = Astro.props;
 if (!post) return new Response(null, { status: 404 });
 
+// Fungsi standarisasi slug (Wajib sama di semua file)
+const getSlug = (str: string) => str.toLowerCase()
+    .replace(/[^\w\s-]/g, '')
+    .trim()
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-');
+
 let finalFrontmatter: any;
 let DynamicContent: any = null;
 let visualData: any = null;
@@ -45,21 +52,9 @@ if (isExternal) {
     };
     visualData = typeof post.visual_content === 'string' ? JSON.parse(post.visual_content) : post.visual_content;
     
-    // --- FIX FINAL: LOGIKA HEADINGS (CAMPURAN RICH TEXT & MARKDOWN) ---
     headings = (visualData || []).flatMap((block: any) => {
         const rawText = block.children?.map((c: any) => c.text).join('') || '';
-        
-        // Fungsi standarisasi slug agar sinkron dengan renderer
-        const getSlug = (str: string) => str.toLowerCase()
-            .replace(/[^\w\s-]/g, '')
-            .trim()
-            .replace(/\s+/g, '-')
-            .replace(/-+/g, '-');
-
-        // 1. Cek jika Heading asli Sanity (h1-h6)
         const isSanityHeading = /^h[1-6]$/.test(block.style || '');
-        
-        // 2. Cek jika manual Markdown (# ## ###)
         const markdownMatch = rawText.match(/^(#{1,6})\s+(.*)/m);
 
         if (isSanityHeading) {
@@ -70,14 +65,18 @@ if (isExternal) {
             const text = markdownMatch[2].trim();
             return [{ depth, text, slug: getSlug(text) }];
         }
-        
         return [];
     });
 } else {
     finalFrontmatter = { ...post.data, isExternal: false };
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
-    headings = rendered.headings;
+    
+    // --- DI SINI PERBAIKANNYA: SINKRONKAN HEADINGS LOKAL ---
+    headings = rendered.headings.map((h: any) => ({
+        ...h,
+        slug: getSlug(h.text)
+    }));
 }
 ---
 
