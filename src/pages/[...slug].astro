@@ -45,10 +45,30 @@ if (isExternal) {
     };
     visualData = typeof post.visual_content === 'string' ? JSON.parse(post.visual_content) : post.visual_content;
     headings = (visualData || []).flatMap((block: any) => {
-        const text = block.children?.map((c: any) => c.text).join('') || '';
+        const rawText = block.children?.map((c: any) => c.text).join('') || '';
+        
+        // 1. Cek jika heading Sanity asli (h2/h3)
         if (block._type === 'block' && (block.style === 'h2' || block.style === 'h3')) {
-            return [{ depth: parseInt(block.style.replace('h', '')), text, slug: text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-') }];
+            const depth = parseInt(block.style.replace('h', ''));
+            return [{ 
+                depth, 
+                text: rawText, 
+                slug: rawText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim() 
+            }];
         }
+        
+        // 2. Cek jika heading ditulis manual pakai Markdown (## atau ###) di dalam blok normal
+        const match = rawText.match(/^(#{2,3})\s+(.*)/m);
+        if (match) {
+            const depth = match[1].length; // ## jadi 2, ### jadi 3
+            const text = match[2].trim();
+            return [{ 
+                depth, 
+                text: text, 
+                slug: text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim() 
+            }];
+        }
+        
         return [];
     });
 } else {

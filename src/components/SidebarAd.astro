@@ -5,59 +5,64 @@ import adBeansImg from '../assets/images/image.webp';
 
 const ads = [
   {
-    label: "Top Choice",
-    title: "Brew Conical Burr Coffee Grinder",
+    label: "Top Pick",
+    title: "The Best Grinder",
+    productName: "Brew Conical Burr",
+    description: "Consistently good grind for perfect daily brewing.",
     img: adGrinderImg,
     link: "https://amzn.to/3YEvz65",
-    btnText: "Check Price"
+    btnText: "Check on Amazon"
   },
   {
-    label: "Top Choice",
-    title: "Lavazza Super Crema Whole Bean Coffee",
+    label: "Our Choice",
+    title: "Premium Beans",
+    productName: "Lavazza Super Crema",
+    description: "Rich, velvety, and perfect for your morning espresso.",
     img: adBeansImg,
     link: "https://amzn.to/44Z5ClA",
-    btnText: "Check Price"
+    btnText: "Check on Amazon"
   }
 ];
 ---
 
-<div class="flex flex-col gap-6 w-full">
+<div class="flex flex-col gap-10 w-full">
   {ads.map((ad) => (
-    <div class="bg-white border border-coffee-brown/15 text-center rounded-xl shadow-sm transition-all hover:shadow-md overflow-hidden flex flex-col w-full">
-      <h3 class="font-black text-[10px] md:text-[11px] text-accent-primary pt-4 pb-2 uppercase tracking-[0.2em]">
-        {ad.label}
-      </h3>
+    <div class="relative bg-white border-2 border-coffee-brown/20 p-5 pt-8 flex flex-col items-center transition-all hover:border-coffee-brown/40">
       
-      <a href={ad.link} target="_blank" aria-label={`View ${ad.title} on Amazon`} class="group block px-3 pb-4"> 
-        <div class="w-full aspect-square bg-[#F9F9F7] overflow-hidden rounded-lg mb-4">
-          {typeof ad.img === 'string' ? (
-            <img 
-              src={ad.img} 
-              alt={`Photo of ${ad.title}`} 
-              class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
-            />
-          ) : (
-            <Image 
-              src={ad.img} 
-              alt={`Photo of ${ad.title}`} 
-              width={300} 
-              height={300} 
-              class="w-full h-full object-contain p-2 transition-transform duration-500 group-hover:scale-105" 
-            />
-          )}
-        </div>
+      <div class="absolute -top-1 -left-1 bg-coffee-dark text-white px-3 py-1 font-black text-[10px] uppercase tracking-widest shadow-sm">
+        {ad.label}
+        <div class="absolute top-full left-0 w-0 h-0 border-t-[4px] border-t-black border-l-[4px] border-l-transparent"></div>
+      </div>
 
-        <div class="px-2">
-          <h4 class="text-[12px] font-bold uppercase leading-tight font-serif text-coffee-dark mb-4 line-clamp-2 min-h-[32px]">
-            {ad.title}
-          </h4>
-          <div class="pt-3 border-t border-coffee-brown/5">
-             <span class="bg-accent-primary text-white text-[9px] font-black px-4 py-2 rounded-full uppercase tracking-wider group-hover:bg-coffee-dark transition-colors inline-block w-full">
-               {ad.btnText}
-             </span>
-          </div>
-        </div>
-      </a>
+      <div class="w-full aspect-square bg-[#FDFCF0]/50 rounded-lg mb-4 p-4">
+        <Image 
+          src={ad.img} 
+          alt={ad.productName} 
+          class="w-full h-full object-contain"
+        />
+      </div>
+
+      <div class="w-full text-left">
+        <h3 class="text-[11px] font-black text-gray-400 uppercase tracking-tighter mb-1">
+          {ad.title}
+        </h3>
+        
+        <h4 class="text-lg font-serif font-bold text-coffee-dark leading-tight mb-2">
+          {ad.productName}
+        </h4>
+
+        <p class="text-gray-600 text-xs leading-relaxed mb-5 line-clamp-3">
+          {ad.description}
+        </p>
+
+        <a 
+          href={ad.link} 
+          target="_blank" 
+          class="block w-full bg-[#1a1a1a] text-white text-center py-3 rounded-md font-bold text-xs uppercase tracking-widest hover:bg-coffee-dark transition-all active:scale-95"
+        >
+          {ad.btnText}
+        </a>
+      </div>
     </div>
   ))}
 </div>

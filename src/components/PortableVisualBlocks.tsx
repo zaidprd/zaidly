@@ -29,16 +29,11 @@ const components = {
   },
   types: {
     image: ({ value }: any) => {
-      const imageUrl = value.url || (value._key ? `https://r2.zaidly.com/blog/body-${value._key}.webp` : null);
+      const imageUrl = value.asset?.url || value.url || (value._key ? `https://r2.zaidly.com/blog/body-${value._key}.webp` : null);
       if (!imageUrl) return null;
       return (
         <div className="zaidly-body-image-container">
-          <img 
-            src={imageUrl} 
-            alt={value.alt || 'Zaidly Coffee Review'} 
-            className="zaidly-main-img"
-            loading="lazy"
-          />
+          <img src={imageUrl} alt={value.alt || 'Zaidly Coffee Review'} className="zaidly-main-img" loading="lazy" />
           {value.alt && <p className="zaidly-alt-caption">{value.alt}</p>}
         </div>
       );
@@ -50,34 +45,40 @@ const components = {
       const rawRating = value.itemRating || 0;
       const stars = [1, 2, 3, 4, 5];
 
-      // --- DATA SCHEMA UNTUK GOOGLE (BINTANG) ---
+      // FIX SCHEMA: Memastikan gambar dan deskripsi masuk ke Google
+      const productImage = value.asset?.url || value.imageUrl || (value._key ? `https://r2.zaidly.com/blog/body-${value._key}.webp` : "https://zaidly.com/images/default-product.webp");
+      const productDesc = value.description || `Expert gear review of ${value.productName} by Zaidly Gear Lab.`;
+
       const schemaData = {
         "@context": "https://schema.org/",
         "@type": "Product",
         "name": value.productName,
+        "image": [productImage],
+        "description": productDesc,
+        "brand": { "@type": "Brand", "name": "Zaidly" },
         "review": {
           "@type": "Review",
-          "reviewRating": {
-            "@type": "Rating",
-            "ratingValue": rawRating,
-            "bestRating": "5"
-          },
-          "author": { "@type": "Person", "name": "Zaidly Gear Lab" }
+          "reviewRating": { "@type": "Rating", "ratingValue": rawRating, "bestRating": "5" },
+          "author": { "@type": "Organization", "name": "Zaidly Gear Lab" }
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": rawRating,
+          "reviewCount": "1"
         },
         "offers": {
           "@type": "Offer",
-          "price": value.itemPrice?.replace(/[^0-9.]/g, '') || "0",
+          "url": value.amazonUrl || value.aliExpressUrl || "https://zaidly.com",
+          "price": value.itemPrice ? value.itemPrice.replace(/[^0-9.]/g, '') : "1.00",
           "priceCurrency": "USD",
-          "availability": "https://schema.org/InStock"
+          "availability": "https://schema.org/InStock",
+          "itemCondition": "https://schema.org/NewCondition"
         }
       };
 
       return (
         <div className="zaidly-card">
-          <script 
-            type="application/ld+json" 
-            dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} 
-          />
+          <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
           <h3 className="zaidly-card-title">{value.productName}</h3>
           <div className="zaidly-card-body">
             <div className="zaidly-card-stat">
@@ -101,6 +102,7 @@ const components = {
             <div className="zaidly-card-actions">
               {hasAmazon && (
                 <div className="zaidly-btn-container-kit">
+                  {/* LOGO SENYUM AMAZON KEMBALI */}
                   <div className="amz-logo-box"><span className="amz-text">amazon</span><div className="amz-arrow"></div></div>
                   <div className="seo-glow-blur amz-blur"></div>
                   <a href={value.amazonUrl} target="_blank" rel="nofollow" className="zaidly-btn-kit amz">CHECK PRICE</a>
@@ -108,6 +110,7 @@ const components = {
               )}
               {hasAli && (
                 <div className="zaidly-btn-container-kit">
+                  {/* LOGO MERAH ALI KEMBALI */}
                   <div className="ali-logo-box"><span>Ali</span>Express</div>
                   <div className="seo-glow-blur ali-blur"></div>
                   <a href={value.aliExpressUrl} target="_blank" rel="nofollow" className="zaidly-btn-kit ali">CHECK PRICE</a>
@@ -123,7 +126,12 @@ const components = {
       return (
         <div className="zaidly-btn-standalone-inline">
           <div className="zaidly-btn-container-kit">
-            {isAli ? <div className="ali-logo-box"><span>Ali</span>Express</div> : <div className="amz-logo-box"><span className="amz-text">amazon</span><div className="amz-arrow"></div></div>}
+            {/* LOGO DI STANDALONE BUTTON JUGA KEMBALI */}
+            {isAli ? (
+              <div className="ali-logo-box"><span>Ali</span>Express</div>
+            ) : (
+              <div className="amz-logo-box"><span className="amz-text">amazon</span><div className="amz-arrow"></div></div>
+            )}
             <div className={`seo-glow-blur ${isAli ? 'ali-blur' : 'amz-blur'}`}></div>
             <a href={value.url} target="_blank" rel="nofollow" className={`zaidly-btn-kit ${isAli ? 'ali' : 'amz'}`}>{(value.label || 'CHECK PRICE').toUpperCase()}</a>
           </div>
@@ -142,60 +150,13 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
     <div className={`portable-text-wrapper ${isClient ? 'is-hydrated' : ''}`}>
       <style dangerouslySetInnerHTML={{ __html: `
         .portable-text-wrapper { width: 100%; color: #000; }
-        
-        .zaidly-body-image-container {
-          width: 100%;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-start;
-          margin-top: 40px;
-          margin-bottom: 30px;
-        }
-        .zaidly-main-img {
-          width: 100%;
-          height: auto;
-          border-radius: 12px;
-          box-shadow: 0 4px 12px rgba(0,0,0,0.05);
-          display: block;
-          margin-bottom: 10px !important;
-        }
-        .zaidly-alt-caption {
-          text-align: left;
-          font-size: 13px;
-          color: #6b7280;
-          margin-top: 3px !important;
-          margin-bottom: 0px !important;
-          font-style: italic;
-          font-family: sans-serif;
-          padding-left: 4px;
-          opacity: 1;
-          font-weight: 500;
-          line-height: 1.4;
-        }
-
-        .zaidly-blockquote { 
-          border-left: 5px solid #be9b7b; background: #ffffff; padding: 2rem; 
-          margin: 3rem 0; font-style: italic; font-family: serif; color: #4a3728;
-          border-radius: 0 16px 16px 0; box-shadow: 0 10px 30px rgba(190, 155, 123, 0.12);
-          position: relative;
-        }
-        .zaidly-blockquote::before {
-          content: '“'; position: absolute; top: -15px; left: 15px; font-size: 90px;
-          color: rgba(190, 155, 123, 0.1); font-family: serif; line-height: 1; z-index: 0;
-        }
-
-        .zaidly-markdown-area table { 
-          width: 100%; border-collapse: collapse; margin: 2.5rem 0; font-family: inherit; font-size: 14px; 
-          background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
-          border: 1px solid rgba(74, 55, 40, 0.08);
-        }
-        .zaidly-markdown-area th { 
-          background-color: #3C2F2F; color: #FDFCF0; font-weight: 800; text-transform: uppercase; 
-          letter-spacing: 0.05em; padding: 16px; text-align: left; font-size: 11px;
-        }
+        .zaidly-body-image-container { width: 100%; display: flex; flex-direction: column; align-items: flex-start; margin-top: 40px; margin-bottom: 30px; }
+        .zaidly-main-img { width: 100%; height: auto; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); display: block; margin-bottom: 10px !important; }
+        .zaidly-alt-caption { text-align: left; font-size: 13px; color: #6b7280; font-style: italic; font-family: sans-serif; padding-left: 4px; font-weight: 500; line-height: 1.4; }
+        .zaidly-blockquote { border-left: 5px solid #be9b7b; background: #ffffff; padding: 2rem; margin: 3rem 0; font-style: italic; font-family: serif; color: #4a3728; border-radius: 0 16px 16px 0; box-shadow: 0 10px 30px rgba(190, 155, 123, 0.12); position: relative; }
+        .zaidly-markdown-area table { width: 100%; border-collapse: collapse; margin: 2.5rem 0; font-family: inherit; font-size: 14px; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); border: 1px solid rgba(74, 55, 40, 0.08); }
+        .zaidly-markdown-area th { background-color: #3C2F2F; color: #FDFCF0; font-weight: 800; text-transform: uppercase; padding: 16px; text-align: left; font-size: 11px; }
         .zaidly-markdown-area td { padding: 14px 16px; border-bottom: 1px solid rgba(74, 55, 40, 0.06); color: #4a3728; }
-        .zaidly-markdown-area tr:nth-child(even) { background-color: #FDFCF0; }
-
         .zaidly-card { margin: 3rem 0; padding: 2rem; border: 1.5px solid rgba(74,55,40,0.1); border-radius: 16px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
         .zaidly-card-title { font-family: serif; font-style: italic; font-weight: 900; font-size: 1.85rem; margin-bottom: 1.5rem; color: #4a3728; }
         .zaidly-card-body { display: flex; align-items: center; gap: 2.5rem; border-top: 1px solid #f5f5f5; padding-top: 1.5rem; }
@@ -207,6 +168,7 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         .zaidly-btn-kit { padding: 10px 18px; border-radius: 6px; font-weight: 900; font-size: 11px; text-decoration: none; text-align: center; min-width: 115px; position: relative; z-index: 2; transition: transform 0.2s; }
         .amz { background: #ff9900; color: #000; }
         .ali { background: #e62e04; color: #fff; }
+        /* STYLE LOGO SENYUM & ALI LENGKAP */
         .amz-logo-box { height: 35px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative; margin-bottom: 4px; }
         .amz-text { font-family: sans-serif; font-weight: 900; font-size: 18px; color: #000; line-height: 1; }
         .amz-arrow { width: 45px; height: 10px; border-bottom: 3px solid #ff9900; border-radius: 0 0 50% 50%; margin-top: -4px; position: relative; }
@@ -216,14 +178,66 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         .seo-glow-blur { position: absolute; bottom: 0; left: 10%; width: 80%; height: 50%; filter: blur(12px); opacity: 0.4; z-index: -1; }
         .amz-blur { background: #ff9900; }
         .ali-blur { background: #e62e04; }
-        .zaidly-btn-standalone-inline { display: inline-flex !important; vertical-align: top; margin-right: 20px; margin-bottom: 30px; margin-top: 1rem; }
+        .zaidly-btn-standalone-inline { display: inline-flex !important; vertical-align: top; margin-right: 20px; margin-bottom: 1rem; margin-top: 1rem; }
         @media (max-width: 768px) {
-          .zaidly-card-body { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
-          .divider { display: none; }
-          .zaidly-card-actions { margin-left: 0; width: 100%; display: flex !important; flex-direction: row !important; justify-content: flex-start; gap: 12px; }
-          .zaidly-btn-standalone-inline { display: inline-flex !important; margin-right: 12px; width: auto; }
-          .zaidly-btn-kit { min-width: 105px; padding: 10px 14px; }
-          .zaidly-markdown-area table { display: block; overflow-x: auto; white-space: nowrap; }
+          /* 1. Card jadi lebih rapat dan modern */
+          .zaidly-card {
+            padding: 1.25rem;
+            margin: 1.5rem 0;
+            border-radius: 20px;
+          }
+          
+          .zaidly-card-title {
+            font-size: 1.4rem;
+            margin-bottom: 1rem;
+          }
+
+          /* 2. Rating & Price jadi sejajar (Kiri-Kanan) */
+          .zaidly-card-body {
+            flex-direction: row; /* Berjejer kesamping */
+            flex-wrap: wrap;    /* Bungkus kalau gak muat */
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+            padding-top: 1rem;
+          }
+
+          .zaidly-card-stat {
+            flex: 1; /* Biar bagi tempat rata */
+            min-width: 120px;
+          }
+
+          .divider {
+            display: none; /* Hilangkan garis tegak biar gak sempit */
+          }
+
+          /* 3. Tombol Aksi di Mobile */
+          .zaidly-card-actions {
+            width: 100%;
+            margin-left: 0;
+            justify-content: space-between;
+            gap: 10px;
+            margin-top: 0.5rem;
+          }
+
+          .zaidly-btn-container-kit {
+            flex: 1; /* Tombol melebar rata kiri-kanan */
+          }
+
+          .zaidly-btn-kit {
+            width: 100%;
+            min-width: unset;
+            padding: 12px 5px;
+          }
+
+          /* 4. Skala Rating Bintang Lebih Pas */
+          .zaidly-card-stat .text-xl {
+            font-size: 1.1rem;
+          }
+          
+          .zaidly-card-stat .value.price {
+            font-size: 1.3rem;
+          }
         }
       ` }} />
       <PortableText value={value} components={components} />
