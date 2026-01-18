@@ -62,7 +62,8 @@ if (isExternal) {
 <ArticleLayout frontmatter={finalFrontmatter} headings={headings}>
     <div class="prose max-w-none zaidly-content">
         {isExternal ? (
-            <PortableVisualBlocks value={visualData} client:load />
+            /* DI SINI PERBAIKANNYA: client:load DIHAPUS */
+            <PortableVisualBlocks value={visualData} />
         ) : (
             <div class="local-article-fix">
                 {DynamicContent && <DynamicContent />}
