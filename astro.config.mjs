@@ -1,5 +1,5 @@
 import { defineConfig } from 'astro/config';
-import tailwind from "@astrojs/tailwind";
+import tailwind from '@astrojs/tailwind';
 import sitemap from '@astrojs/sitemap';
 import mdx from '@astrojs/mdx';
 import react from '@astrojs/react';
@@ -7,41 +7,55 @@ import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   site: 'https://zaidly.com',
-  
-  // Tetap 'server' agar Webhook Sanity -> Turso abang bisa diproses secara dinamis
-  output: 'server', 
+  output: 'server',
 
   adapter: cloudflare({
-    // AKTIFKAN INI: Agar library Google (Node.js) bisa jalan di Cloudflare
-    node_compat: true,
+    // 1. INI KUNCI UTAMA: Wajib pakai nodeCompat: true (bukan node_compat) 
+    // untuk versi adapter cloudflare terbaru agar fungsi Google jalan.
+    nodeCompat: true, 
     platformProxy: {
       enabled: true,
     },
   }),
 
   image: {
-    // Pakai noop karena abang pakai R2/Cloudflare untuk handle gambar eksternal
     service: {
-      entrypoint: 'astro/assets/services/noop'
-    }
+      entrypoint: 'astro/assets/services/noop',
+    },
   },
 
   integrations: [
-    tailwind({
-      applyBaseStyles: true,
-    }),
+    tailwind({ applyBaseStyles: true }),
     sitemap(),
     mdx(),
     react(),
   ],
 
-  // TAMBAHKAN INI: Agar Vite tidak bingung saat memproses library googleapis
   vite: {
     ssr: {
-      external: ['node:events', 'node:fs', 'node:util', 'node:stream', 'node:path', 'node:url'],
+      // 2. Tambahkan modul node internal di sini agar Vite tidak bingung
+      external: [
+        'googleapis',
+        'google-auth-library',
+        'gaxios',
+        'node-fetch',
+        'node:events',
+        'node:fs',
+        'node:util',
+        'node:stream',
+        'node:path',
+        'node:url'
+      ],
     },
-    optimizeDeps: {
-      exclude: ['googleapis']
+    // 3. Ini membantu Cloudflare saat proses bundling
+    resolve: {
+      alias: {
+        'node:events': 'events',
+        'node:fs': 'fs',
+        'node:util': 'util',
+        'node:stream': 'stream',
+        'node:path': 'path',
+      }
     }
   },
 });
