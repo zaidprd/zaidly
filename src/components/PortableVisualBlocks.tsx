@@ -49,9 +49,8 @@ const components = {
       const hasAli = !!value.aliExpressUrl;
       const rawRating = value.itemRating || 0;
       const stars = [1, 2, 3, 4, 5];
-<<<<<<< HEAD
 
-      // --- INI DATA RAHASIA UNTUK GOOGLE (SCHEMA.ORG) ---
+      // --- DATA SCHEMA UNTUK GOOGLE (BINTANG) ---
       const schemaData = {
         "@context": "https://schema.org/",
         "@type": "Product",
@@ -73,16 +72,12 @@ const components = {
         }
       };
 
-=======
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
       return (
         <div className="zaidly-card">
-          {/* SCRIPT INI YANG DIBACA GOOGLE UNTUK MEMUNCULKAN BINTANG */}
           <script 
             type="application/ld+json" 
             dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} 
           />
-          
           <h3 className="zaidly-card-title">{value.productName}</h3>
           <div className="zaidly-card-body">
             <div className="zaidly-card-stat">
@@ -148,25 +143,13 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
       <style dangerouslySetInnerHTML={{ __html: `
         .portable-text-wrapper { width: 100%; color: #000; }
         
-<<<<<<< HEAD
-=======
-        /* =========================================
-           SETTING JARAK GAMBAR (ATUR DI SINI)
-           ========================================= */
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
         .zaidly-body-image-container {
           width: 100%;
           display: flex;
           flex-direction: column;
-<<<<<<< HEAD
           align-items: flex-start;
           margin-top: 40px;
           margin-bottom: 30px;
-=======
-          align-items: flex-start; /* Rata Kiri */
-          margin-top: 40px;        /* Jarak Gambar ke teks atas */
-          margin-bottom: 30px;     /* Jarak seluruh blok ke teks bawah */
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
         }
         .zaidly-main-img {
           width: 100%;
@@ -174,39 +157,22 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
           border-radius: 12px;
           box-shadow: 0 4px 12px rgba(0,0,0,0.05);
           display: block;
-<<<<<<< HEAD
           margin-bottom: 10px !important;
-=======
-        margin-bottom: 10px !important;
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
         }
         .zaidly-alt-caption {
           text-align: left;
           font-size: 13px;
-<<<<<<< HEAD
           color: #6b7280;
           margin-top: 3px !important;
-=======
-          color: #6b7280;           /* Warna cerah */
-          margin-top: 3px !important; /* JARAK TEKS KE GAMBAR (Ubah ini) */
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
           margin-bottom: 0px !important;
           font-style: italic;
           font-family: sans-serif;
           padding-left: 4px;
           opacity: 1;
-<<<<<<< HEAD
           font-weight: 500;
           line-height: 1.4;
         }
 
-=======
-        font-weight: 500;
-          line-height: 1.4;
-        }
-
-        /* --- STYLE QUOTE CERAH PREMIUM --- */
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
         .zaidly-blockquote { 
           border-left: 5px solid #be9b7b; background: #ffffff; padding: 2rem; 
           margin: 3rem 0; font-style: italic; font-family: serif; color: #4a3728;
@@ -218,10 +184,6 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
           color: rgba(190, 155, 123, 0.1); font-family: serif; line-height: 1; z-index: 0;
         }
 
-<<<<<<< HEAD
-=======
-        /* --- STYLE TABEL EDITORIAL --- */
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
         .zaidly-markdown-area table { 
           width: 100%; border-collapse: collapse; margin: 2.5rem 0; font-family: inherit; font-size: 14px; 
           background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,0.04); 
@@ -234,10 +196,6 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
         .zaidly-markdown-area td { padding: 14px 16px; border-bottom: 1px solid rgba(74, 55, 40, 0.06); color: #4a3728; }
         .zaidly-markdown-area tr:nth-child(even) { background-color: #FDFCF0; }
 
-<<<<<<< HEAD
-=======
-        /* --- FITUR LAMA CARD & BUTTON --- */
->>>>>>> a330c95e62a6bc09a4c466e3fb15be4cfaf2778f
         .zaidly-card { margin: 3rem 0; padding: 2rem; border: 1.5px solid rgba(74,55,40,0.1); border-radius: 16px; background: #fff; box-shadow: 0 4px 20px rgba(0,0,0,0.03); }
         .zaidly-card-title { font-family: serif; font-style: italic; font-weight: 900; font-size: 1.85rem; margin-bottom: 1.5rem; color: #4a3728; }
         .zaidly-card-body { display: flex; align-items: center; gap: 2.5rem; border-top: 1px solid #f5f5f5; padding-top: 1.5rem; }
