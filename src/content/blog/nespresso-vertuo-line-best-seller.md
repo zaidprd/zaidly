@@ -32,31 +32,12 @@ The 30-count Best Seller Assortment includes three distinct, full-size coffee bl
 
 The true value of this pack lies in the variety, allowing you to match your coffee to your mood. Here is a detailed comparison of the three best-selling flavors:
 
-{% table %}
-- Blend Name
-- Roast Level
-- Intensity
-- Primary Flavor Notes
-- Best For
----
-- **Stormio**
-- Dark Roast
-- 8
-- Spicy, Woody, Cereal
-- Strong morning coffee
----
-- **Odacio**
-- Medium-Dark
-- 7
-- Bold, Fruity, Full-Bodied
-- All-day drinking, balanced
----
-- **Melozio**
-- Medium Roast
-- 6
-- Smooth, Honey, Sweet Cereal
-- Lattes, sweeter drinks
-{% /table %}
+| Blend Name | Roast Level | Intensity | Primary Flavor Notes | Best For |
+|-----------|------------|-----------|----------------------|----------|
+| **Stormio** | Dark Roast | 8 | Spicy, Woody, Cereal | Strong morning coffee |
+| **Odacio** | Medium-Dark | 7 | Bold, Fruity, Full-Bodied | All-day drinking, balanced |
+| **Melozio** | Medium Roast | 6 | Smooth, Honey, Sweet Cereal | Lattes, sweeter drinks |
+
 
 ### 1. Stormio: The Powerhouse Blend
 
@@ -74,22 +55,13 @@ Melozio is arguably the most popular and the smoothest of the trio. Its medium r
 
 When considering the **Nespresso Vertuo pods price US**, the cost-per-cup is higher than standard ground coffee. However, the convenience and quality often justify the premium.
 
-{% table %}
-- Pros (Advantages)
-- Cons (Disadvantages)
----
-- **Exceptional Crema:** The Centrifusion system delivers a signature thick, rich crema.
-- **Higher Cost Per Pod:** More expensive than most third-party OriginalLine pods or ground coffee.
----
-- **Convenience:** Perfect, consistent brew with a single button press.
-- **Proprietary System:** Only Nespresso-brand pods work with Vertuo machines.
----
-- **Variety:** Allows sampling of three top-selling flavors to find your favorite.
-- **Limited Third-Party Options:** No generic or budget-friendly third-party pods available.
----
-- **Sustainability:** Nespresso offers a free, easy-to-use recycling program for all aluminum pods.
-- **Machine Exclusivity:** Pods are not compatible with OriginalLine machines.
-{% /table %}
+| Pros (Advantages) | Cons (Disadvantages) |
+|------------------|---------------------|
+| **Exceptional Crema** – Thick, rich crema from Centrifusion | **Higher Cost Per Pod** |
+| **Convenience** – One-button brewing | **Proprietary System** |
+| **Variety** – Three best-selling flavors | **Limited Third-Party Options** |
+| **Sustainability** – Free recycling program | **Machine Exclusivity** |
+
 
 ## FAQ: Your Questions About Nespresso Vertuo Pods Answered
 
