@@ -12,7 +12,6 @@ renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
 
 const components = {
   block: {
-    // FIX: Sinkronisasi ID untuk Heading asli Sanity
     h2: ({ children, value }: any) => {
       const text = value.children.map((c: any) => c.text).join('');
       const id = text.toLowerCase().replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '-').replace(/-+/g, '-');
@@ -80,7 +79,8 @@ const components = {
           "price": value.itemPrice ? value.itemPrice.replace(/[^0-9.]/g, '') : "1.00",
           "priceCurrency": "USD",
           "availability": "https://schema.org/InStock",
-          "itemCondition": "https://schema.org/NewCondition"
+          "itemCondition": "https://schema.org/NewCondition",
+          "priceValidUntil": `${new Date().getFullYear() + 1}-12-31`
         }
       };
 
