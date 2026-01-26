@@ -52,27 +52,38 @@ if (isExternal) {
     };
     visualData = typeof post.visual_content === 'string' ? JSON.parse(post.visual_content) : post.visual_content;
     
+    // --- PENYEMPURNAAN DETEKSI HEADINGS (MARKDOWN & SANITY) ---
     headings = (visualData || []).flatMap((block: any) => {
         const rawText = block.children?.map((c: any) => c.text).join('') || '';
         const isSanityHeading = /^h[1-6]$/.test(block.style || '');
-        const markdownMatch = rawText.match(/^(#{1,6})\s+(.*)/m);
-
+        
+        // 1. Tangkap heading resmi dari dropdown Sanity (H2, H3, dst)
         if (isSanityHeading) {
             const depth = parseInt(block.style.replace('h', ''));
             return [{ depth, text: rawText, slug: getSlug(rawText) }];
-        } else if (markdownMatch) {
-            const depth = markdownMatch[1].length;
-            const text = markdownMatch[2].trim();
-            return [{ depth, text, slug: getSlug(text) }];
-        }
-        return [];
+        } 
+        
+        // 2. Scan blok Normal untuk mencari simbol ## dan ### secara baris-demi-baris
+        const lines = rawText.split('\n');
+        const extracted: any[] = [];
+        
+        lines.forEach(line => {
+            const match = line.match(/^(#{2,3})\s+(.*)/);
+            if (match) {
+                const depth = match[1].length;
+                const text = match[2].replace(/\*\*/g, '').trim(); // Bersihkan bold stars
+                extracted.push({ depth, text, slug: getSlug(text) });
+            }
+        });
+
+        return extracted;
     });
 } else {
     finalFrontmatter = { ...post.data, isExternal: false };
     const rendered = await render(post);
     DynamicContent = rendered.Content; 
     
-    // --- DI SINI PERBAIKANNYA: SINKRONKAN HEADINGS LOKAL ---
+    // Sinkronkan Headings Lokal
     headings = rendered.headings.map((h: any) => ({
         ...h,
         slug: getSlug(h.text)
