@@ -5,35 +5,36 @@ import { useState, useEffect } from 'react';
 
 const renderer = new marked.Renderer();
 
-// 1. LINK ORANYE #d97706
+// Link Oranye Zaidly
 renderer.link = ({ href, title, text }: any) => {
   return `<a href="${href}" title="${title || ''}" rel="nofollow sponsored noopener" target="_blank" class="zaidly-link">${text}</a>`;
 };
 
-// 2. TABEL MARKDOWN (Renderer Global)
+// Renderer Tabel Markdown (Anti Jelek)
 renderer.table = ({ header, body }: any) => {
   return `<div class="zaidly-table-scroller"><table><thead>${header}</thead><tbody>${body}</tbody></table></div>`;
 };
 
-renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
-  const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
-  return `<h${depth} id="${id}">${text}</h${depth}>`;
-};
-
-// --- FUNGSI SAKTI: Bongkar Sel Tabel Sanity (Anti [object Object]) ---
-const renderCellContent = (cell: any) => {
+// --- FUNGSI SAKTI: Bongkar [object Object] Sampai Akar ---
+const superParse = (cell: any): string => {
+  if (!cell) return '';
   if (typeof cell === 'string') return cell;
-  if (typeof cell === 'object' && cell !== null) {
-    // Jika ada text property (Sanity standard)
-    if (cell.text) return cell.text;
-    // Jika nested children (Rich Text di dalam sel)
-    if (Array.isArray(cell.children)) {
-      return cell.children.map((child: any) => child.text || '').join('');
-    }
+  
+  // Jika Sanity kirim array (Rich Text dalam sel)
+  if (Array.isArray(cell)) {
+    return cell.map(c => superParse(c)).join('');
   }
-  return '';
+  
+  // Jika objek, cari field text atau bongkar children
+  if (typeof cell === 'object') {
+    if (cell.text) return cell.text;
+    if (cell.children) return superParse(cell.children);
+  }
+  
+  return String(cell);
 };
 
+// --- RENDERER TABEL SANITY (3 WARNA + ANTI OBJECT) ---
 const RenderSanityTable = ({ value }: any) => {
   if (!value || !value.rows || value.rows.length === 0) return null;
   return (
@@ -42,15 +43,15 @@ const RenderSanityTable = ({ value }: any) => {
         <thead>
           <tr>
             {value.rows[0]?.cells?.map((cell: any, i: number) => (
-              <th key={i}>{renderCellContent(cell)}</th>
+              <th key={i}>{superParse(cell)}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {value.rows.slice(1).map((row: any, i: number) => (
-            <tr key={i}>
+            <tr key={i} className={i % 2 === 0 ? 'even' : 'odd'}>
               {row.cells?.map((cell: any, j: number) => (
-                <td key={j}>{renderCellContent(cell)}</td>
+                <td key={j}>{superParse(cell)}</td>
               ))}
             </tr>
           ))}
@@ -64,13 +65,13 @@ const components = {
   block: {
     normal: ({ node, children }: any) => {
       const rawText = node.children?.map((c: any) => c.text).join('') || '';
-      // PROTEKSI TOMBOL LAMA: Biarkan Astro render {% %}
+      // Proteksi tombol artikel lama {% %}
       if (rawText.includes('{%')) return <>{children}</>;
-
+      
       const isMarkdown = rawText.includes('|') || /^#{1,6}\s/m.test(rawText) || rawText.includes('**');
       if (isMarkdown) {
         const html = marked.parse(rawText, { renderer }) as string;
-        return <section className="zaidly-markdown-gate" dangerouslySetInnerHTML={{ __html: html }} />;
+        return <section className="zaidly-md-content" dangerouslySetInnerHTML={{ __html: html }} />;
       }
       return <p className="zaidly-p">{children}</p>;
     },
@@ -123,8 +124,7 @@ const components = {
     },
     affiliateButton: ({ value }: any) => {
       const label = value.label || 'CHECK PRICE';
-      const store = value.storeId || '';
-      const isAli = store === 'aliexpress' || label.toLowerCase().includes('ali');
+      const isAli = value.storeId === 'aliexpress' || label.toLowerCase().includes('ali');
       return (
         <div className="btn-stack inline">
           {isAli ? <div className="ali-logo"><span>Ali</span>Express</div> : <div className="amz-logo">amazon<div className="amz-arrow"></div></div>}
@@ -145,29 +145,27 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
   return (
     <div className={`zaidly-master-wrapper ${isClient ? 'is-ready' : ''}`}>
       <style dangerouslySetInnerHTML={{ __html: `
-        .zaidly-master-wrapper { width: 100%; color: #000; line-height: 1.8; }
+        .zaidly-master-wrapper { width: 100%; color: #000; }
         .zaidly-link, .zaidly-master-wrapper a { color: #d97706 !important; font-weight: 800; text-decoration: underline; }
-        .zaidly-quote, .zaidly-master-wrapper blockquote { border-left: 5px solid #d97706; padding: 15px 20px; background: #fffcf0; margin: 2rem 0; font-style: italic; border-radius: 0 8px 8px 0; }
+        .zaidly-quote { border-left: 5px solid #d97706; padding: 15px 25px; background: #fffcf0; margin: 2rem 0; border-radius: 0 10px 10px 0; font-style: italic; }
 
-        /* TABEL 3-WARNA (GLOBAL FIX) */
+        /* TABEL 3-WARNA (HEADER COKELAT, GANJIL KREM, GENAP PUTIH) */
         .zaidly-table-scroller { width: 100%; overflow-x: auto; margin: 2.5rem 0; border-radius: 12px; border: 1px solid #eee; -webkit-overflow-scrolling: touch; background: #fff; }
         .zaidly-table-scroller table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        .zaidly-table-scroller th { background: #3C2F2F !important; color: #fff !important; padding: 14px 16px; text-align: left; text-transform: uppercase; font-size: 13px; }
+        .zaidly-table-scroller td { padding: 12px 16px; border-bottom: 1px solid #f0f0f0; color: #4a3728; font-weight: 600; }
         
-        /* WARNA 1: HEADER (COKELAT) */
-        .zaidly-table-scroller th { background: #3C2F2F !important; color: #fff !important; padding: 16px; text-align: left; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; border: none; }
-        
-        .zaidly-table-scroller td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; color: #4a3728; font-weight: 600; }
-        
-        /* WARNA 2 & 3: ZEBRA (GANJIL KREM, GENAP PUTIH) */
-        .zaidly-table-scroller tr:nth-child(even) { background-color: #ffffff; }
-        .zaidly-table-scroller tr:nth-child(odd) { background-color: #f9f7f5; }
+        /* ZEBRA STRIPES */
+        .zaidly-table-scroller tr.odd { background-color: #f9f7f5; }
+        .zaidly-table-scroller tr.even { background-color: #ffffff; }
 
-        /* BUTTON & LOGO */
+        /* BUTTON & LOGO PANAH */
         .btn-stack { display: inline-flex; flex-direction: column; align-items: center; width: 155px; margin-right: 18px; margin-bottom: 25px; vertical-align: top; }
-        .amz-logo { color: #000; font-weight: 900; font-size: 18px; position: relative; font-family: sans-serif; height: 35px; display: flex; align-items: center; }
+        .amz-logo { color: #000; font-weight: 900; font-size: 18px; position: relative; height: 35px; display: flex; align-items: center; }
         .amz-arrow { width: 100%; height: 5px; border-bottom: 2.5px solid #ff9900; border-radius: 0 0 50% 50%; margin-top: -6px; }
         .z-btn { width: 100%; padding: 12px 5px; border-radius: 6px; font-weight: 900; font-size: 11px; text-align: center; display: block; text-decoration: none; }
         .amz-bg { background: #ff9900; color: #000; }
+        .ali-bg { background: #e62e04; color: #fff; }
 
         .zaidly-card { margin: 3rem 0; padding: 2.2rem; border: 1.5px solid #eee; border-radius: 16px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
         .card-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 1.2rem; color: #4a3728; }
