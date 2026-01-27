@@ -5,40 +5,43 @@ import { useState, useEffect } from 'react';
 
 const renderer = new marked.Renderer();
 
-// Link Cerah Menyala
+// 1. LINK BERWARNA CERAH (#d97706)
 renderer.link = ({ href, title, text }: any) => {
   return `<a href="${href}" title="${title || ''}" class="zaidly-inline-link">${text}</a>`;
 };
 
-// PENTING: Renderer Heading Markdown agar TOC tidak hilang!
+// 2. HEADINGS UNTUK TOC
 renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
   const cleanText = text.replace(/<[^>]*>/g, '');
   const id = cleanText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
   return `<h${depth} id="${id}" class="zaidly-h${depth}" style="scroll-margin-top: 120px;">${text}</h${depth}>`;
 };
 
+// 3. RENDER TABEL MODERN DENGAN WARNA BARIS BERBEDA (ZEBRA STRIPES)
 const RenderSanityTable = ({ value }: any) => {
   if (!value || !value.rows) return null;
   return (
-    <div className="zaidly-table-responsive">
-      <table>
-        <thead>
-          <tr>
-            {value.rows[0]?.cells?.map((cell: string, i: number) => (
-              <th key={i}>{cell}</th>
-            ))}
-          </tr>
-        </thead>
-        <tbody>
-          {value.rows.slice(1).map((row: any, i: number) => (
-            <tr key={i}>
-              {row.cells?.map((cell: string, j: number) => (
-                <td key={j}>{cell}</td>
+    <div className="zaidly-table-container">
+      <div className="zaidly-table-scroll-wrapper">
+        <table className="zaidly-custom-table">
+          <thead>
+            <tr>
+              {value.rows[0]?.cells?.map((cell: string, i: number) => (
+                <th key={i}>{cell}</th>
               ))}
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+          <tbody>
+            {value.rows.slice(1).map((row: any, i: number) => (
+              <tr key={i} className={i % 2 === 0 ? 'row-even' : 'row-odd'}>
+                {row.cells?.map((cell: string, j: number) => (
+                  <td key={j}>{cell}</td>
+                ))}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };
@@ -60,14 +63,21 @@ const components = {
   block: {
     normal: ({ node, children }: any) => {
       const rawText = node.children?.map((c: any) => c.text).join('') || '';
-      if (rawText.includes('{%')) return <p className="zaidly-normal-p">{children}</p>;
+      
+      // FIX BUTTON ARTIKEL LAMA: Jangan biarkan 'marked' menyentuh shortcode {% %}
+      if (rawText.includes('{%')) return <p className="zaidly-legacy-shortcode">{children}</p>;
+
       const isMarkdown = rawText.includes('|') || /^#{1,6}\s/m.test(rawText) || rawText.includes('**');
       if (isMarkdown) {
         const html = marked.parse(rawText, { renderer }) as string;
-        return <section className="zaidly-markdown-area zaidly-table-responsive" dangerouslySetInnerHTML={{ __html: html }} />;
+        return <section className="zaidly-markdown-area" dangerouslySetInnerHTML={{ __html: html }} />;
       }
       return <p className="zaidly-normal-p">{children}</p>;
     },
+    // BLOCKQUOTE BERWARNA
+    blockquote: ({ children }: any) => (
+      <blockquote className="zaidly-quote">{children}</blockquote>
+    ),
     h2: ({ children }: any) => {
       const text = children.toString();
       const id = text.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
@@ -146,16 +156,25 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
   return (
     <div className={`portable-text-wrapper ${isClient ? 'is-hydrated' : ''}`}>
       <style dangerouslySetInnerHTML={{ __html: `
-        .portable-text-wrapper { display: block; width: 100%; color: #000; overflow: hidden; }
-        .zaidly-inline-link { color: #d97706 !important; text-decoration: underline; font-weight: 800; }
+        .portable-text-wrapper { display: block; width: 100%; color: #000; }
+        
+        /* WARNA LINK & QUOTE */
+        .zaidly-inline-link, .zaidly-markdown-area a { color: #d97706 !important; text-decoration: underline; font-weight: 800; }
+        .zaidly-quote { border-left: 5px solid #d97706; padding: 10px 20px; background: #fef3c7; font-style: italic; margin: 20px 0; border-radius: 0 8px 8px 0; }
 
-        /* TABEL MODERN & GULIR SAMPING */
-        .zaidly-table-responsive { width: 100%; overflow-x: auto; margin: 2rem 0; border-radius: 12px; border: 1px solid #eee; -webkit-overflow-scrolling: touch; }
-        .zaidly-table-responsive table { width: 100%; border-collapse: collapse; min-width: 500px; }
-        .zaidly-table-responsive th { background: #3C2F2F !important; color: #fff !important; padding: 14px 16px; text-align: left; font-size: 13px; text-transform: uppercase; white-space: nowrap; }
-        .zaidly-table-responsive td { padding: 12px 16px; border-bottom: 1px solid #eee; font-weight: 600; color: #4a3728; font-size: 15px; }
+        /* FIX TABEL: Hanya tabel yang bisa digulir */
+        .zaidly-table-container { margin: 2rem 0; width: 100%; }
+        .zaidly-table-scroll-wrapper { width: 100%; overflow-x: auto; border-radius: 12px; border: 1px solid #eee; -webkit-overflow-scrolling: touch; }
+        
+        table.zaidly-custom-table { width: 100%; border-collapse: collapse; min-width: 600px; }
+        table.zaidly-custom-table th { background: #3C2F2F !important; color: #fff !important; padding: 14px 16px; text-align: left; font-size: 13px; text-transform: uppercase; }
+        table.zaidly-custom-table td { padding: 12px 16px; border-bottom: 1px solid #eee; font-weight: 600; color: #4a3728; }
+        
+        /* WARNA TABEL BERBEDA (ZEBRA) */
+        .row-even { background-color: #ffffff; }
+        .row-odd { background-color: #f9f7f5; }
 
-        /* BUTTON & LOGO PANAH */
+        /* BUTTON & LOGO */
         .zaidly-btn-container { display: inline-flex !important; flex-direction: column; align-items: center; width: 155px; margin-right: 20px; margin-bottom: 30px; vertical-align: top; }
         .no-margin { margin-right: 0 !important; margin-bottom: 0 !important; }
         .zaidly-logo-box { height: 35px; display: flex; align-items: center; margin-bottom: 8px; }
