@@ -55,6 +55,10 @@ if (isExternal) {
     // --- PENYEMPURNAAN DETEKSI HEADINGS (MARKDOWN & SANITY) ---
     headings = (visualData || []).flatMap((block: any) => {
         const rawText = block.children?.map((c: any) => c.text).join('') || '';
+        
+        // JANGAN SCAN jika mengandung tag legacy {% %} agar tidak merusak tombol/tabel lama
+        if (rawText.includes('{%')) return [];
+
         const isSanityHeading = /^h[1-6]$/.test(block.style || '');
         
         // 1. Tangkap heading resmi dari dropdown Sanity (H2, H3, dst)
