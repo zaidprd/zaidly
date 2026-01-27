@@ -5,33 +5,59 @@ import { useState, useEffect } from 'react';
 
 const renderer = new marked.Renderer();
 
-// Link Cerah Menyala (#d97706)
+// LINK CERAH (#d97706)
 renderer.link = ({ href, title, text }: any) => {
   return `<a href="${href}" title="${title || ''}" class="zaidly-inline-link">${text}</a>`;
 };
 
-// Heading ID untuk TOC
+// TABEL MARKDOWN CUSTOM RENDERER
+renderer.table = ({ header, body }: any) => {
+  return `
+    <div class="zaidly-table-wrapper">
+      <table class="zaidly-main-table">
+        <thead>${header}</thead>
+        <tbody>${body}</tbody>
+      </table>
+    </div>
+  `;
+};
+
 renderer.heading = ({ text, depth }: { text: string; depth: number }) => {
   const cleanText = text.replace(/<[^>]*>/g, '');
   const id = cleanText.toLowerCase().replace(/[^\w\s-]/g, '').replace(/\s+/g, '-').trim();
   return `<h${depth} id="${id}" class="zaidly-h${depth}" style="scroll-margin-top: 120px;">${text}</h${depth}>`;
 };
 
+const RenderStoreLogo = ({ store, label }: { store: string; label: string }) => {
+  const isAli = store === 'aliexpress' || label.toLowerCase().includes('ali');
+  return (
+    <div className="zaidly-logo-container">
+      {isAli ? (
+        <div className="ali-logo-brand"><span>Ali</span>Express</div>
+      ) : (
+        <div className="amz-logo-brand">
+          amazon
+          <div className="amz-arrow-icon"></div>
+        </div>
+      )}
+    </div>
+  );
+};
+
 const components = {
   block: {
     normal: ({ node, children }: any) => {
       const rawText = node.children?.map((c: any) => c.text).join('') || '';
-      
-      // Deteksi Markdown (Tabel, Heading manual, Bold, List)
-      const isMarkdown = rawText.includes('|') || /^#{1,6}\s/m.test(rawText) || /^\s*[-*+]\s+/m.test(rawText);
+      if (rawText.includes('{%')) return <p className="zaidly-normal-p">{children}</p>;
 
-      // Jika Rich Text murni atau ada tag legacy, jangan pakai marked
-      if (rawText.includes('{%') || (!isMarkdown && !rawText.includes('**'))) {
-        return <p className="zaidly-normal-p">{children}</p>;
+      // DETEKSI TABEL & MARKDOWN
+      const isMarkdown = rawText.includes('|') || /^#{1,6}\s/m.test(rawText) || rawText.includes('**');
+
+      if (isMarkdown) {
+        const html = marked.parse(rawText, { renderer }) as string;
+        return <section className="zaidly-markdown-area" dangerouslySetInnerHTML={{ __html: html }} />;
       }
-
-      const html = marked.parse(rawText, { renderer }) as string;
-      return <section className="zaidly-markdown-area" dangerouslySetInnerHTML={{ __html: html }} />;
+      return <p className="zaidly-normal-p">{children}</p>;
     },
     h2: ({ children }: any) => {
       const text = children.toString();
@@ -45,18 +71,15 @@ const components = {
     }
   },
   types: {
-    // GAMBAR R2 TETAP PAKAI LOGIKA _KEY YANG SUDAH BERHASIL
     image: ({ value }: any) => {
       const imageUrl = value.asset?.url || value.url || (value._key ? `https://r2.zaidly.com/blog/body-${value._key}.webp` : null);
       if (!imageUrl) return null;
       return (
         <div className="zaidly-img-box">
           <img src={imageUrl} alt={value.alt || ''} loading="lazy" />
-          {value.alt && <p className="zaidly-alt-caption">{value.alt}</p>}
         </div>
       );
     },
-    // PRODUCT REVIEW CARD MEWAH (DENGAN BINTANG & HARGA)
     productReviewCard: ({ value }: any) => {
       const rawRating = value.itemRating || 0;
       const stars = [1, 2, 3, 4, 5];
@@ -81,32 +104,23 @@ const components = {
               <span className="price-val">{value.itemPrice || 'Check'}</span>
             </div>
             <div className="zaidly-card-btns">
-              {value.amazonUrl && (
-                <div className="btn-wrap">
-                  <div className="amz-logo-mini">amazon<div className="smile-line"></div></div>
+               <div className="zaidly-btn-wrapper no-margin">
+                  <RenderStoreLogo store="amazon" label="amazon" />
                   <a href={value.amazonUrl} target="_blank" rel="nofollow" className="zaidly-btn amz">CHECK PRICE</a>
-                </div>
-              )}
+               </div>
             </div>
           </div>
         </div>
       );
     },
-    // TOMBOL STANDALONE SEJAJAR DENGAN LOGO DETAIL
     affiliateButton: ({ value }: any) => {
-      const label = (value.label || '').toLowerCase();
-      const isAli = value.storeId === 'aliexpress' || label.includes('ali');
+      const label = value.label || 'CHECK PRICE';
+      const store = value.storeId || '';
       return (
-        <div className="zaidly-btn-container">
-          <div className="zaidly-logo-box">
-            {isAli ? (
-              <div className="ali-logo-ui"><span>Ali</span>Express</div>
-            ) : (
-              <div className="amz-logo-ui">amazon<div className="smile-line"></div></div>
-            )}
-          </div>
-          <a href={value.url} target="_blank" rel="nofollow" className={`zaidly-btn ${isAli ? 'ali' : 'amz'}`}>
-            {(value.label || 'CHECK PRICE').toUpperCase()}
+        <div className="zaidly-btn-wrapper">
+          <RenderStoreLogo store={store} label={label} />
+          <a href={value.url} target="_blank" rel="nofollow" className={`zaidly-btn ${(store === 'aliexpress' || label.toLowerCase().includes('ali')) ? 'ali' : 'amz'}`}>
+            {label.toUpperCase()}
           </a>
         </div>
       );
@@ -123,50 +137,42 @@ export default function PortableVisualBlocks({ value }: { value: any }) {
     <div className={`portable-text-wrapper ${isClient ? 'is-hydrated' : ''}`}>
       <style dangerouslySetInnerHTML={{ __html: `
         .portable-text-wrapper { display: block; width: 100%; color: #000; }
-        
-        /* LINK CERAH */
         .zaidly-inline-link, .zaidly-markdown-area a { color: #d97706 !important; text-decoration: underline; font-weight: 800; }
 
-        /* TOMBOL SEJAJAR */
-        .zaidly-btn-container { display: inline-flex !important; flex-direction: column; align-items: center; width: 155px; margin-right: 20px; margin-bottom: 30px; vertical-align: top; }
-        .zaidly-logo-box { height: 35px; display: flex; align-items: center; margin-bottom: 8px; }
-        .zaidly-btn { width: 100%; padding: 12px 5px; border-radius: 6px; font-weight: 900; font-size: 11px; text-decoration: none; text-align: center; display: block; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        /* BUTTON SEJAJAR & LOGO */
+        .zaidly-btn-wrapper { display: inline-flex !important; flex-direction: column; align-items: center; width: 155px; margin-right: 20px; margin-bottom: 30px; vertical-align: top; }
+        .no-margin { margin-right: 0 !important; margin-bottom: 0 !important; }
+        .zaidly-logo-container { height: 35px; display: flex; align-items: center; margin-bottom: 8px; }
+        .amz-logo-brand { color: #000; font-weight: 900; font-size: 17px; font-family: sans-serif; position: relative; }
+        .amz-arrow-icon { width: 100%; height: 5px; border-bottom: 2.5px solid #ff9900; border-radius: 0 0 50% 50%; margin-top: -6px; }
+        .ali-logo-brand { color: #e62e04; font-weight: 900; font-size: 14px; }
+        .ali-logo-brand span { background: #e62e04; color: #fff; padding: 2px 5px; border-radius: 4px; margin-right: 3px; }
+        .zaidly-btn { width: 100%; padding: 12px 5px; border-radius: 6px; font-weight: 900; font-size: 11px; text-decoration: none; text-align: center; display: block; }
         .ali { background: #e62e04; color: #fff; }
         .amz { background: #ff9900; color: #000; }
 
-        /* LOGO DETAIL */
-        .ali-logo-ui { color: #e62e04; font-weight: 900; font-size: 14px; }
-        .ali-logo-ui span { background: #e62e04; color: #fff; padding: 2px 5px; border-radius: 4px; margin-right: 3px; }
-        .amz-logo-ui, .amz-logo-mini { color: #000; font-weight: 900; font-size: 17px; font-family: sans-serif; position: relative; }
-        .smile-line { width: 100%; height: 4px; border-bottom: 2.5px solid #ff9900; border-radius: 50%; margin-top: -6px; }
+        /* TABEL PREMIUM (HEADER COKELAT GELAP) */
+        .zaidly-table-wrapper { width: 100%; overflow-x: auto; margin: 2.5rem 0; border-radius: 12px; border: 1px solid #eee; }
+        table.zaidly-main-table { width: 100%; border-collapse: collapse; background: #fff; }
+        table.zaidly-main-table th { background: #3C2F2F !important; color: #fff !important; padding: 16px; text-align: left; font-size: 14px; text-transform: uppercase; letter-spacing: 0.5px; }
+        table.zaidly-main-table td { padding: 14px 16px; border-bottom: 1px solid #f0f0f0; color: #4a3728; font-weight: 600; font-size: 15px; }
+        table.zaidly-main-table tr:last-child td { border-bottom: none; }
 
-        /* PRODUCT REVIEW CARD MEWAH */
-        .zaidly-card-review { margin: 3rem 0; padding: 2rem; border: 1.5px solid #eee; border-radius: 16px; background: #fff; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        /* REVIEW CARD */
+        .zaidly-card-review { margin: 3rem 0; padding: 2rem; border: 1.5px solid #eee; border-radius: 16px; background: #fff; box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
         .zaidly-card-title { font-size: 1.8rem; font-weight: 900; margin-bottom: 1.5rem; color: #4a3728; }
-        .zaidly-card-content { display: flex; align-items: center; gap: 2.5rem; border-top: 1px solid #f5f5f5; padding-top: 1.5rem; }
-        .zaidly-stat { display: flex; flex-direction: column; }
-        .zaidly-label { font-size: 10px; font-weight: 900; color: #aaa; margin-bottom: 5px; }
-        .stars { font-size: 1.2rem; display: flex; gap: 2px; }
-        .score-num { font-weight: 900; font-style: italic; color: #4a3728; }
-        .price-val { font-size: 1.5rem; font-weight: 900; color: #4a3728; }
+        .zaidly-card-content { display: flex; align-items: center; gap: 2rem; border-top: 1px solid #f5f5f5; padding-top: 1.5rem; }
         .zaidly-divider { width: 1px; height: 50px; background: #eee; }
-        .zaidly-card-btns { margin-left: auto; }
-        .btn-wrap { display: flex; flex-direction: column; align-items: center; }
-
-        /* TABEL PREMIUM (HEADER COKELAT) */
-        table { width: 100%; border-collapse: collapse; margin: 2.5rem 0; border: 1px solid #eee; border-radius: 12px; overflow: hidden; }
-        th { background: #3C2F2F; color: #fff; padding: 16px; text-align: left; font-size: 13px; text-transform: uppercase; }
-        td { padding: 14px 16px; border-bottom: 1px solid #eee; font-weight: 600; color: #4a3728; }
+        .zaidly-label { font-size: 10px; font-weight: 900; color: #aaa; }
+        .score-num, .price-val { font-weight: 900; color: #4a3728; font-size: 1.2rem; }
 
         .zaidly-normal-p, .zaidly-markdown-area p { margin-bottom: 1.5rem; line-height: 1.8; font-size: 1.125rem; }
         .zaidly-img-box img { width: 100%; border-radius: 12px; border-bottom: 4px solid #4a3728; margin: 2rem 0; }
-        .zaidly-alt-caption { font-size: 13px; color: #6b7280; font-style: italic; text-align: center; margin-top: -1rem; margin-bottom: 2rem; }
 
         @media (max-width: 768px) {
-          .zaidly-card-content { flex-direction: column; align-items: flex-start; gap: 1.5rem; }
+          .zaidly-card-content { flex-direction: column; align-items: flex-start; }
           .zaidly-divider { display: none; }
-          .zaidly-card-btns { width: 100%; margin-left: 0; }
-          .zaidly-btn-container { width: 140px; margin-right: 10px; }
+          .zaidly-btn-wrapper { width: 140px; margin-right: 10px; }
         }
       ` }} />
       <PortableText value={value} components={components} />
